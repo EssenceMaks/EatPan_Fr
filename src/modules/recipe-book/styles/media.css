@@ -1,0 +1,46 @@
+/* media.css */
+/* Responsiveness states matrix for SPA */
+
+/* 1. 320px - 480px (Mobile) */
+@media (min-width: 320px) and (max-width: 480px) and (orientation: portrait) {
+    :root { --book-width: 98vw; --page-padding: 0.5rem; --grid-columns: 1; }
+    .side-tab { transform: scale(0.85); transform-origin: left center; }
+}
+@media (min-width: 320px) and (max-width: 480px) and (orientation: landscape) {
+    :root { --book-width: 95vw; --page-padding: 0.5rem; --grid-columns: 2; }
+    .side-tab { transform: scale(0.7); transform-origin: left center; }
+}
+
+/* 2. 481px - 700px (Large Mobile / Small Tablet) */
+@media (min-width: 481px) and (max-width: 700px) and (orientation: portrait) {
+    :root { --book-width: 95vw; --page-padding: 1rem; --grid-columns: 1; }
+}
+@media (min-width: 481px) and (max-width: 700px) and (orientation: landscape) {
+    :root { --book-width: 90vw; --page-padding: 1rem; --grid-columns: 2; }
+}
+
+/* 3. 701px - 900px (Tablet) */
+@media (min-width: 701px) and (max-width: 900px) and (orientation: portrait) {
+    :root { --book-width: 90vw; --page-padding: 1.5rem; --grid-columns: 2; }
+}
+@media (min-width: 701px) and (max-width: 900px) and (orientation: landscape) {
+    :root { --book-width: 85vw; --page-padding: 1.5rem; --grid-columns: 2; }
+}
+
+/* 4. 901px - 1200px (Desktop / Laptop) */
+@media (min-width: 901px) and (max-width: 1200px) and (orientation: portrait) {
+    :root { --book-width: 85vw; --page-padding: 2rem; --grid-columns: 2; }
+}
+@media (min-width: 901px) and (max-width: 1200px) and (orientation: landscape) {
+    :root { --book-width: 80vw; --page-padding: 2.5rem; --grid-columns: 3; }
+}
+
+/* 5. 1201px - 1400px (Large Desktop) */
+@media (min-width: 1201px) and (max-width: 1400px) {
+    :root { --book-width: 1100px; --page-padding: 3rem; --grid-columns: 3; }
+}
+
+/* 6. 1401px+ (Extra Large) */
+@media (min-width: 1401px) {
+    :root { --book-width: 1280px; --page-padding: 3rem; --grid-columns: 3; }
+}
