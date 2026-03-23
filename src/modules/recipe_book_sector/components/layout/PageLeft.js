@@ -125,8 +125,42 @@ export default class PageLeft extends Component {
                             <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="coffee" style="width:18px;"></i><span>Напої</span></button>
                         </div>
                         <div class="create-new-category">
-                            <input type="text" placeholder="Нова категорія...">
-                            <button class="create-new-cat-btn" type="button"><i data-lucide="plus" style="width:14px;height:14px;"></i></button>
+                            <button class="create-icon-preview" type="button" id="selected-cat-icon" onclick="window.toggleIconPicker()" title="Обрати іконку">
+                                <i data-lucide="help-circle" style="width:16px;"></i>
+                            </button>
+                            <input type="text" id="new-category-name" placeholder="Нова категорія...">
+                            <button class="create-new-cat-btn" type="button" onclick="window.addCustomCategory()"><i data-lucide="plus" style="width:14px;height:14px;"></i></button>
+                        </div>
+                        <div class="create-icon-picker" id="create-icon-picker">
+                            <button type="button" class="icon-pick-btn" data-icon="apple" onclick="window.pickCategoryIcon(this)"><i data-lucide="apple" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="banana" onclick="window.pickCategoryIcon(this)"><i data-lucide="banana" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="beef" onclick="window.pickCategoryIcon(this)"><i data-lucide="beef" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="beer" onclick="window.pickCategoryIcon(this)"><i data-lucide="beer" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="cake-slice" onclick="window.pickCategoryIcon(this)"><i data-lucide="cake-slice" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="candy" onclick="window.pickCategoryIcon(this)"><i data-lucide="candy" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="carrot" onclick="window.pickCategoryIcon(this)"><i data-lucide="carrot" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="cherry" onclick="window.pickCategoryIcon(this)"><i data-lucide="cherry" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="coffee" onclick="window.pickCategoryIcon(this)"><i data-lucide="coffee" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="cookie" onclick="window.pickCategoryIcon(this)"><i data-lucide="cookie" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="croissant" onclick="window.pickCategoryIcon(this)"><i data-lucide="croissant" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="cup-soda" onclick="window.pickCategoryIcon(this)"><i data-lucide="cup-soda" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="drumstick" onclick="window.pickCategoryIcon(this)"><i data-lucide="drumstick" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="egg-fried" onclick="window.pickCategoryIcon(this)"><i data-lucide="egg-fried" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="fish" onclick="window.pickCategoryIcon(this)"><i data-lucide="fish" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="grape" onclick="window.pickCategoryIcon(this)"><i data-lucide="grape" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="ham" onclick="window.pickCategoryIcon(this)"><i data-lucide="ham" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="ice-cream-cone" onclick="window.pickCategoryIcon(this)"><i data-lucide="ice-cream-cone" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="leaf" onclick="window.pickCategoryIcon(this)"><i data-lucide="leaf" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="milk" onclick="window.pickCategoryIcon(this)"><i data-lucide="milk" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="nut" onclick="window.pickCategoryIcon(this)"><i data-lucide="nut" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="pizza" onclick="window.pickCategoryIcon(this)"><i data-lucide="pizza" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="salad" onclick="window.pickCategoryIcon(this)"><i data-lucide="salad" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="sandwich" onclick="window.pickCategoryIcon(this)"><i data-lucide="sandwich" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="shrimp" onclick="window.pickCategoryIcon(this)"><i data-lucide="shrimp" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="soup" onclick="window.pickCategoryIcon(this)"><i data-lucide="soup" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="utensils" onclick="window.pickCategoryIcon(this)"><i data-lucide="utensils" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="wheat" onclick="window.pickCategoryIcon(this)"><i data-lucide="wheat" style="width:14px;"></i></button>
+                            <button type="button" class="icon-pick-btn" data-icon="wine" onclick="window.pickCategoryIcon(this)"><i data-lucide="wine" style="width:14px;"></i></button>
                         </div>
                     </section>
                 </div>

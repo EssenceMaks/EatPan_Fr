@@ -6,17 +6,17 @@
 
 ### Точки входу
 
-| Елемент | Розташування | Дія |
-|---------|-------------|-----|
-| Стрічка «Створити рецепт» | Закладка зверху книги (bookmark-btn) | `window.toggleCreateRecipe()` — новий рецепт |
-| Пір'їнко (feather) | Бічна вкладка справа внизу (side-tabs--right-bottom) | `window.toggleCreateRecipe()` — редагування поточного |
+| Елемент                   | Розташування                                         | Дія                                                   |
+| ------------------------- | ---------------------------------------------------- | ----------------------------------------------------- |
+| Стрічка «Створити рецепт» | Закладка зверху книги (bookmark-btn)                 | `window.toggleCreateRecipe()` — новий рецепт          |
+| Пір'їнко (feather)        | Бічна вкладка справа внизу (side-tabs--right-bottom) | `window.toggleCreateRecipe()` — редагування поточного |
 
 ### Ліва сторінка (PageLeft overlay)
 
 - **Заголовок:** «Новий рецепт»
 - **Додати до книги** — чекбокси: Всі рецепти, Особисті, Гості, Заклади
-- **Категорія** — сітка кнопок з іконками Lucide (Супи, М'ясо, Птиця, Риба, Морепродукти, Паста, Салати, Випічка, Десерти, Напої)
-- **Нова категорія** — текстове поле + кнопка «+» для створення власної категорії
+- **Категорія** — сітка кнопок з іконками Lucide (Супи, М'ясо, Птиця, Риба, Морепродукти, Паста, Салати, Випічка, Десерти, Напої). **Мульти-вибір** — можна обрати кілька категорій, повторне натискання знімає вибір
+- **Нова категорія** — кнопка preview іконки + picker з 29 Lucide іконками їжі/напоїв + текстове поле + кнопка «+». Нова категорія додається в сітку з обраною іконкою
 
 ### Права сторінка (PageRight overlay)
 
@@ -30,6 +30,12 @@
 - **Подача** — textarea з рекомендацією до подачі
 - **Дії:** «Зберегти в книгу» (brand-red) + «Скасувати»
 
+### Анімація та UX (v0.3.0)
+
+- **Page flip** — при переході в/з режиму створення сторінки виконують 3D flip-анімацію (rotateY через spine, 600ms). Контент перемикається на 300ms (середина анімації)
+- **Bookmark кнопка** — динамічно змінює іконку (`feather` ↔ `arrow-left`) та текст («Створити рецепт» ↔ «До рецептів»)
+- **Тонкий скролбар** — 4px scrollbar на overlay-формах. Права сторінка: скролбар зліва (біля spine, через `direction: rtl`). Ліва: справа (біля spine, default)
+
 ### Технічна реалізація
 
 - CSS клас `.book--create-mode` на `.book-cover` перемикає видимість overlay
@@ -37,16 +43,17 @@
 - Бічні вкладки та нижні стрічки ховаються в create-режимі
 - Lucide іконки переініціалізуються після toggle (`lucide.createIcons()`)
 - Всі onclick функції зареєстровані на `window.*` (паттерн проєкту)
+- Flip анімація: CSS keyframes `flip-left` / `flip-right` + JS клас `.page--flipping` з таймаутами
 
 ### Файли
 
-| Файл | Що містить |
-|------|-----------|
-| `src/modules/recipe-book/components/layout/PageLeft.js` | Overlay лівої сторінки (книги + категорії) |
-| `src/modules/recipe-book/components/layout/PageRight.js` | Overlay правої сторінки (форма рецепту) |
-| `src/modules/recipe-book/components/layout/Book.js` | Bookmark onclick → `toggleCreateRecipe()` |
-| `src/modules/recipe-book/styles/create-recipe.css` | Всі стилі режиму створення |
-| `main.js` | `window.toggleCreateRecipe`, `selectCategory`, `addIngredientRow`, `addStepRow`, `saveRecipe` |
+| Файл                                                     | Що містить                                                                                                                                                 |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/modules/recipe-book/components/layout/PageLeft.js`  | Overlay лівої сторінки (книги + категорії)                                                                                                                 |
+| `src/modules/recipe-book/components/layout/PageRight.js` | Overlay правої сторінки (форма рецепту)                                                                                                                    |
+| `src/modules/recipe-book/components/layout/Book.js`      | Bookmark onclick → `toggleCreateRecipe()`                                                                                                                  |
+| `src/modules/recipe-book/styles/create-recipe.css`       | Всі стилі режиму створення                                                                                                                                 |
+| `main.js`                                                | `window.toggleCreateRecipe`, `selectCategory`, `addIngredientRow`, `addStepRow`, `saveRecipe`, `toggleIconPicker`, `pickCategoryIcon`, `addCustomCategory` |
 
 ---
 
