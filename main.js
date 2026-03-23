@@ -422,15 +422,82 @@ window.toggleEdit = function() {
 
 window.toggleCreateRecipe = function() {
     const bookCover = document.querySelector('.book-cover');
-    if (bookCover) {
+    if (!bookCover) return;
+
+    const pages = bookCover.querySelectorAll('.page');
+    if (bookCover.querySelector('.page--flipping')) return;
+
+    pages.forEach(p => p.classList.add('page--flipping'));
+
+    setTimeout(() => {
         bookCover.classList.toggle('book--create-mode');
+        const isCreate = bookCover.classList.contains('book--create-mode');
+        const btn = bookCover.querySelector('.bookmark-btn');
+        if (btn) {
+            const ico = btn.querySelector('[data-lucide]');
+            const txt = btn.querySelector('.bookmark-text');
+            if (isCreate) {
+                ico.setAttribute('data-lucide', 'arrow-left');
+                txt.textContent = 'До рецептів';
+            } else {
+                ico.setAttribute('data-lucide', 'feather');
+                txt.textContent = 'Створити рецепт';
+            }
+        }
+        lucide.createIcons();
+    }, 300);
+
+    setTimeout(() => {
+        pages.forEach(p => p.classList.remove('page--flipping'));
+    }, 600);
+};
+
+window.selectCategory = function(btn) {
+    btn.classList.toggle('selected');
+};
+
+window.toggleIconPicker = function() {
+    const picker = document.getElementById('create-icon-picker');
+    if (picker) picker.classList.toggle('show');
+};
+
+window.pickCategoryIcon = function(btn) {
+    document.querySelectorAll('.icon-pick-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    const iconName = btn.dataset.icon;
+    const preview = document.getElementById('selected-cat-icon');
+    if (preview) {
+        preview.querySelector('[data-lucide]').setAttribute('data-lucide', iconName);
+        preview.classList.add('has-icon');
         lucide.createIcons();
     }
 };
 
-window.selectCategory = function(btn) {
-    document.querySelectorAll('.create-cat-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
+window.addCustomCategory = function() {
+    const nameInput = document.getElementById('new-category-name');
+    const selectedIcon = document.querySelector('.icon-pick-btn.selected');
+    const name = nameInput ? nameInput.value.trim() : '';
+    if (!name) return;
+    const iconName = selectedIcon ? selectedIcon.dataset.icon : 'utensils';
+    const grid = document.querySelector('.create-category-grid');
+    if (!grid) return;
+
+    const btn = document.createElement('button');
+    btn.className = 'create-cat-btn selected';
+    btn.type = 'button';
+    btn.setAttribute('onclick', 'window.selectCategory(this)');
+    btn.innerHTML = '<i data-lucide="' + iconName + '" style="width:18px;"></i><span>' + name + '</span>';
+    grid.appendChild(btn);
+
+    nameInput.value = '';
+    document.querySelectorAll('.icon-pick-btn').forEach(b => b.classList.remove('selected'));
+    const preview = document.getElementById('selected-cat-icon');
+    if (preview) {
+        preview.querySelector('[data-lucide]').setAttribute('data-lucide', 'help-circle');
+        preview.classList.remove('has-icon');
+    }
+    document.getElementById('create-icon-picker').classList.remove('show');
+    lucide.createIcons();
 };
 
 window.addIngredientRow = function() {

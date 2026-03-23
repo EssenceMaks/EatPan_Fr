@@ -5,6 +5,30 @@
 
 ---
 
+## [0.3.0] - 2026-03-23
+
+### Added
+
+- **Анімація гортання сторінок** — при переході в режим створення рецепту та назад обидві сторінки книги виконують 3D flip-анімацію (rotateY через spine), імітуючи гортання сторінок. CSS keyframes `flip-left` / `flip-right` з `perspective(1200px)`.
+- **Вибір іконки для нової категорії** — при створенні користувацької категорії відкривається picker з 29 Lucide іконками їжі та напоїв (apple, banana, beef, beer, cake-slice, candy, carrot, cherry, coffee, cookie, croissant, cup-soda, drumstick, egg-fried, fish, grape, ham, ice-cream-cone, leaf, milk, nut, pizza, salad, sandwich, shrimp, soup, utensils, wheat, wine).
+- **Тонкий скролбар в режимі створення** — видимий 4px скролбар на overlay-формах. На правій сторінці (форма рецепту) скролбар зліва (біля spine), на лівій (категорії) — справа (біля spine). Реалізовано через `direction: rtl` трік.
+
+### Changed
+
+- **Bookmark кнопка динамічна** — в режимі створення іконка змінюється з `feather` на `arrow-left`, текст з «Створити рецепт» на «До рецептів». При поверненні — відновлюється.
+- **Мульти-вибір категорій** — `selectCategory()` тепер toggle (можна обрати кілька категорій одночасно, повторне натискання знімає вибір).
+- **Нова категорія з іконкою** — замість простого текстового поля тепер є preview-кнопка обраної іконки + picker + поле назви + кнопка додавання. Нова категорія додається в сітку з обраною іконкою і автоматично виділяється.
+
+### Documentation
+
+- Оновлено `CHANGELOG.md` — додано запис [0.3.0].
+- Оновлено `docs/features/recipe-creation.md` — додано опис анімації, icon picker, мульти-вибору.
+
+**Назва коміту:**
+`feat: page flip animation, multi-select categories, icon picker, scrollbar UX`
+
+---
+
 ## [0.2.0] - 2026-03-23
 
 ### Added
