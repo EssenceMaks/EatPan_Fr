@@ -1,4 +1,4 @@
-import BookModule from './src/modules/recipe-book/BookModule.js';
+import BookModule from './src/modules/recipe_book_sector/BookModule.js';
 
 // --- ALL JS LOGIC FROM EatPan_SPA.html ---
 

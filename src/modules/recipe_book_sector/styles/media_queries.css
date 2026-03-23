@@ -1,10 +1,10 @@
-/* media.css */
-/* Responsiveness states matrix for SPA */
+/* media_queries.css */
+/* Матриця станів адаптивності для SPA */
 
 /* =========================================
-   1. МЕЛКИЕ СМАРТФОНЫ (320px - 479px)
+   1. ДРІБНІ СМАРТФОНИ (320px - 479px)
    ========================================= */
-/* Портретная (вертикально) */
+/* Портретна (вертикальна) */
 @media (min-width: 320px) and (max-width: 479px) and (orientation: portrait) {
     :root { 
         --book-width: 98vw; 
@@ -15,7 +15,7 @@
     .side-tab { transform: scale(0.85); transform-origin: left center; }
 }
 
-/* Альбомная (горизонтально) */
+/* Альбомна (горизонтальна) */
 @media (min-width: 320px) and (max-width: 479px) and (orientation: landscape) {
     :root { 
         --book-width: min(100vw, calc((100vh - var(--header-height) * 2 - 20px) * 1.4));
@@ -28,9 +28,9 @@
 }
 
 /* =========================================
-   2. КРУПНЫЕ СМАРТФОНЫ (480px - 767px)
+   2. КРУПНІ СМАРТФОНИ (480px - 767px)
    ========================================= */
-/* Портретная */
+/* Портретна */
 @media (min-width: 480px) and (max-width: 767px) and (orientation: portrait) {
     :root { 
         --book-width: 95vw; 
@@ -40,7 +40,7 @@
     }
 }
 
-/* Альбомная */
+/* Альбомна */
 @media (min-width: 480px) and (max-width: 767px) and (orientation: landscape) {
     :root { 
         --book-width: min(100vw, calc((100vh - var(--header-height) * 2 - 20px) * 1.4));
@@ -52,9 +52,9 @@
 }
 
 /* =========================================
-   3. ПЛАНШЕТЫ (768px - 1023px)
+   3. ПЛАНШЕТИ (768px - 1023px)
    ========================================= */
-/* Портретная: ВМЕЩАТЬ ПО ШИРИНЕ */
+/* Портретна: ВМІЩАТИ ПО ШИРИНІ */
 @media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
     :root { 
         --book-width: 93vw; 
@@ -65,7 +65,7 @@
     .book-wrapper { width: var(--book-width); max-width: 100%; height: auto; }
 }
 
-/* Альбомная: ВМЕЩАТЬ ПО ВЫСОТЕ */
+/* Альбомна: ВМІЩАТИ ПО ВИСОТІ */
 @media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
     :root { 
         --header-height: clamp(50px, 12vh, 80px);
@@ -84,12 +84,12 @@
 }
 
 /* =========================================
-   4. БОЛЬШИЕ ПЛАНШЕТЫ И НЕТБУКИ (1024px - 1199px)
+   4. ВЕЛИКІ ПЛАНШЕТИ ТА НЕТБУКИ (1024px - 1199px)
    ========================================= */
-/* Портретная: ВМЕЩАТЬ ПО ШИРИНЕ */
+/* Портретна: ВМІЩАТИ ПО ШИРИНІ */
 @media (min-width: 1024px) and (max-width: 1199px) and (orientation: portrait) {
     :root { 
-        --book-width: 93vw; 
+        --book-width: 93vw; /* Строго по ширині */
         --page-padding: 2rem; 
         --grid-columns: 2; 
         --header-height: clamp(60px, 10vh, 80px);
@@ -97,7 +97,7 @@
     .book-wrapper { width: var(--book-width); max-width: 100%; height: auto; }
 }
 
-/* Альбомная: ВМЕЩАТЬ ПО ВЫСОТЕ */
+/* Альбомна: ВМІЩАТИ ПО ВИСОТІ */
 @media (min-width: 1024px) and (max-width: 1199px) and (orientation: landscape) {
     :root { 
         --header-height: clamp(60px, 12vh, 80px);
@@ -116,9 +116,9 @@
 }
 
 /* =========================================
-   5. ДЕСКТОПЫ (1200px - 1439px)
+   5. ДЕСКТОПИ (1200px - 1439px)
    ========================================= */
-/* ВМЕЩАТЬ ПО ВЫСОТЕ */
+/* ВМІЩАТИ ПО ВИСОТІ */
 @media (min-width: 1200px) and (max-width: 1439px) {
     :root { 
         --header-height: clamp(60px, 12vh, 80px);
@@ -137,9 +137,9 @@
 }
 
 /* =========================================
-   6. ШИРОКИЕ ЭКРАНЫ (1440px - 1919px)
+   6. ШИРОКІ ЕКРАНИ (1440px - 1919px)
    ========================================= */
-/* ВМЕЩАТЬ ПО ВЫСОТЕ */
+/* ВМІЩАТИ ПО ВИСОТІ */
 @media (min-width: 1440px) and (max-width: 1919px) {
     :root { 
         --header-height: clamp(60px, 12vh, 80px);
@@ -157,9 +157,9 @@
 }
 
 /* =========================================
-   7. FULLHD И ВЫШЕ (1920px+)
+   7. FULLHD ТА ВИЩЕ (1920px+)
    ========================================= */
-/* ВМЕЩАТЬ ПО ВЫСОТЕ */
+/* ВМІЩАТИ ПО ВИСОТІ */
 @media (min-width: 1920px) {
     :root { 
         --header-height: clamp(60px, 12vh, 80px);
