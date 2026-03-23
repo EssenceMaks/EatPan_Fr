@@ -420,6 +420,56 @@ window.toggleEdit = function() {
     document.getElementById('edit-modal').classList.toggle('hidden');
 };
 
+window.toggleCreateRecipe = function() {
+    const bookCover = document.querySelector('.book-cover');
+    if (bookCover) {
+        bookCover.classList.toggle('book--create-mode');
+        lucide.createIcons();
+    }
+};
+
+window.selectCategory = function(btn) {
+    document.querySelectorAll('.create-cat-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+};
+
+window.addIngredientRow = function() {
+    const list = document.getElementById('create-ingredients-list');
+    if (!list) return;
+    const row = document.createElement('div');
+    row.className = 'create-ingredient-row';
+    row.innerHTML = `
+        <input type="text" class="create-ing-name" placeholder="Інгредієнт">
+        <input type="text" class="create-ing-amount" placeholder="К-сть">
+        <button type="button" class="create-remove-btn" onclick="this.parentElement.remove()"><i data-lucide="x" style="width:12px;"></i></button>
+    `;
+    list.appendChild(row);
+    lucide.createIcons();
+};
+
+window.addStepRow = function() {
+    const list = document.getElementById('create-steps-list');
+    if (!list) return;
+    const count = list.children.length + 1;
+    const row = document.createElement('div');
+    row.className = 'create-step-row';
+    row.innerHTML = `
+        <div class="create-step-num">${String(count).padStart(2, '0')}</div>
+        <div class="create-step-fields">
+            <input type="text" placeholder="Назва кроку">
+            <textarea placeholder="Опис кроку..." rows="2"></textarea>
+        </div>
+        <button type="button" class="create-remove-btn" onclick="this.parentElement.remove()"><i data-lucide="x" style="width:12px;"></i></button>
+    `;
+    list.appendChild(row);
+    lucide.createIcons();
+};
+
+window.saveRecipe = function() {
+    console.log('Recipe saved (mock)');
+    window.toggleCreateRecipe();
+};
+
 
 // INIT
 document.addEventListener('DOMContentLoaded', async () => {

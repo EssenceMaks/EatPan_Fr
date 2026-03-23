@@ -9,8 +9,12 @@ Thumbs.db
 # Logs
 *.log
 
-# Node (если появится в будущем)
+# Node (if it appears in the future)
 node_modules/
 
 # Archive
 _archive/
+
+# Other folders
+audio/
+
