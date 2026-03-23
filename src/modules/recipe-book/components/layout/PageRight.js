@@ -107,12 +107,77 @@ export default class PageRight extends Component {
                 </div>
                 <!-- RIGHT SIDE VARIANT TABS -->
                 <aside class="side-tabs-container side-tabs--right-bottom">
-                    <div class="side-tab--right" title="Редагувати"><i data-lucide="feather" style="width: 16px;"></i></div>
+                    <div class="side-tab--right" title="Редагувати" onclick="window.toggleCreateRecipe()"><i data-lucide="feather" style="width: 16px;"></i></div>
                     <div class="side-tab--right" title="Роздрукувати"><i data-lucide="printer" style="width: 16px;"></i></div>
                     <div class="side-tab--right active"><span>1 в.</span></div>
                     <div class="side-tab--right"><span>2 в.</span></div>
                     <div class="side-tab--right" title="Додати варіант"><i data-lucide="plus" style="width: 16px;"></i></div>
                 </aside>
+                <!-- CREATE MODE OVERLAY -->
+                <div class="create-mode-content">
+                    <div class="create-recipe-form">
+                        <input type="text" class="create-input-title" placeholder="Назва рецепту">
+                        <input type="text" class="create-input-subtitle" placeholder="Короткий опис (напр. Хрусткі та соковиті)">
+                        <div class="create-image-upload" onclick="this.querySelector('input[type=file]').click()">
+                            <i data-lucide="image-plus" style="width:32px;height:32px;"></i>
+                            <span>Додати фото</span>
+                            <input type="file" accept="image/*" style="display:none;">
+                        </div>
+                        <div class="create-stats-row">
+                            <div class="create-stat-input">
+                                <i data-lucide="clock" style="width:14px;"></i>
+                                <input type="text" placeholder="45 хв">
+                            </div>
+                            <div class="create-stat-input">
+                                <i data-lucide="users" style="width:14px;"></i>
+                                <input type="text" placeholder="4 порції">
+                            </div>
+                        </div>
+                        <section>
+                            <h3 class="section-title">Інгредієнти</h3>
+                            <div id="create-ingredients-list">
+                                <div class="create-ingredient-row">
+                                    <input type="text" class="create-ing-name" placeholder="Інгредієнт">
+                                    <input type="text" class="create-ing-amount" placeholder="К-сть">
+                                    <button type="button" class="create-remove-btn" onclick="this.parentElement.remove()"><i data-lucide="x" style="width:12px;"></i></button>
+                                </div>
+                            </div>
+                            <button type="button" class="create-add-row-btn" onclick="window.addIngredientRow()">
+                                <i data-lucide="plus" style="width:12px;"></i> Додати інгредієнт
+                            </button>
+                        </section>
+                        <section>
+                            <h3 class="section-title">Процес приготування</h3>
+                            <div id="create-steps-list">
+                                <div class="create-step-row">
+                                    <div class="create-step-num">01</div>
+                                    <div class="create-step-fields">
+                                        <input type="text" placeholder="Назва кроку">
+                                        <textarea placeholder="Опис кроку..." rows="2"></textarea>
+                                    </div>
+                                    <button type="button" class="create-remove-btn" onclick="this.parentElement.remove()"><i data-lucide="x" style="width:12px;"></i></button>
+                                </div>
+                            </div>
+                            <button type="button" class="create-add-row-btn" onclick="window.addStepRow()">
+                                <i data-lucide="plus" style="width:12px;"></i> Додати крок
+                            </button>
+                        </section>
+                        <section>
+                            <h3 class="section-title">Секрет шефа</h3>
+                            <textarea class="create-secret-textarea" placeholder="Порада або секрет приготування..." rows="2"></textarea>
+                        </section>
+                        <section>
+                            <h3 class="section-title">Подача</h3>
+                            <textarea class="create-serving-textarea" placeholder="Рекомендація до подачі..." rows="2"></textarea>
+                        </section>
+                        <div class="create-form-actions">
+                            <button type="button" class="create-save-btn" onclick="window.saveRecipe()">
+                                <i data-lucide="check" style="width:16px;"></i> Зберегти в книгу
+                            </button>
+                            <button type="button" class="create-cancel-btn" onclick="window.toggleCreateRecipe()">Скасувати</button>
+                        </div>
+                    </div>
+                </div>
             </section>
         `;
     }

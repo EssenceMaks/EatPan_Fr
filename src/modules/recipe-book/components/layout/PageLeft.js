@@ -98,6 +98,38 @@ export default class PageLeft extends Component {
                     <button class="bookmark-bottom-left planned" onclick="this.classList.toggle('active')"><i data-lucide="timer" style="width: 25px; height: 25px;"></i></button>
                     <button class="bookmark-bottom-left shopping active" onclick="this.classList.toggle('active')"><i data-lucide="shopping-basket" style="width: 25px; height: 25px;"></i></button>
                 </div>
+                <!-- CREATE MODE OVERLAY -->
+                <div class="create-mode-content">
+                    <h2 class="create-mode-title">Новий рецепт</h2>
+                    <section class="create-section">
+                        <h3 class="section-title">Додати до книги</h3>
+                        <div class="create-checklist">
+                            <label class="create-check-item"><input type="checkbox" name="book" value="all" checked> <span>Всі рецепти</span></label>
+                            <label class="create-check-item"><input type="checkbox" name="book" value="personal"> <span>Особисті</span></label>
+                            <label class="create-check-item"><input type="checkbox" name="book" value="guests"> <span>Гості</span></label>
+                            <label class="create-check-item"><input type="checkbox" name="book" value="places"> <span>Заклади</span></label>
+                        </div>
+                    </section>
+                    <section class="create-section">
+                        <h3 class="section-title">Категорія</h3>
+                        <div class="create-category-grid">
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="soup" style="width:18px;"></i><span>Супи</span></button>
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="beef" style="width:18px;"></i><span>М'ясо</span></button>
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="drumstick" style="width:18px;"></i><span>Птиця</span></button>
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="fish" style="width:18px;"></i><span>Риба</span></button>
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="shrimp" style="width:18px;"></i><span>Морепродукти</span></button>
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="utensils" style="width:18px;"></i><span>Паста</span></button>
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="leaf" style="width:18px;"></i><span>Салати</span></button>
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="wheat" style="width:18px;"></i><span>Випічка</span></button>
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="cake-slice" style="width:18px;"></i><span>Десерти</span></button>
+                            <button class="create-cat-btn" type="button" onclick="window.selectCategory(this)"><i data-lucide="coffee" style="width:18px;"></i><span>Напої</span></button>
+                        </div>
+                        <div class="create-new-category">
+                            <input type="text" placeholder="Нова категорія...">
+                            <button class="create-new-cat-btn" type="button"><i data-lucide="plus" style="width:14px;height:14px;"></i></button>
+                        </div>
+                    </section>
+                </div>
             </section>
         `;
     }
