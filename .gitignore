@@ -18,3 +18,9 @@ _archive/
 # Other folders
 audio/
 
+
+# AI Agents & Figma Tooling
+Figma_EatPan_Antigravity/
+figma_uikit_generator.js
+.agents/rules/sync_with_figma.md
+

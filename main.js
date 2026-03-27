@@ -151,7 +151,7 @@ function createClockFace() {
     labels.forEach(({ hour, text }) => {
         const angleDeg = hourToAngle(hour, 0);
         const rad = (angleDeg - 90) * Math.PI / 180;
-        const r = 46;
+        const r = 54;
         const label = document.createElement('div');
         label.className = 'clock-label';
         label.style.left = (50 + r * Math.cos(rad)) + '%';
@@ -544,6 +544,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(updateSmallClock, 1000);
     updateSmallClock();
     smallClock.addEventListener('click', activateClock);
+    
+    const placeholder = document.querySelector('.clock-placeholder');
+    if (placeholder) {
+        placeholder.addEventListener('click', () => {
+            if (document.body.classList.contains('clock-mode')) {
+                window.history.back();
+            }
+        });
+    }
+
     createClockFace();
     
     // Inject the isolated Book Module into its block
