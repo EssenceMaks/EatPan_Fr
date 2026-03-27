@@ -121,6 +121,23 @@
   opacity: 0.5;
 }
 
+.raw-task-subchapter {
+  margin-top: 15px;
+  margin-bottom: 8px;
+  text-align: center;
+  position: relative;
+}
+
+.subchapter-title {
+  font-family: var(--font-title);
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  opacity: 0.8;
+  position: relative;
+  display: inline-block;
+}
+
 /* Kanban Columns Area was previously a scrollable sibling, now it's just flattened inside board */
 .kanban-column {
   width: 360px;

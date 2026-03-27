@@ -113,8 +113,12 @@ async function loadData() {
             const mdText = await mdRes.text();
             rawTasks = mdText.split('\n').reduce((acc, line) => {
                 const trimmed = line.trim();
+                // Match subheaders e.g. "#### Frontend"
+                if (trimmed.startsWith('#### ')) {
+                    acc.push({ type: 'subchapter', text: trimmed.replace(/^####\s+/, '') });
+                }
                 // Match headers e.g. "### TRENDING CREATORS"
-                if (trimmed.startsWith('### ')) {
+                else if (trimmed.startsWith('### ')) {
                     acc.push({ type: 'chapter', text: trimmed.replace(/^###\s+/, '') });
                 } 
                 // Match tasks
@@ -152,6 +156,12 @@ function renderSidebar() {
                 <div class="raw-task-chapter">
                     <span class="chapter-title">${item.text}</span>
                     <div class="chapter-line"></div>
+                </div>
+            `;
+        } else if (item.type === 'subchapter') {
+            return `
+                <div class="raw-task-subchapter">
+                    <span class="subchapter-title">${item.text}</span>
                 </div>
             `;
         } else {
