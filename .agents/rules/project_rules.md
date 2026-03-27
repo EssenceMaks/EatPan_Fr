@@ -48,3 +48,7 @@ Media breakpoints defined in `media.css`:
 - Не трогать логику infinite-scroll и clock animation без necessity
 - Не добавлять `<script>` блоки в `index.html`
 - Не ломать `grid-template-rows: auto auto 1fr auto` на `.page--left`
+
+## Figma Integration
+- **Обязательно:** Перед внесением изменений в UI или добавлением новых модулей, сверяйтесь с макетом Figma через MCP сервер (см. `sync_with_figma.md`).
+- **Файл Figma:** `lWzzBp0TFIsbeypUlRMSxu`
