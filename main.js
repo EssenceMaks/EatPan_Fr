@@ -1,4 +1,5 @@
 import BookModule from './src/modules/recipe_book_sector/BookModule.js';
+import { initCraftSpace } from './src/modules/craft_space/craft_space.js';
 
 // --- ALL JS LOGIC FROM EatPan_SPA.html ---
 
@@ -563,6 +564,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const bookElement = await bookModule.render();
         cookbookArea.appendChild(bookElement);
     }
+    
+    // Inject Craft Space
+    await initCraftSpace('craftSpaceInner');
     
     lucide.createIcons();
     initInfiniteScroll();
