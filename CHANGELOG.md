@@ -5,6 +5,52 @@
 
 ---
 
+## [0.5.2] - 2026-03-28
+
+### Fixed
+
+- **Trackpad overshoot / blink** — доопрацьовано SPA-навігацію `ORIGINAL BLOCKS` у `main.js`, щоб один inertial swipe на MacBook trackpad більше не провокував другий автоперехід і коротке блимання інтерфейсу.
+- **Horizontal trackpad jitter** — прибрано зайвий короткий зсув слайдера при горизонтальних свайпах, коли контейнер починав рухатися до сусіднього блоку, але навігація ще не була підтверджена порогом жесту.
+
+### Changed
+
+- **Gesture lock logic** — фіксований cooldown замінено на блокування в межах одного wheel-жесту (`wheelGestureLocked` + `wheelGestureUnlockTimer`), а також додано `wheelLockUntil` на час завершення переходу між блоками.
+- **Programmatic centering** — замість `scrollIntoView()` для переходів між блоками тепер використовується точний `scrollTo()` через `scrollBlockToCenter()`, а `scroll-snap` тимчасово вимикається на час програмного скролу і повертається після завершення.
+- **Scroll settle detection** — завершення програмного переходу тепер відстежується не лише таймером, а й досягненням цільової `scrollLeft` позиції (`pendingBlockNavTarget`), що зменшує видимий дриг при horizontal wheel gestures.
+
+### Documentation
+
+- Оновлено `docs/tasks.md` — додано виконані follow-up пункти про усунення overshoot/blink та horizontal jitter на трекпаді.
+
+**Назва коміту:**
+`fix: prevent inertial trackpad overshoot and block blink`
+
+---
+
+## [0.5.1] - 2026-03-28
+
+### Added
+
+- **Клавіатурна навігація блоками** — додано перемикання слайдів клавішами `ArrowLeft` / `ArrowRight` та також `ArrowUp` / `ArrowDown`, коли жоден блок не відкрито і фокус не знаходиться в полях вводу.
+
+### Fixed
+
+- **MacBook trackpad navigation** — покращено обробку жестів у `main.js` для `ORIGINAL BLOCKS`: замість реагування лише на `deltaY`, логіка тепер визначає домінантну вісь (`deltaX` або `deltaY`), накопичує інтенцію скролу до порогу та лише тоді перемикає слайд. Це прибирає ситуації, коли свайп на трекпаді то працював у напрямку жесту, то ігнорувався.
+
+### Changed
+
+- **`Esc` поведінка** — клавіша `Escape` тепер закриває режим створення рецепту, а якщо він не активний — закриває відкритий блок або режим годинника через наявну `history.back()` логіку.
+- **Навігаційний cooldown** — wheel-навігація отримала явні константи `WHEEL_INTENT_THRESHOLD`, `WHEEL_INTENT_RESET_MS`, `WHEEL_NAV_COOLDOWN_MS` для більш передбачуваної поведінки на трекпадах і мишах.
+
+### Documentation
+
+- Оновлено `docs/tasks.md` — додано й відмічено виконаними задачі по SPA-навігації.
+
+**Назва коміту:**
+`fix: stabilize macbook trackpad slide navigation and add keyboard controls`
+
+---
+
 ## [0.5.0] - 2026-03-28
 
 ### Added
