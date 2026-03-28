@@ -17,7 +17,11 @@ const col4 = document.getElementById('col-4-container');
 
 let savedBlockIndex = 0;
 const CLONES_COUNT = 2; 
-let blockWidth = 0;     
+let blockWidth = 0;
+const BLOCK_NAV_SETTLE_MS = 520;
+const WHEEL_INTENT_THRESHOLD = 32;
+const WHEEL_INTENT_RESET_MS = 140;
+const WHEEL_GESTURE_IDLE_MS = 320;
 
 function initInfiniteScroll() {
     const originals = Array.from(document.querySelectorAll('.original-block'));
@@ -190,6 +194,7 @@ function updateSmallClock() {
 
 // --- SEC: SCROLL & TOUCH ---
 function scrollToAdjacentBlock(direction) {
+    if (isJumping) return;
     const centerX = sectionBlocks.scrollLeft + sectionBlocks.clientWidth / 2;
     const blocks = Array.from(sectionBlocks.querySelectorAll('.section_block:not(#clockBlock)'));
     let currentIdx = 0;
@@ -202,24 +207,81 @@ function scrollToAdjacentBlock(direction) {
     const nextIdx = currentIdx + direction;
     if (nextIdx >= 0 && nextIdx < blocks.length) {
         isJumping = true;
-        blocks[nextIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        sectionBlocks.classList.remove('snapping');
+        scrollBlockToCenter(blocks[nextIdx], 'smooth');
         setTimeout(() => {
             isJumping = false;
             wrapToOriginalIfNeeded();
-        }, 500);
+            requestAnimationFrame(() => {
+                sectionBlocks.classList.add('snapping');
+            });
+        }, BLOCK_NAV_SETTLE_MS);
     }
 }
 
-let wheelCooldown = false;
+function scrollBlockToCenter(block, behavior) {
+    const scrollTarget = block.offsetLeft - (sectionBlocks.clientWidth / 2) + (block.clientWidth / 2);
+    sectionBlocks.scrollTo({ left: scrollTarget, behavior: behavior });
+}
+
+let wheelGestureLocked = false;
+let wheelGestureUnlockTimer = null;
+let wheelIntentAccumulator = 0;
+let wheelIntentAxis = null;
+let wheelIntentResetTimer = null;
+let wheelLockUntil = 0;
+
+function resolveWheelIntent(evt) {
+    const absX = Math.abs(evt.deltaX);
+    const absY = Math.abs(evt.deltaY);
+    if (absX < 2 && absY < 2) return null;
+
+    if (absX > absY) {
+        return { axis: 'x', delta: evt.deltaX };
+    }
+
+    return { axis: 'y', delta: evt.deltaY };
+}
+
 sectionBlocks.addEventListener('wheel', (evt) => {
     if (body.classList.contains('active-mode')) return;
-    if (evt.deltaY !== 0) {
-        evt.preventDefault();
-        if (wheelCooldown) return;
-        wheelCooldown = true;
-        setTimeout(() => { wheelCooldown = false; }, 400);
-        scrollToAdjacentBlock(evt.deltaY > 0 ? 1 : -1);
+
+    const intent = resolveWheelIntent(evt);
+    if (!intent) return;
+
+    evt.preventDefault();
+
+    clearTimeout(wheelGestureUnlockTimer);
+    wheelGestureUnlockTimer = setTimeout(() => {
+        wheelGestureLocked = false;
+        wheelIntentAccumulator = 0;
+        wheelIntentAxis = null;
+    }, WHEEL_GESTURE_IDLE_MS);
+
+    if (Date.now() < wheelLockUntil || isJumping || wheelGestureLocked) return;
+
+    if (wheelIntentAxis && wheelIntentAxis !== intent.axis) {
+        wheelIntentAccumulator = 0;
     }
+
+    wheelIntentAxis = intent.axis;
+    wheelIntentAccumulator += intent.delta;
+
+    clearTimeout(wheelIntentResetTimer);
+    wheelIntentResetTimer = setTimeout(() => {
+        wheelIntentAccumulator = 0;
+        wheelIntentAxis = null;
+    }, WHEEL_INTENT_RESET_MS);
+
+    if (Math.abs(wheelIntentAccumulator) < WHEEL_INTENT_THRESHOLD) return;
+
+    const direction = wheelIntentAccumulator > 0 ? 1 : -1;
+    wheelIntentAccumulator = 0;
+    wheelIntentAxis = null;
+    wheelGestureLocked = true;
+    wheelLockUntil = Date.now() + BLOCK_NAV_SETTLE_MS + 120;
+
+    scrollToAdjacentBlock(direction);
 }, { passive: false });
 
 let touchStartX = 0, touchStartY = 0, touchDirection = null;
@@ -251,6 +313,41 @@ sectionBlocks.addEventListener('touchend', (e) => {
     }
     touchDirection = null;
 }, { passive: true });
+
+function isEditableTarget(target) {
+    if (!(target instanceof HTMLElement)) return false;
+    return Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
+}
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        const createModeBook = document.querySelector('.book-cover.book--create-mode');
+        if (createModeBook) {
+            event.preventDefault();
+            window.toggleCreateRecipe();
+            return;
+        }
+
+        if (body.classList.contains('active-mode') || body.classList.contains('clock-mode')) {
+            event.preventDefault();
+            history.back();
+        }
+        return;
+    }
+
+    if (isEditableTarget(event.target)) return;
+    if (body.classList.contains('active-mode') || body.classList.contains('clock-mode')) return;
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        scrollToAdjacentBlock(1);
+    }
+
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        scrollToAdjacentBlock(-1);
+    }
+});
 
 // --- SEC: CLICKS & ACTIVATION ---
 sectionBlocks.addEventListener('click', (e) => {
