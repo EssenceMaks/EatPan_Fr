@@ -4,12 +4,24 @@ import Book from './components/layout/Book.js';
 
 export default class BookModule extends Component {
     async onMount() {
+        await this.loadData();
+    }
+
+    async loadData() {
         console.log('BookModule mounting... Fetching data.');
         this.recipes = await RecipeService.fetchAll();
         
+        // Clear previous contents
+        this.element.innerHTML = this.template();
+        
         const book = new Book({ recipes: this.recipes });
         const bookElement = await book.render();
+        
         this.element.appendChild(bookElement);
+        
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
     }
 
     template() {

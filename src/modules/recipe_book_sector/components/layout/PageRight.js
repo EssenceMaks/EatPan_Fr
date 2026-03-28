@@ -2,6 +2,53 @@ import Component from '../../../../core/Component.js';
 
 export default class PageRight extends Component {
     template() {
+        const recipeObj = this.props.recipe;
+        
+        // EMPTY STATE
+        if (!recipeObj) {
+            return `
+                <section class="page page--right empty-recipe-state">
+                    <div class="empty-state-content" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text-main); opacity:0.6;">
+                        <i data-lucide="chef-hat" style="width:64px; height:64px; margin-bottom:20px;"></i>
+                        <h2 class="text-h2">Оберіть рецепт зі списку</h2>
+                        <p class="text-subtitle">або створіть новий</p>
+                    </div>
+                </section>
+            `;
+        }
+
+        // RECIPE STATE
+        const data = recipeObj.data || {};
+        const title = data.title || "Без назви";
+        const subtitle = data.subtitle || "";
+        const timeStr = data.time_str || "0 хв";
+        const portionsStr = data.portions_str || "0 порцій";
+        const ingredients = data.ingredients || [];
+        const steps = data.steps || [];
+
+        // BUILD INGREDIENTS HTML
+        const ingredientsHTML = ingredients.map(ing => `
+                                    <li class="ingredient-item">
+                                        <div class="ingredient-info">
+                                            <!-- Using flask conical as placeholder for generic ingredient icons -->
+                                            <i data-lucide="flask-conical" class="ingredient-icon" style="width: 18px; color: var(--accent); margin-right: 8px;"></i>
+                                            <span>${ing.name || ''}</span>
+                                        </div>
+                                        <span class="ingredient-amt">${ing.amount || ''}</span>
+                                    </li>
+        `).join('');
+
+        // BUILD STEPS HTML
+        const stepsHTML = steps.map((st, i) => `
+                                    <div class="step-item">
+                                        <div class="step-num">${String(st.num || i+1).padStart(2, '0')}</div>
+                                        <div>
+                                            <h5 class="step-title">${st.title || 'Крок'}</h5>
+                                            <p class="step-desc">${st.text || ''}</p>
+                                        </div>
+                                    </div>
+        `).join('');
+
         return `
             <section class="page page--right" id="recipe-page">
                 <!-- BOTTOM RIBBONS -->
@@ -25,7 +72,7 @@ export default class PageRight extends Component {
                 <div class="scrollable-area right-page-inner">
                     <header class="recipe-top-bar">
                         <div class="recipe-actions">
-                            <button class="btn-recipe-action" style="min-width: 40px;"></button>
+                            <button class="btn-recipe-action" style="min-width: 40px;" onclick="window.clearActiveRecipe && window.clearActiveRecipe()"><i data-lucide="x" style="width: 14px;"></i></button>
                             <button class="btn-recipe-status active" title="Блюдо в наявності" onclick="this.classList.toggle('active')">Приготовлено 26.04</button>
                             <button class="btn-recipe-action" onclick="const s = this.classList.toggle('active'); this.querySelector('span').innerText = s ? 'Заплановано' : 'Запланувати приготування'; this.querySelector('i').style.display = s ? 'inline-block' : 'none';">
                                 <i data-lucide="timer" style="width: 14px; margin-right: 6px; display: none;"></i>
@@ -35,11 +82,11 @@ export default class PageRight extends Component {
                     </header>
                     <div class="hero-grid">
                         <div class="hero-meta">
-                            <h1 class="text-h1">Курячі <br /><strong>Нагетси</strong></h1>
-                            <p class="text-subtitle">(Хрусткі та дуже соковиті)</p>
+                            <h1 class="text-h1">${title}</h1>
+                            <p class="text-subtitle">${subtitle ? `(${subtitle})` : ''}</p>
                             <div class="recipe-stats">
-                                <div class="stat-item"><i data-lucide="clock" style="width: 12px;"></i> 45 ХВ</div>
-                                <div class="stat-item"><i data-lucide="users" style="width: 12px;"></i> 4 ПОРЦІЇ</div>
+                                <div class="stat-item"><i data-lucide="clock" style="width: 12px;"></i> ${timeStr}</div>
+                                <div class="stat-item"><i data-lucide="users" style="width: 12px;"></i> ${portionsStr}</div>
                             </div>
                         </div>
                         <div class="recipe-image-wrap">
@@ -51,34 +98,7 @@ export default class PageRight extends Component {
                             <section>
                                 <h3 class="section-title">Інгредієнти</h3>
                                 <ul class="ingredient-list">
-                                    <li class="ingredient-item">
-                                        <div class="ingredient-info">
-                                            <img alt="Chicken" class="ingredient-icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK0E_P4XkP3Mi-Th3oHTSUcFFeA9mKK6ULYoFZSd77dwQ0wTA3efNjeQojiSOwSoN0wJVDbZ0D3vIAoVvLTdSoH4kUyRN0QsypWfYda9CZ40jOpxrDetSUdlrFohr2NuncHvKiOOQBQNfSE3W3zwhMW1_1LVT4ArErZiFkWBHyi7jKAzMfV3JIFAzb0X_X5jXKX3R9ilCHy5UlBjm1gU_9K_-0EaFW9I47sDh8szLaKSYVsXzpKI6VG4Tex1f1jDXNTTRZlyIyJEJD" />
-                                            <span>Куряче філе</span>
-                                        </div>
-                                        <span class="ingredient-amt">500г</span>
-                                    </li>
-                                    <li class="ingredient-item">
-                                        <div class="ingredient-info">
-                                            <img alt="Ginger" class="ingredient-icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKovzf6PItVLDwEJW-_w9ofr7lrLphKoLLJYYcCfbIJcuTiLTWTDFASKrQ0zRi2YisTzY5X4hkLIvYN5sVfDs8t2myihGJsjZAyEsWniJ5RUuUqTWhjvaDbXB4P9FBsIuGk81JzIxNmoUWahKpwayd4oDBvKaDU5jm0_IUfm2lfQVVmQvt6sM8fvO4W2ovx67ySxMVSdYJ0z-Fwy_gQHSif3cmww1fCs84RiSySxOeiBaWttDWnah8rLb16NwSMN9WTllmQxearj2r" />
-                                            <span>Імбирна паста</span>
-                                        </div>
-                                        <span class="ingredient-amt">1 ч.л.</span>
-                                    </li>
-                                    <li class="ingredient-item">
-                                        <div class="ingredient-info">
-                                            <img alt="Soy Sauce" class="ingredient-icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDF6knehI_SBKRBEVcDIw6e1-D3xA1NkvWQAMO6P6ofVt1RW2BnaTaNvEGJT4MPpglEidq01QCmC5CczTUyw7bWSvvJZc-y-jD_bCadu-gehNRh-JvaleQ7ynSsgNZo0cCWTXi_IiRxiinnkO61Zh51oce_OV2HWvnUO5kxD1ucGLdNvsP0-lxdqw80xMtM0ha2wye0_sRFBJ3GoomnO-lvVEyFnR_B3ZfoX0bar4BjaXHVMlccX1-CcCUw705CifWkm2f-CEef5kI3" />
-                                            <span>Соєвий соус</span>
-                                        </div>
-                                        <span class="ingredient-amt">1 ст.л.</span>
-                                    </li>
-                                    <li class="ingredient-item">
-                                        <div class="ingredient-info">
-                                            <img alt="Breadcrumbs" class="ingredient-icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT_bReqNdKs4RbI0gGNYxx62qf-AF9TR8UZaQskv7ZdABXVFvWGi9843othKdJfNggUr_WG9fy0HYpA6KuyZjnsTuumO-BaUMYU2Fddfxa7TEpNFz8NBAEnFK0w9a5bd-Du-urCqHZ0nbDEQ3czftAmFQkVD6DymkaCNBb7l9O7IEDEta_xFp__sVte_TYiSd4SvORefSxpxcH8JW3TosPSQP3MjLeDWU9JZ7qX4I1Xv9b_fA_0EWyiXpCQA-YNsgHpw-UuRMZVTkr" />
-                                            <span>Паніровка</span>
-                                        </div>
-                                        <span class="ingredient-amt">100г</span>
-                                    </li>
+                                    ${ingredientsHTML}
                                 </ul>
                             </section>
                             <section class="secret-box">
@@ -86,21 +106,19 @@ export default class PageRight extends Component {
                                     <i data-lucide="lightbulb" style="width: 14px; color: var(--accent);"></i>
                                     <span class="text-label" style="color: var(--accent);">Секрет шефа</span>
                                 </div>
-                                <p style="font-size: 11px; line-height: 1.5; font-family: var(--font-serif); font-style: italic;">Для ідеальної хрусткості обваляйте нагетси в сухарях двічі, охолодивши їх між етапами.</p>
+                                <p style="font-size: 11px; line-height: 1.5; font-family: var(--font-serif); font-style: italic;">${data.secret || "Для ідеальної хрусткості обваляйте нагетси в сухарях двічі, охолодивши їх між етапами."}</p>
                             </section>
                         </div>
                         <div class="details-col-right" style="border-left: 1px solid rgba(0,0,0,0.05); padding-left: 1rem; padding-right: 1.8rem;">
                             <section>
                                 <h3 class="section-title">Процес</h3>
                                 <div class="step-list">
-                                    <div class="step-item"><div class="step-num">01</div><div><h5 class="step-title">Маринування</h5><p class="step-desc">Наріжте філе кубиками, змішайте зі спеціями та соусом. Залиште на 20 хвилин.</p></div></div>
-                                    <div class="step-item"><div class="step-num">02</div><div><h5 class="step-title">Панірування</h5><p class="step-desc">Сформуйте нагетси, вмочіть у яйце, а потім щільно обваляйте в сухарях.</p></div></div>
-                                    <div class="step-item"><div class="step-num">03</div><div><h5 class="step-title">Смаження</h5><p class="step-desc">Смажте у розігрітій олії до золотої скоринки (приблизно 4 хв з кожного боку).</p></div></div>
+                                    ${stepsHTML}
                                 </div>
                             </section>
                             <section class="serving-box">
                                 <h4 style="font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Рекомендація до подачі</h4>
-                                <p style="opacity: 0.7;">"Подавайте гарячими з медово-гірчичним соусом або домашнім кетчупом для розкриття смаку."</p>
+                                <p style="opacity: 0.7;">${data.serving || '"Подавайте гарячими з медово-гірчичним соусом або домашнім кетчупом для розкриття смаку."'}</p>
                             </section>
                         </div>
                     </div>
@@ -113,6 +131,7 @@ export default class PageRight extends Component {
                     <div class="side-tab--right"><span>2 в.</span></div>
                     <div class="side-tab--right" title="Додати варіант"><i data-lucide="plus" style="width: 16px;"></i></div>
                 </aside>
+
                 <!-- CREATE MODE OVERLAY -->
                 <div class="create-mode-content">
                     <div class="create-recipe-form">
@@ -178,7 +197,16 @@ export default class PageRight extends Component {
                         </div>
                     </div>
                 </div>
+
             </section>
         `;
+    }
+
+    async onMount() {
+        if(window.lucide) {
+            window.lucide.createIcons({
+                root: this.element
+            });
+        }
     }
 }
