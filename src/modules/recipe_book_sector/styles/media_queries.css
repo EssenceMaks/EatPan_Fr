@@ -136,6 +136,60 @@
     .page { height: 100%; min-height: 0 !important; }
 }
 
+@media (min-width: 768px) and (orientation: landscape) and (max-height: 900px) {
+    .side-tabs--left-top {
+        left: -28px;
+        top: 112px;
+        gap: 3px;
+    }
+
+    .side-tabs--left-bottom {
+        left: -28px;
+        bottom: 38px;
+        gap: 3px;
+    }
+
+    .side-tab--left {
+        width: 46px;
+        height: 28px;
+        padding-right: 10px;
+    }
+
+    .side-tab--left.active {
+        transform: translateX(6px);
+    }
+
+    .side-tab--left [data-lucide] {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .bookmark-bottom-group-left {
+        right: 28px;
+        bottom: -4px;
+        gap: 12px;
+    }
+
+    .bookmark-bottom-left {
+        width: 32px;
+        height: 64px;
+        padding-top: 16px;
+    }
+
+    .bookmark-bottom-left:hover {
+        height: 72px;
+    }
+
+    .bookmark-bottom-left.active {
+        height: 82px;
+    }
+
+    .bookmark-bottom-left [data-lucide] {
+        width: 22px !important;
+        height: 22px !important;
+    }
+}
+
 /* =========================================
    6. ШИРОКІ ЕКРАНИ (1440px - 1919px)
    ========================================= */
