@@ -10,15 +10,17 @@
 ### Fixed
 
 - **Trackpad overshoot / blink** — доопрацьовано SPA-навігацію `ORIGINAL BLOCKS` у `main.js`, щоб один inertial swipe на MacBook trackpad більше не провокував другий автоперехід і коротке блимання інтерфейсу.
+- **Horizontal trackpad jitter** — прибрано зайвий короткий зсув слайдера при горизонтальних свайпах, коли контейнер починав рухатися до сусіднього блоку, але навігація ще не була підтверджена порогом жесту.
 
 ### Changed
 
 - **Gesture lock logic** — фіксований cooldown замінено на блокування в межах одного wheel-жесту (`wheelGestureLocked` + `wheelGestureUnlockTimer`), а також додано `wheelLockUntil` на час завершення переходу між блоками.
 - **Programmatic centering** — замість `scrollIntoView()` для переходів між блоками тепер використовується точний `scrollTo()` через `scrollBlockToCenter()`, а `scroll-snap` тимчасово вимикається на час програмного скролу і повертається після завершення.
+- **Scroll settle detection** — завершення програмного переходу тепер відстежується не лише таймером, а й досягненням цільової `scrollLeft` позиції (`pendingBlockNavTarget`), що зменшує видимий дриг при horizontal wheel gestures.
 
 ### Documentation
 
-- Оновлено `docs/tasks.md` — додано виконаний follow-up пункт про усунення overshoot/blink на трекпаді.
+- Оновлено `docs/tasks.md` — додано виконані follow-up пункти про усунення overshoot/blink та horizontal jitter на трекпаді.
 
 **Назва коміту:**
 `fix: prevent inertial trackpad overshoot and block blink`

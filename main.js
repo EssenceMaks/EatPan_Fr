@@ -19,6 +19,7 @@ let savedBlockIndex = 0;
 const CLONES_COUNT = 2; 
 let blockWidth = 0;
 const BLOCK_NAV_SETTLE_MS = 520;
+const BLOCK_NAV_TARGET_EPSILON = 6;
 const WHEEL_INTENT_THRESHOLD = 32;
 const WHEEL_INTENT_RESET_MS = 140;
 const WHEEL_GESTURE_IDLE_MS = 320;
@@ -87,6 +88,8 @@ function getCurrentBlockIndex() {
 
 // --- SEC: LOOPING ---
 let isJumping = false;
+let pendingBlockNavTarget = null;
+let blockNavFinalizeTimer = null;
 
 function wrapToOriginalIfNeeded() {
     const centerX = sectionBlocks.scrollLeft + sectionBlocks.clientWidth / 2;
@@ -107,7 +110,13 @@ function wrapToOriginalIfNeeded() {
 
 let scrollDebounce = null;
 sectionBlocks.addEventListener('scroll', () => {
-    if (body.classList.contains('active-mode') || blockWidth === 0 || isJumping) return;
+    if (body.classList.contains('active-mode') || blockWidth === 0) return;
+    if (isJumping) {
+        if (pendingBlockNavTarget !== null && Math.abs(sectionBlocks.scrollLeft - pendingBlockNavTarget) <= BLOCK_NAV_TARGET_EPSILON) {
+            finalizeBlockNavigation();
+        }
+        return;
+    }
     clearTimeout(scrollDebounce);
     scrollDebounce = setTimeout(wrapToOriginalIfNeeded, 150);
 });
@@ -208,20 +217,30 @@ function scrollToAdjacentBlock(direction) {
     if (nextIdx >= 0 && nextIdx < blocks.length) {
         isJumping = true;
         sectionBlocks.classList.remove('snapping');
-        scrollBlockToCenter(blocks[nextIdx], 'smooth');
-        setTimeout(() => {
-            isJumping = false;
-            wrapToOriginalIfNeeded();
-            requestAnimationFrame(() => {
-                sectionBlocks.classList.add('snapping');
-            });
+        pendingBlockNavTarget = scrollBlockToCenter(blocks[nextIdx], 'smooth');
+        clearTimeout(blockNavFinalizeTimer);
+        blockNavFinalizeTimer = setTimeout(() => {
+            finalizeBlockNavigation();
         }, BLOCK_NAV_SETTLE_MS);
     }
 }
 
-function scrollBlockToCenter(block, behavior) {
+function finalizeBlockNavigation() {
+    clearTimeout(blockNavFinalizeTimer);
+    blockNavFinalizeTimer = null;
+    pendingBlockNavTarget = null;
+    isJumping = false;
+    wrapToOriginalIfNeeded();
+    requestAnimationFrame(() => {
+        sectionBlocks.classList.add('snapping');
+    });
+}
+
+function scrollBlockToCenter(block, behavior = 'smooth') {
+    if (!block) return null;
     const scrollTarget = block.offsetLeft - (sectionBlocks.clientWidth / 2) + (block.clientWidth / 2);
-    sectionBlocks.scrollTo({ left: scrollTarget, behavior: behavior });
+    sectionBlocks.scrollTo({ left: scrollTarget, behavior });
+    return scrollTarget;
 }
 
 let wheelGestureLocked = false;
@@ -230,6 +249,12 @@ let wheelIntentAccumulator = 0;
 let wheelIntentAxis = null;
 let wheelIntentResetTimer = null;
 let wheelLockUntil = 0;
+
+function resetWheelGestureState() {
+    wheelGestureLocked = false;
+    wheelIntentAccumulator = 0;
+    wheelIntentAxis = null;
+}
 
 function resolveWheelIntent(evt) {
     const absX = Math.abs(evt.deltaX);
@@ -246,17 +271,16 @@ function resolveWheelIntent(evt) {
 sectionBlocks.addEventListener('wheel', (evt) => {
     if (body.classList.contains('active-mode')) return;
 
-    const intent = resolveWheelIntent(evt);
-    if (!intent) return;
-
     evt.preventDefault();
+
+    const intent = resolveWheelIntent(evt);
 
     clearTimeout(wheelGestureUnlockTimer);
     wheelGestureUnlockTimer = setTimeout(() => {
-        wheelGestureLocked = false;
-        wheelIntentAccumulator = 0;
-        wheelIntentAxis = null;
+        resetWheelGestureState();
     }, WHEEL_GESTURE_IDLE_MS);
+
+    if (!intent) return;
 
     if (Date.now() < wheelLockUntil || isJumping || wheelGestureLocked) return;
 
