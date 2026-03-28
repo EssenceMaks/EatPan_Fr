@@ -147,10 +147,10 @@ async function loadData() {
 }
 
 function renderSidebar() {
-    const list = document.getElementById('mdTasksList');
-    if (!list) return;
+    const lists = document.querySelectorAll('#mdTasksList');
+    if (lists.length === 0) return;
     
-    list.innerHTML = rawTasks.map(item => {
+    const htmlToInject = rawTasks.map(item => {
         if (item.type === 'chapter') {
             return `
                 <div class="raw-task-chapter">
@@ -173,18 +173,25 @@ function renderSidebar() {
             `;
         }
     }).join('');
+
+    lists.forEach(list => {
+        list.innerHTML = htmlToInject;
+    });
 }
 
 function renderBoard() {
     COLUMNS.forEach(col => {
-        const colContainer = document.getElementById(`col-${col}`);
-        if (!colContainer) return;
+        // Query all instances across original and SPA-cloned blocks
+        const colContainers = document.querySelectorAll(`.kanban-column[data-status="${col}"] .kanban-cards-container`);
+        if (colContainers.length === 0) return;
         
-        colContainer.innerHTML = '';
         const colTickets = tickets.filter(t => t.status === col);
         
-        colTickets.forEach(ticket => {
-            colContainer.appendChild(createTicketNode(ticket));
+        colContainers.forEach(container => {
+            container.innerHTML = '';
+            colTickets.forEach(ticket => {
+                container.appendChild(createTicketNode(ticket));
+            });
         });
     });
 }
@@ -192,9 +199,8 @@ function renderBoard() {
 function createTicketNode(ticket) {
     // Create a ticket DOM node
     const card = document.createElement('div');
-    // Make ticket draggable
     card.className = 'vintage-ticket';
-    card.setAttribute('draggable', 'true');
+    card.draggable = true;
     card.dataset.id = ticket.id;
 
     // Calc progress
@@ -345,27 +351,20 @@ function createTicketNode(ticket) {
 
     // Drag and Drop Logic for this card
     card.addEventListener('dragstart', (e) => {
-        // Only allow drag if not expanded to prevent messy interactions
-        if (isExpanded || isHovered) {
-            e.preventDefault();
-            return;
-        }
-        e.dataTransfer.effectAllowed = 'move';
-        // Safari/Firefox sometimes demand ANY string to be explicitly set
-        e.dataTransfer.setData('text/plain', String(ticket.id)); 
-        
-        // Critical: Store ID globally because "drop" event often loses this data in some browsers
         draggedTicketId = ticket.id;
+        // REQUIRED: Must set data otherwise dragging cancels in some browsers
+        e.dataTransfer.setData('text/plain', ticket.id);
+        e.dataTransfer.effectAllowed = 'move';
         
-        // Delay adding class so the drag-ghost doesn't immediately become transparent
-        requestAnimationFrame(() => {
+        // Use timeout so styling triggers AFTER browser screenshot for drag-ghost
+        setTimeout(() => {
             card.classList.add('dragging');
-        });
+        }, 0);
     });
-    
+
     card.addEventListener('dragend', () => {
+        draggedTicketId = null;
         card.classList.remove('dragging');
-        draggedTicketId = null; // Clean up
     });
 
     // Handle checkmark toggles
@@ -389,6 +388,7 @@ function createTicketNode(ticket) {
             e.stopPropagation();
             const newStatus = btn.dataset.status;
             if (newStatus !== ticket.status) {
+                // Instantly move and re-render the board for absolute consistency
                 moveTicket(ticket.id, newStatus);
             }
         });
@@ -398,10 +398,19 @@ function createTicketNode(ticket) {
 }
 
 function moveTicket(id, newStatus) {
-    const ticket = tickets.find(t => t.id === id);
+    // 1. Ensure type-safe matching by casting both to Strings
+    const ticket = tickets.find(t => String(t.id) === String(id));
+    
     if (ticket) {
+        // 2. Update memory state
         ticket.status = newStatus;
+        
+        // 3. Sync to persistence
         localStorage.setItem('eatpan_tickets', JSON.stringify(tickets));
-        renderBoard(); // Simple re-render to update DOM
+        
+        // 4. Force robust visual update. Rebuilding preserves flex states perfectly.
+        renderBoard();
+    } else {
+        console.warn(`Attempted to move ticket ${id} but it was not found.`);
     }
 }
