@@ -23,7 +23,10 @@ const BLOCK_NAV_SETTLE_MS = 520;
 const BLOCK_NAV_TARGET_EPSILON = 6;
 const WHEEL_INTENT_THRESHOLD = 32;
 const WHEEL_INTENT_RESET_MS = 140;
-const WHEEL_GESTURE_IDLE_MS = 320;
+const WHEEL_GESTURE_IDLE_MS = 180;
+const WHEEL_GESTURE_KEEPALIVE_DELTA = 10;
+const WHEEL_POST_NAV_LOCK_MS = 80;
+const WHEEL_POST_FINALIZE_LOCK_MS = 160;
 
 function initInfiniteScroll() {
     const originals = Array.from(document.querySelectorAll('.original-block'));
@@ -231,6 +234,8 @@ function finalizeBlockNavigation() {
     blockNavFinalizeTimer = null;
     pendingBlockNavTarget = null;
     isJumping = false;
+    resetWheelGestureState();
+    wheelLockUntil = Date.now() + WHEEL_POST_FINALIZE_LOCK_MS;
     wrapToOriginalIfNeeded();
     requestAnimationFrame(() => {
         sectionBlocks.classList.add('snapping');
@@ -252,9 +257,19 @@ let wheelIntentResetTimer = null;
 let wheelLockUntil = 0;
 
 function resetWheelGestureState() {
+    clearTimeout(wheelGestureUnlockTimer);
+    wheelGestureUnlockTimer = null;
     wheelGestureLocked = false;
     wheelIntentAccumulator = 0;
     wheelIntentAxis = null;
+}
+
+function keepWheelGestureAlive(delta) {
+    if (Math.abs(delta) < WHEEL_GESTURE_KEEPALIVE_DELTA) return;
+    clearTimeout(wheelGestureUnlockTimer);
+    wheelGestureUnlockTimer = setTimeout(() => {
+        resetWheelGestureState();
+    }, WHEEL_GESTURE_IDLE_MS);
 }
 
 function resolveWheelIntent(evt) {
@@ -276,12 +291,13 @@ sectionBlocks.addEventListener('wheel', (evt) => {
 
     const intent = resolveWheelIntent(evt);
 
-    clearTimeout(wheelGestureUnlockTimer);
-    wheelGestureUnlockTimer = setTimeout(() => {
-        resetWheelGestureState();
-    }, WHEEL_GESTURE_IDLE_MS);
-
     if (!intent) return;
+
+    keepWheelGestureAlive(intent.delta);
+
+    if (!isJumping && wheelGestureLocked && Date.now() >= wheelLockUntil && Math.abs(intent.delta) >= WHEEL_GESTURE_KEEPALIVE_DELTA) {
+        resetWheelGestureState();
+    }
 
     if (Date.now() < wheelLockUntil || isJumping || wheelGestureLocked) return;
 
@@ -304,7 +320,7 @@ sectionBlocks.addEventListener('wheel', (evt) => {
     wheelIntentAccumulator = 0;
     wheelIntentAxis = null;
     wheelGestureLocked = true;
-    wheelLockUntil = Date.now() + BLOCK_NAV_SETTLE_MS + 120;
+    wheelLockUntil = Date.now() + WHEEL_POST_NAV_LOCK_MS;
 
     scrollToAdjacentBlock(direction);
 }, { passive: false });
@@ -344,6 +360,11 @@ function isEditableTarget(target) {
     return Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
 }
 
+function getCurrentOriginalBlock() {
+    const currentIndex = getCurrentBlockIndex();
+    return document.querySelector(`.original-block[data-index="${currentIndex}"]`);
+}
+
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
         const createModeBook = document.querySelector('.book-cover.book--create-mode');
@@ -371,6 +392,13 @@ document.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
         event.preventDefault();
         scrollToAdjacentBlock(-1);
+    }
+
+    if (event.key === 'Enter') {
+        const currentBlock = getCurrentOriginalBlock();
+        if (!currentBlock) return;
+        event.preventDefault();
+        activateBlock(currentBlock);
     }
 });
 
