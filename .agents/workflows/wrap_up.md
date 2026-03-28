@@ -11,7 +11,7 @@ description: Wrap-up sequence for tracking progress, tasks, and changelogs at th
 - **Оновити `docs/tasks.md`:** 
   Знайди відповідні задачі та відзнач їх як виконані `[x]`. Всі технічні завдання або рефакторинг від агента фіксуй у блоці `### AGENT TASKS`. Завжди дотримуйся ієрархії: `### Тема` -> `#### Підтема` (наприклад, `#### Frontend: Craft Space`).
   
-- **Оновити `docs/changelogs/CHANGELOG.md`:** 
+- **Оновити `CHANGELOG.md`:** 
   Внеси всі значні структурні, візуальні та логічні зміни до відповідного блоку версії (Added, Changed, Fixed, Removed).
 
 ## 2. Логування контролю версій (Git)

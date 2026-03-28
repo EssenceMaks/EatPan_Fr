@@ -55,12 +55,20 @@
   overflow-y: scroll;
 }
 
+.sidebar-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--brand-red);
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+}
+
 .raw-tasks-sidebar h3 {
   font-family: var(--font-title);
   color: var(--brand-red);
-  margin-bottom: 10px;
-  border-bottom: 2px solid var(--brand-red);
-  padding-bottom: 5px;
+  margin: 0;
+  font-size: 1.1rem;
 }
 
 .raw-task-item {
@@ -256,6 +264,113 @@
   font-size: 0.9rem;
   transition: all 0.3s ease;
   margin-left: 10px;
+}
+
+/* Sidebar Task Item */
+.raw-task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--ink);
+  cursor: default;
+  transition: all 0.2s ease;
+  /* Make sure container handles child buttons correctly */
+  position: relative;
+}
+
+.raw-task-item:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.raw-task-item.archived {
+  opacity: 0.5;
+}
+
+.raw-task-item.done .raw-check {
+  background-color: var(--brand-red);
+  color: var(--parchment);
+  border-color: var(--brand-red);
+}
+
+.task-text {
+  flex: 1;
+}
+
+/* Sidebar Task Actions (Hover Icons) */
+.task-actions {
+  display: flex;
+  gap: 6px;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.2s ease;
+}
+
+.raw-task-item:hover .task-actions,
+.raw-task-item.archived .task-actions,
+.sidebar-icon-btn.linked {
+  opacity: 1; /* Show on hover, or ALWAYS if archived/linked */
+}
+
+/* Base style for sidebar icon buttons */
+.sidebar-icon-btn {
+  background: none;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  transition: all 0.1s;
+}
+
+.sidebar-icon-btn:hover {
+  background: rgba(0,0,0,0.05);
+  transform: scale(1.05);
+}
+
+.sidebar-icon-btn.linked {
+  border-color: var(--brand-red);
+  color: var(--brand-red);
+}
+
+/* Master Toggles in Header */
+.sidebar-toggles {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-sidebar-toggle {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: 1px solid var(--outline-variant);
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.2s;
+}
+
+.btn-sidebar-toggle.active {
+  opacity: 1;
+  background-color: rgba(0,0,0,0.03);
+  border-color: var(--brand-red);
+  color: var(--brand-red);
+}
+
+@keyframes flash-card {
+  0% { box-shadow: 0 0 0 4px var(--brand-red); transform: scale(1.02); }
+  100% { box-shadow: none; transform: scale(1); }
+}
+
+.flash-highlight {
+  animation: flash-card 1.5s ease-out forwards;
 }
 
 /* Progress dashes */

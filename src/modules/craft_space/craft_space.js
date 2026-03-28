@@ -6,6 +6,19 @@ let rawTasks = [];
 let tickets = [];
 let draggedTicketId = null; // Failsafe global variable specifically for Drag and Drop
 
+// Sidebar persistent state for tracking Markdown mappings
+let sidebarState = {
+    showArchive: false,
+    showKanban: true,
+    archivedTasks: [],
+    linkedTickets: {},
+    completedTasks: [] // Add client-side completed tracking
+};
+
+function saveSidebarState() {
+    localStorage.setItem('eatpan_sidebar', JSON.stringify(sidebarState));
+}
+
 // Entry point when Craft Space block is loaded
 export async function initCraftSpace(containerId) {
     const container = document.getElementById(containerId);
@@ -21,7 +34,10 @@ export async function initCraftSpace(containerId) {
         <div class="kanban-scroll-wrapper">
             <div class="kanban-board-container" id="kanbanBoardContainer">
                 <div class="raw-tasks-sidebar">
-                    <h3>TASKS (MD)</h3>
+                    <div class="sidebar-header-row">
+                        <h3>TASKS (MD)</h3>
+                        <div class="sidebar-toggles"></div>
+                    </div>
                     <div id="mdTasksList">Loading...</div>
                 </div>
                 <!-- Kanban columns sit right next to sidebar -->
@@ -141,16 +157,51 @@ async function loadData() {
                 tickets = await diffRes.json();
             }
         }
+
+        // Load Sidebar Mappings state
+        const storedSidebar = localStorage.getItem('eatpan_sidebar');
+        if (storedSidebar) {
+            sidebarState = { ...sidebarState, ...JSON.parse(storedSidebar) };
+        }
     } catch (e) {
         console.error("Failed to load CraftSpace data", e);
     }
 }
 
 function renderSidebar() {
+    // 1. Inject Toggles into Headers (across all SPA clones)
+    const sidebars = document.querySelectorAll('.raw-tasks-sidebar');
+    sidebars.forEach(sidebar => {
+        let toggleContainer = sidebar.querySelector('.sidebar-toggles');
+        if (!toggleContainer) return; // Structural HTML is generated in initCraftSpace
+        
+        toggleContainer.innerHTML = `
+            <button class="btn-sidebar-toggle ${sidebarState.showArchive ? 'active' : ''}" id="toggleArchiveGlob" title="Показувати/Приховувати Архів">
+                <i data-lucide="${sidebarState.showArchive ? 'eye' : 'eye-off'}" style="width:14px; height:14px;"></i> <span style="font-size: 10px; font-weight: bold; margin-left: 2px;">A</span>
+            </button>
+            <button class="btn-sidebar-toggle ${sidebarState.showKanban ? 'active' : ''}" id="toggleKanbanGlob" title="Показувати Значки Канбану">
+                <i data-lucide="${sidebarState.showKanban ? 'eye' : 'eye-off'}" style="width:14px; height:14px;"></i> <span style="font-size: 10px; font-weight: bold; margin-left: 2px;">KB</span>
+            </button>
+        `;
+        
+        // Bind Header Events
+        toggleContainer.querySelector('#toggleArchiveGlob').addEventListener('click', () => {
+            sidebarState.showArchive = !sidebarState.showArchive;
+            saveSidebarState();
+            renderSidebar();
+        });
+        toggleContainer.querySelector('#toggleKanbanGlob').addEventListener('click', () => {
+            sidebarState.showKanban = !sidebarState.showKanban;
+            saveSidebarState();
+            renderSidebar();
+        });
+    });
+
+    // 2. Render List contents
     const lists = document.querySelectorAll('#mdTasksList');
     if (lists.length === 0) return;
     
-    const htmlToInject = rawTasks.map(item => {
+    const htmlToInject = rawTasks.map((item, index) => {
         if (item.type === 'chapter') {
             return `
                 <div class="raw-task-chapter">
@@ -164,19 +215,153 @@ function renderSidebar() {
                     <span class="subchapter-title">${item.text}</span>
                 </div>
             `;
-        } else {
+        } else if (item.type === 'task') {
+            const isArchived = sidebarState.archivedTasks.includes(item.text);
+            const isClientDone = sidebarState.completedTasks?.includes(item.text) || item.isDone;
+            const linkedId = sidebarState.linkedTickets[item.text];
+            const isLinked = !!linkedId;
+            
+            // Filter Logic:
+            // If the user turned OFF showArchive...
+            // AND the task IS archived...
+            // AND the task is COMPLETED... then hide it!
+            // BUT if it's archived and NOT completed, we still show it (greyed out).
+            if (isArchived && isClientDone && !sidebarState.showArchive) return '';
+            
+            const archClass = isArchived ? 'archived' : '';
+            let iconsHtml = '';
+            
+            // Archive Toggle Button
+            iconsHtml += `
+                <button class="sidebar-icon-btn btn-archive" data-idx="${index}" title="${isArchived ? 'Повернути з архіву' : 'В архів'}">
+                    <i data-lucide="${isArchived ? 'archive-restore' : 'archive'}" style="width:14px; height:14px;"></i>
+                </button>
+            `;
+            
+            // Kanban Badge Button
+            if (sidebarState.showKanban) {
+                iconsHtml += `
+                    <button class="sidebar-icon-btn btn-kanban ${isLinked ? 'linked' : ''}" data-idx="${index}" title="${isLinked ? 'Показати картку' : 'Створити картку на канбані'}">
+                        <i data-lucide="${isLinked ? 'kanban' : 'plus-square'}" style="width:14px; height:14px;"></i>
+                    </button>
+                `;
+            }
+
             return `
-                <div class="raw-task-item ${item.isDone ? 'done' : ''}">
-                    <div class="raw-check">${item.isDone ? '✓' : ''}</div>
-                    <span>${item.text}</span>
+                <div class="raw-task-item ${isClientDone ? 'done' : ''} ${archClass}">
+                    <div class="raw-check" data-idx="${index}" style="cursor: pointer;">
+                        ${isClientDone ? '<i data-lucide="check" style="width:12px; height:12px; stroke-width:3px;"></i>' : ''}
+                    </div>
+                    <span class="task-text">${item.text}</span>
+                    <div class="task-actions">
+                        ${iconsHtml}
+                    </div>
                 </div>
             `;
         }
+        return '';
     }).join('');
 
+    // Inject and bind dynamic events
     lists.forEach(list => {
         list.innerHTML = htmlToInject;
+        
+        // Task Context Actions
+        list.querySelectorAll('.raw-check').forEach(check => {
+            check.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!sidebarState.completedTasks) sidebarState.completedTasks = [];
+                const idx = Number(check.dataset.idx);
+                const taskText = rawTasks[idx].text;
+                
+                if (sidebarState.completedTasks.includes(taskText)) {
+                    sidebarState.completedTasks = sidebarState.completedTasks.filter(t => t !== taskText);
+                } else {
+                    sidebarState.completedTasks.push(taskText);
+                }
+                saveSidebarState();
+                renderSidebar();
+            });
+        });
+
+        list.querySelectorAll('.btn-archive').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = Number(btn.dataset.idx);
+                const taskText = rawTasks[idx].text;
+                
+                if (sidebarState.archivedTasks.includes(taskText)) {
+                    sidebarState.archivedTasks = sidebarState.archivedTasks.filter(t => t !== taskText);
+                } else {
+                    sidebarState.archivedTasks.push(taskText);
+                }
+                saveSidebarState();
+                renderSidebar();
+            });
+        });
+
+        list.querySelectorAll('.btn-kanban').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = Number(btn.dataset.idx);
+                const taskText = rawTasks[idx].text;
+                const existingId = sidebarState.linkedTickets[taskText];
+                
+                if (existingId) {
+                    // Navigate to existing Kanban card via smooth scrolling
+                    const cardNode = document.querySelector(`.original-block .vintage-ticket[data-id="${existingId}"]`);
+                    if (cardNode) {
+                        cardNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        cardNode.classList.remove('flash-highlight');
+                        void cardNode.offsetWidth; // force reflow jump
+                        cardNode.classList.add('flash-highlight');
+                    } else {
+                        alert('Ця картка не знайдена на дошці. (Можливо була видалена вручну)');
+                    }
+                } else {
+                    // Custom Modal Slide-in
+                    window.showCustomModal(`Створити нову картку в Kanban для задачі:<br/><br/><span style="font-family:var(--font-body); font-size: 0.9rem; color: var(--ink); opacity: 0.8;">"${taskText}"?</span>`, () => {
+                        const newId = Date.now().toString();
+                        const newTicket = {
+                            id: newId,
+                            title: taskText,
+                            type: 'FEAT', // Default fallback
+                            typeLabel: 'FEAT',
+                            tags: [],
+                            checkpoints: [],
+                            status: 'GET',
+                            cost: '-',
+                            timeLabel: 'est',
+                            timeline: { start: '00:00', end: '00:00', date: '-' }
+                        };
+                        tickets.push(newTicket);
+                        localStorage.setItem('eatpan_tickets', JSON.stringify(tickets));
+                        
+                        sidebarState.linkedTickets[taskText] = newId;
+                        saveSidebarState();
+                        
+                        // Render full updates
+                        renderBoard();
+                        renderSidebar();
+                        
+                        // Focus visually
+                        setTimeout(() => {
+                            const newCard = document.querySelector(`.original-block .vintage-ticket[data-id="${newId}"]`);
+                            if (newCard) {
+                                newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                newCard.classList.add('flash-highlight');
+                            }
+                        }, 100);
+                    });
+                }
+            });
+        });
     });
+    
+    // Mount Lucide Icons dynamically
+    if (window.lucide) {
+        lucide.createIcons();
+    }
 }
 
 function renderBoard() {
@@ -414,3 +599,70 @@ function moveTicket(id, newStatus) {
         console.warn(`Attempted to move ticket ${id} but it was not found.`);
     }
 }
+// Global Modal Slide-In Mechanic
+window.showCustomModal = function(message, onConfirm) {
+    let modal = document.getElementById('kanban-custom-modal');
+    
+    // Create base template if it doesn't exist
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'kanban-custom-modal';
+        
+        // Inline Vintage Styles for slide-up block
+        Object.assign(modal.style, {
+            position: 'fixed',
+            bottom: '-200px', // start hidden
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'var(--parchment, #Fdfbf5)', // Fallback included
+            border: '2px solid var(--brand-red, #9E1010)',
+            borderRadius: '12px 12px 0 0',
+            padding: '24px 20px',
+            boxShadow: '0 -5px 30px rgba(0,0,0,0.15)',
+            zIndex: '9999',
+            fontFamily: 'var(--font-title)',
+            color: 'var(--ink, #1F1E1B)',
+            transition: 'bottom 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)', // smooth bouncy slide
+            width: '90%',
+            maxWidth: '500px',
+            textAlign: 'center'
+        });
+        
+        modal.innerHTML = `
+            <div id="kmodal-msg" style="margin-bottom: 24px; font-size: 1.1rem; line-height: 1.4;"></div>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="kmodal-yes" style="padding: 10px 24px; background: var(--brand-red, #9E1010); color: var(--parchment, #Fdfbf5); border: none; border-radius: 6px; cursor: pointer; font-family: var(--font-title); font-size: 1rem; font-weight: bold; transition: opacity 0.2s;">Створити</button>
+                <button id="kmodal-no" style="padding: 10px 24px; background: transparent; border: 2px solid var(--ink, #1F1E1B); color: var(--ink, #1F1E1B); border-radius: 6px; cursor: pointer; font-family: var(--font-title); font-size: 1rem; font-weight: bold; transition: opacity 0.2s;">Скасувати</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // Apply message
+    document.getElementById('kmodal-msg').innerHTML = message;
+    const btnYes = document.getElementById('kmodal-yes');
+    const btnNo = document.getElementById('kmodal-no');
+    
+    // Clear old listeners by cloning
+    const newYes = btnYes.cloneNode(true);
+    const newNo = btnNo.cloneNode(true);
+    btnYes.parentNode.replaceChild(newYes, btnYes);
+    btnNo.parentNode.replaceChild(newNo, btnNo);
+    
+    // Slide up
+    requestAnimationFrame(() => {
+        modal.style.bottom = '0px';
+    });
+    
+    newYes.addEventListener('hover', () => newYes.style.opacity = '0.8');
+    newNo.addEventListener('hover', () => newNo.style.opacity = '0.8');
+    
+    newYes.addEventListener('click', () => {
+        modal.style.bottom = '-300px';
+        if (onConfirm) onConfirm();
+    });
+    
+    newNo.addEventListener('click', () => {
+        modal.style.bottom = '-300px'; // slide out
+    });
+};
