@@ -453,3 +453,19 @@ body.clock-mode .clock-placeholder {
   position: relative;
   color: var(--ink);
 }
+
+/* --- MICRO-ANIMATIONS --- */
+@keyframes slideFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.categories-list-view, .categories-grid-view {
+    animation: slideFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}

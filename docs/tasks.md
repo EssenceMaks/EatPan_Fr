@@ -40,6 +40,8 @@
 - [x] Stabilize original-block slide navigation for MacBook trackpad
 - [x] Prevent trackpad overshoot and blink on inertial swipe
 - [x] Suppress horizontal trackpad slide jitter before block switch
+- [x] Speed up consecutive trackpad swipes between slides
+- [x] Open the current slide with Enter
 - [x] Add keyboard arrow navigation for slide switching
 - [x] Add `Esc` to close the currently open block
 

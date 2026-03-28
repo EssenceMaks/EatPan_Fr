@@ -4,18 +4,26 @@ import PageRight from "./PageRight.js";
 
 export default class Book extends Component {
   async onMount() {
-    const pageLeft = new PageLeft({ recipes: this.props.recipes });
-    const pageRight = new PageRight();
+    this.activeRecipe = null;
+    
+    this.pageLeft = new PageLeft({ 
+        recipes: this.props.recipes || [],
+        onRecipeSelect: async (recipe) => {
+            this.activeRecipe = recipe;
+            if (this.pageRight) {
+                await this.pageRight.update({ recipe: this.activeRecipe });
+            }
+        }
+    });
+    
+    this.pageRight = new PageRight({ recipe: this.activeRecipe });
 
-    const leftEl = await pageLeft.render();
-    const rightEl = await pageRight.render();
+    const leftEl = await this.pageLeft.render();
+    const rightEl = await this.pageRight.render();
 
     const cover = this.element.querySelector(".book-cover");
-
-    // Use replaceWith for the existing .spine to place pages correctly
-    // Or just append before the spine like the DOM structure:
-    // .book-cover > .bookmark-btn, .page--left, .spine, .page--right
     const spine = cover.querySelector(".spine");
+    
     cover.insertBefore(leftEl, spine);
     cover.appendChild(rightEl);
   }

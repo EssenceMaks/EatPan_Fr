@@ -11,16 +11,19 @@
 
 - **Trackpad overshoot / blink** — доопрацьовано SPA-навігацію `ORIGINAL BLOCKS` у `main.js`, щоб один inertial swipe на MacBook trackpad більше не провокував другий автоперехід і коротке блимання інтерфейсу.
 - **Horizontal trackpad jitter** — прибрано зайвий короткий зсув слайдера при горизонтальних свайпах, коли контейнер починав рухатися до сусіднього блоку, але навігація ще не була підтверджена порогом жесту.
+- **Consecutive swipe delay** — прибрано надмірну паузу між сусідніми свайпами: після одного переходу користувач тепер може значно швидше перейти до наступного слайду без очікування 1-3 секунди.
 
 ### Changed
 
+- **`Enter` відкриває слайд** — клавіша `Enter` тепер відкриває поточний центрований `original-block` через ту саму логіку активації, що і клік по слайду.
 - **Gesture lock logic** — фіксований cooldown замінено на блокування в межах одного wheel-жесту (`wheelGestureLocked` + `wheelGestureUnlockTimer`), а також додано `wheelLockUntil` на час завершення переходу між блоками.
 - **Programmatic centering** — замість `scrollIntoView()` для переходів між блоками тепер використовується точний `scrollTo()` через `scrollBlockToCenter()`, а `scroll-snap` тимчасово вимикається на час програмного скролу і повертається після завершення.
 - **Scroll settle detection** — завершення програмного переходу тепер відстежується не лише таймером, а й досягненням цільової `scrollLeft` позиції (`pendingBlockNavTarget`), що зменшує видимий дриг при horizontal wheel gestures.
+- **Responsive gesture release** — таймінги `wheel`-lock скорочено, lock тепер скидається одразу після фактичного завершення переходу, а дрібна інерція трекпада більше не продовжує блокування нового свайпу так довго.
 
 ### Documentation
 
-- Оновлено `docs/tasks.md` — додано виконані follow-up пункти про усунення overshoot/blink та horizontal jitter на трекпаді.
+- Оновлено `docs/tasks.md` — додано виконані follow-up пункти про усунення overshoot/blink, horizontal jitter, затримки між сусідніми свайпами на трекпаді та відкривання слайду клавішею `Enter`.
 
 **Назва коміту:**
 `fix: prevent inertial trackpad overshoot and block blink`

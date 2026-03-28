@@ -1,5 +1,6 @@
 import BookModule from './src/modules/recipe_book_sector/BookModule.js';
 import { initCraftSpace } from './src/modules/craft_space/craft_space.js';
+import { RecipeService } from './src/api/RecipeService.js';
 
 // --- ALL JS LOGIC FROM EatPan_SPA.html ---
 
@@ -22,7 +23,10 @@ const BLOCK_NAV_SETTLE_MS = 520;
 const BLOCK_NAV_TARGET_EPSILON = 6;
 const WHEEL_INTENT_THRESHOLD = 32;
 const WHEEL_INTENT_RESET_MS = 140;
-const WHEEL_GESTURE_IDLE_MS = 320;
+const WHEEL_GESTURE_IDLE_MS = 180;
+const WHEEL_GESTURE_KEEPALIVE_DELTA = 10;
+const WHEEL_POST_NAV_LOCK_MS = 80;
+const WHEEL_POST_FINALIZE_LOCK_MS = 160;
 
 function initInfiniteScroll() {
     const originals = Array.from(document.querySelectorAll('.original-block'));
@@ -230,6 +234,8 @@ function finalizeBlockNavigation() {
     blockNavFinalizeTimer = null;
     pendingBlockNavTarget = null;
     isJumping = false;
+    resetWheelGestureState();
+    wheelLockUntil = Date.now() + WHEEL_POST_FINALIZE_LOCK_MS;
     wrapToOriginalIfNeeded();
     requestAnimationFrame(() => {
         sectionBlocks.classList.add('snapping');
@@ -251,9 +257,19 @@ let wheelIntentResetTimer = null;
 let wheelLockUntil = 0;
 
 function resetWheelGestureState() {
+    clearTimeout(wheelGestureUnlockTimer);
+    wheelGestureUnlockTimer = null;
     wheelGestureLocked = false;
     wheelIntentAccumulator = 0;
     wheelIntentAxis = null;
+}
+
+function keepWheelGestureAlive(delta) {
+    if (Math.abs(delta) < WHEEL_GESTURE_KEEPALIVE_DELTA) return;
+    clearTimeout(wheelGestureUnlockTimer);
+    wheelGestureUnlockTimer = setTimeout(() => {
+        resetWheelGestureState();
+    }, WHEEL_GESTURE_IDLE_MS);
 }
 
 function resolveWheelIntent(evt) {
@@ -275,12 +291,13 @@ sectionBlocks.addEventListener('wheel', (evt) => {
 
     const intent = resolveWheelIntent(evt);
 
-    clearTimeout(wheelGestureUnlockTimer);
-    wheelGestureUnlockTimer = setTimeout(() => {
-        resetWheelGestureState();
-    }, WHEEL_GESTURE_IDLE_MS);
-
     if (!intent) return;
+
+    keepWheelGestureAlive(intent.delta);
+
+    if (!isJumping && wheelGestureLocked && Date.now() >= wheelLockUntil && Math.abs(intent.delta) >= WHEEL_GESTURE_KEEPALIVE_DELTA) {
+        resetWheelGestureState();
+    }
 
     if (Date.now() < wheelLockUntil || isJumping || wheelGestureLocked) return;
 
@@ -303,7 +320,7 @@ sectionBlocks.addEventListener('wheel', (evt) => {
     wheelIntentAccumulator = 0;
     wheelIntentAxis = null;
     wheelGestureLocked = true;
-    wheelLockUntil = Date.now() + BLOCK_NAV_SETTLE_MS + 120;
+    wheelLockUntil = Date.now() + WHEEL_POST_NAV_LOCK_MS;
 
     scrollToAdjacentBlock(direction);
 }, { passive: false });
@@ -343,6 +360,11 @@ function isEditableTarget(target) {
     return Boolean(target.closest('input, textarea, select, [contenteditable="true"]'));
 }
 
+function getCurrentOriginalBlock() {
+    const currentIndex = getCurrentBlockIndex();
+    return document.querySelector(`.original-block[data-index="${currentIndex}"]`);
+}
+
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
         const createModeBook = document.querySelector('.book-cover.book--create-mode');
@@ -370,6 +392,13 @@ document.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
         event.preventDefault();
         scrollToAdjacentBlock(-1);
+    }
+
+    if (event.key === 'Enter') {
+        const currentBlock = getCurrentOriginalBlock();
+        if (!currentBlock) return;
+        event.preventDefault();
+        activateBlock(currentBlock);
     }
 });
 
@@ -654,9 +683,79 @@ window.addStepRow = function() {
     lucide.createIcons();
 };
 
-window.saveRecipe = function() {
-    console.log('Recipe saved (mock)');
-    window.toggleCreateRecipe();
+window.saveRecipe = async function() {
+    console.log('Gathering recipe data...');
+    try {
+        const title = document.querySelector('.create-input-title')?.value.trim() || 'Без назви';
+        const subtitle = document.querySelector('.create-input-subtitle')?.value.trim() || '';
+        const timeStr = document.querySelectorAll('.create-stats-row .create-stat-input input')[0]?.value.trim() || '';
+        const portionsStr = document.querySelectorAll('.create-stats-row .create-stat-input input')[1]?.value.trim() || '';
+        
+        // Books (e.g. ['Всі рецепти', 'Особисті'])
+        const checkedBooks = Array.from(document.querySelectorAll('.create-checklist input:checked')).map(cb => cb.parentElement.innerText.trim());
+        
+        // Category 
+        const catBtn = document.querySelector('.create-category-grid .create-cat-btn.selected');
+        const categoryValue = catBtn ? catBtn.innerText.trim() : 'Без категорії';
+
+        // Ingredients
+        const ingredients = [];
+        document.querySelectorAll('.create-ingredient-row').forEach(row => {
+            const name = row.querySelector('.create-ing-name')?.value.trim();
+            const amount = row.querySelector('.create-ing-amount')?.value.trim();
+            if(name) {
+                ingredients.push({ name, amount });
+            }
+        });
+
+        // Steps
+        const steps = [];
+        document.querySelectorAll('.create-step-row').forEach((row, i) => {
+            const stepTitle = row.querySelector('.create-step-fields input')?.value.trim() || '';
+            const stepText = row.querySelector('.create-step-fields textarea')?.value.trim() || '';
+            if(stepTitle || stepText) {
+                steps.push({ num: i + 1, title: stepTitle, text: stepText });
+            }
+        });
+
+        const secret = document.querySelector('.create-secret-textarea')?.value.trim() || '';
+        const serving = document.querySelector('.create-serving-textarea')?.value.trim() || '';
+
+        const payload = {
+            title,
+            subtitle,
+            time_str: timeStr,
+            portions_str: portionsStr,
+            books: checkedBooks,
+            category: categoryValue,
+            ingredients,
+            steps,
+            secret,
+            serving
+        };
+
+        console.log('Sending Recipe:', payload);
+        const result = await RecipeService.createRecipe(payload);
+        
+        if (result && !result.error && typeof result.id !== 'undefined') {
+            console.log("Success! Recipe Created", result);
+            window.toggleCreateRecipe(); // Close modal
+            
+            // Re-fetch data and re-render BookModule smoothly
+            if (window.activeBookModule) {
+                await window.activeBookModule.loadData();
+            } else {
+                window.location.reload();
+            }
+        } else {
+            console.error('Failed response:', result);
+            alert('Помилка при збереженні (сервер не відповів "201 Created"). Перевір консоль (F12).');
+        }
+
+    } catch (e) {
+        console.error('Error in saveRecipe:', e);
+        alert('Помилка підключення до API.');
+    }
 };
 
 
@@ -682,6 +781,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cookbookArea = document.getElementById('cookbook-section');
     if (cookbookArea) {
         const bookModule = new BookModule();
+        window.activeBookModule = bookModule; // Store globally for reloads
         const bookElement = await bookModule.render();
         cookbookArea.appendChild(bookElement);
     }
