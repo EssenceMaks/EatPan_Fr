@@ -25,29 +25,34 @@ export default class PageLeft extends Component {
     }
 
     getFilteredRecipes() {
-        const bookName = {
+        if (!this.props.recipes) return [];
+        
+        // Handle BOTH legacy hardcoded activeBooks ('my', 'guests', etc) AND exact dynamically mapped strings!
+        const bookNameBase = {
             'all': 'Всі рецепти',
             'my': 'Особисті',
             'guests': 'Гості',
             'places': 'Заклади'
         }[this.state.activeBook];
+        const bookName = bookNameBase || this.state.activeBook;
 
         let filtered = (this.props.recipes || []).filter(r => {
             if (this.state.activeBook === 'all') return true;
             return r.data && r.data.books && r.data.books.includes(bookName);
         });
 
-        const iconToCat = {
-            'soup': 'Супи', 'beef': 'М\'ясо', 'drumstick': 'Птиця',
-            'fish': 'Риба', 'shrimp': 'Морепродукти', 'utensils': 'Паста',
-            'leaf': 'Салати', 'wheat': 'Випічка', 'cake-slice': 'Десерти', 'coffee': 'Напої'
-        };
-
         if (this.state.activeCategory !== 'all') {
-            const catStr = iconToCat[this.state.activeCategory];
-            if (catStr) {
-                filtered = filtered.filter(r => r.data && r.data.category === catStr);
-            }
+            // Because activeCategory is built from `buildHierarchy` mainGroup labels (e.g. "М'ясні страви" instead of "М'ясо")
+            // we must apply the SAME remapping here while filtering recipes!
+            filtered = filtered.filter(r => {
+                let cat = r.data && r.data.category ? r.data.category : 'Без категорії';
+                let mainGroup = cat; // Default
+                if (cat === "М'ясо") { mainGroup = "М'ясні страви"; }
+                if (cat === "Птиця") { mainGroup = "М'ясні страви"; }
+                if (cat === "Паста" || cat === "Салати") { mainGroup = "Гарніри"; }
+                
+                return mainGroup === this.state.activeCategory;
+            });
         }
         return filtered;
     }
@@ -76,14 +81,7 @@ export default class PageLeft extends Component {
             return `<div style="padding: 20px; text-align: center; color: var(--text-muted);">Немає рецептів у цій категорії.</div>`;
         }
 
-        const getMainGroupIcon = (name) => {
-            const m = {
-                "Супи": "soup", "М'ясні страви": "beef", "Гарніри": "wheat",
-                "Риба та Морепродукти": "fish", "Випічка та Десерти": "cake-slice",
-                "Напої": "coffee", "Без категорії": "help-circle"
-            };
-            return m[name] || "utensils";
-        };
+        const isSingleCategory = Object.keys(hierarchy).length === 1;
 
         return Object.entries(hierarchy).map(([mainGroupName, subCats]) => {
             const subGroupsHTML = Object.entries(subCats).map(([subGroupName, recList]) => {
@@ -105,7 +103,7 @@ export default class PageLeft extends Component {
                                 ${subGroupName}
                                 <i data-lucide="chevron-down" style="width:14px; opacity:0.6;"></i>
                             </div>
-                            <div style="display:none; padding-left:15px; margin-top:5px;">
+                            <div style="display:${isSingleCategory ? 'block' : 'none'}; padding-left:15px; margin-top:5px;">
                                 ${recipesHTML}
                             </div>
                         </div>
@@ -117,12 +115,12 @@ export default class PageLeft extends Component {
                 <div style="border-bottom:1px solid #e0dbce; padding: 12px 0;">
                     <div onclick="const n = this.nextElementSibling; n.style.display = n.style.display==='none'?'block':'none';" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-family:'Playfair Display', serif; font-size:18px; color:#4a3f35;">
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <i data-lucide="${getMainGroupIcon(mainGroupName)}" style="width:20px; color:var(--brand-red);"></i>
+                            <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(mainGroupName) : 'utensils'}" style="width:20px; color:var(--brand-red);"></i>
                             ${mainGroupName}
                         </div>
                         <i data-lucide="chevron-down" style="width:16px;"></i>
                     </div>
-                    <div style="display:none; padding-top:10px;">
+                    <div style="display:${isSingleCategory ? 'block' : 'none'}; padding-top:10px;">
                         ${subGroupsHTML}
                     </div>
                 </div>
@@ -144,10 +142,8 @@ export default class PageLeft extends Component {
             
             const cards = Array.from(existingCats).map(cat => {
                 const img = catImgs[cat] || catImgs["Супи"]; // fallback
-                const iconMapper = {'Супи': 'soup', 'М\'ясо': 'beef', 'Птиця': 'drumstick', 'Паста': 'utensils'};
-                const actionIcon = iconMapper[cat] || 'utensils';
                 return `
-                    <div class="category-card" onclick="window.setPageLeftState({ activeCategory: '${actionIcon}', viewMode: 'grid' })">
+                    <div class="category-card" onclick="window.setPageLeftState({ activeCategory: '${cat.replace(/'/g, "\\'")}', viewMode: 'list' })">
                         <img alt="${cat}" class="category-card-img" src="${img}" />
                         <div class="category-card-pill" style="text-transform:uppercase;">${cat}</div>
                     </div>
@@ -191,18 +187,59 @@ export default class PageLeft extends Component {
     }
 
     template() {
+window.getMainGroupIconDef = (name) => {
+    const lower = name.toLowerCase();
+    if (lower.includes('м\'яс') || lower.includes('beef') || lower.includes('lamb') || lower.includes('pork')) return 'beef';
+    if (lower.includes('суп') || lower.includes('soup')) return 'soup';
+    if (lower.includes('гарнір') || lower.includes('випіч') || lower.includes('wheat') || lower.includes('rice') || lower.includes('pasta')) return 'wheat';
+    if (lower.includes('риба') || lower.includes('море') || lower.includes('fish') || lower.includes('shrimp')) return 'fish';
+    if (lower.includes('десерт') || lower.includes('cake') || lower.includes('dessert')) return 'cake-slice';
+    if (lower.includes('напій') || lower.includes('coffee') || lower.includes('drink')) return 'coffee';
+    if (lower.includes('пт') || lower.includes('chicken') || lower.includes('turkey')) return 'drumstick';
+    if (lower.includes('салат') || lower.includes('veg') || lower.includes('leaf')) return 'leaf';
+    if (lower.includes('паста') || lower.includes('macaroni')) return 'utensils';
+    return "utensils";
+};
+
         const book = this.state.activeBook;
         const view = this.state.viewMode;
         const cat = this.state.activeCategory;
         
         // Data logic
         const activeRecipesForView = this.getFilteredRecipes();
-        const hierarchyForList = this.buildHierarchy(activeRecipesForView);
+        let hierarchyForList = this.buildHierarchy(activeRecipesForView);
+        if (view === 'list' && cat !== 'all') {
+            hierarchyForList = { [cat]: hierarchyForList[cat] || {} };
+        }
+
+        // Recipes filtered ONLY by the current group (to know which categories actually exist in it)
+        const recipesInCurrentBook = (this.props.recipes || []).filter(r => {
+            if (book === 'all') return true;
+            return r.data && r.data.books && r.data.books.includes(book);
+        });
+
+        const bookHier = this.buildHierarchy(recipesInCurrentBook);
+        const allCats = Object.keys(bookHier).filter(c => c !== 'Без категорії').sort();
+
+        // Extract all dynamic groups
+        const uniqueGroupsSet = new Set(['Особисті', 'Гості', 'Заклади']);
+        (this.props.recipes || []).forEach(r => {
+            if (r.data && Array.isArray(r.data.books)) {
+                r.data.books.forEach(b => {
+                    if (b !== 'Всі рецепти' && b.trim() !== '') {
+                        uniqueGroupsSet.add(b);
+                    }
+                });
+            }
+        });
+        const dynamicGroups = Array.from(uniqueGroupsSet);
 
         // Build View Content
         const viewContentHTML = view === 'list' 
             ? `<div class="categories-list-view" style="padding-top:10px;">${this.renderListView(hierarchyForList)}</div>`
             : this.renderGridView(activeRecipesForView);
+
+        const catNameStr = cat !== 'all' ? cat.toUpperCase() : '';
 
         return `
             <section class="page page--left">
@@ -212,11 +249,20 @@ export default class PageLeft extends Component {
                 </div>
                 <!-- Inner Header Tabs -->
                 <header class="inner-tabs-header">
-                    <div class="inner-tabs-group">
+                    <div class="inner-tabs-group" style="display:flex; flex-wrap:wrap; gap: 4px; align-items:center;">
                         <button class="tab-btn--top ${book === 'all' ? 'active' : ''}" onclick="window.setPageLeftState({ activeBook: 'all' })">Всі рецепти</button>
-                        <button class="tab-btn--top ${book === 'my' ? 'active' : ''}" onclick="window.setPageLeftState({ activeBook: 'my' })">Особисті</button>
-                        <button class="tab-btn--top ${book === 'guests' ? 'active' : ''}" onclick="window.setPageLeftState({ activeBook: 'guests' })">Гості</button>
-                        <button class="tab-btn--top ${book === 'places' ? 'active' : ''}" onclick="window.setPageLeftState({ activeBook: 'places' })">Заклади</button>
+                        ${dynamicGroups.map(g => {
+                            const customStyle = !['Особисті', 'Гості', 'Заклади'].includes(g) ? 'font-style: italic; color: var(--accent);' : '';
+                            return `
+                                <div class="group-tab-wrap" style="position:relative; display:inline-flex; align-items:center;" onmouseover="this.querySelector('.grp-actions').style.display='flex'" onmouseout="this.querySelector('.grp-actions').style.display='none'">
+                                    <button class="tab-btn--top ${book === g ? 'active' : ''}" style="${customStyle}" onclick="window.setPageLeftState({ activeBook: '${g.replace(/'/g, "\\'")}' })">${g}</button>
+                                    <div class="grp-actions" style="display:none; position:absolute; top:-12px; right:-10px; gap:2px; background:var(--parchment); border-radius:4px; border:1px solid rgba(0,0,0,0.1); padding:2px;">
+                                        <i data-lucide="edit-2" style="width:12px; height:12px; cursor:pointer; color:var(--ink);" onclick="window.renameRecipeGroup('${g.replace(/'/g, "\\'")}')" title="Перейменувати"></i>
+                                        <i data-lucide="trash-2" style="width:12px; height:12px; cursor:pointer; color:var(--brand-red);" onclick="window.deleteRecipeGroup('${g.replace(/'/g, "\\'")}')" title="Видалити"></i>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                     <div>
                         <button class="tab-btn--top" onclick="window.toggleCreateRecipe()"><i data-lucide="plus" style="width: 14px; height: 14px;"></i></button>
@@ -225,13 +271,13 @@ export default class PageLeft extends Component {
 
                 <!-- LEFT SIDE CATEGORY TABS -->
                 <aside class="side-tabs-container side-tabs--left-top" id="side-tabs-categories">
-                    ${['soup','beef','drumstick','fish','shrimp','utensils','leaf','wheat','cake-slice','coffee'].map(icon => `
-                        <div class="side-tab--left ${cat === icon ? 'active' : ''}" onclick="window.setPageLeftState({ activeCategory: '${icon}', viewMode: 'list' })">
-                            <i data-lucide="${icon}" style="width: 18px;"></i>
+                    ${allCats.map(c => `
+                        <div class="side-tab--left ${cat === c ? 'active' : ''}" title="${c}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
+                            <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(c) : 'utensils'}" style="width: 18px;"></i>
                         </div>
                     `).join('')}
                     <!-- Click active selected tab again to reset to 'all' -->
-                    ${cat !== 'all' ? `<div class="side-tab--left" style="margin-top:20px; color:var(--brand-red);" onclick="window.setPageLeftState({ activeCategory: 'all' })"><i data-lucide="x" style="width: 18px;"></i></div>` : ''}
+                    ${cat !== 'all' ? `<div class="side-tab--left" style="margin-top:20px; color:var(--brand-red);" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })"><i data-lucide="x" style="width: 18px;"></i></div>` : ''}
                 </aside>
 
                 <!-- LEFT SIDE HEALTH TABS -->
@@ -248,7 +294,12 @@ export default class PageLeft extends Component {
                     <div class="categories-grid-view">
                         <div class="categories-header-wrap">
                             <div>
-                                <h1 class="text-h1">${cat === 'all' && view === 'grid' ? "CATEGORIES" : (cat !== 'all' ? "РЕЦЕПТИ" : "СПИСОК РЕЦЕПТІВ")}</h1>
+                                ${cat !== 'all' ? `
+                                <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 5px; cursor: pointer; color: var(--brand-red); font-weight: bold; font-family: var(--font-serif); font-size: 14px;" onclick="window.setPageLeftState({activeCategory: 'all', viewMode: 'grid'})">
+                                    <i data-lucide="arrow-left" style="width:16px;"></i> КАТЕГОРІЇ
+                                </div>
+                                ` : ''}
+                                <h1 class="text-h1">${cat === 'all' && view === 'grid' ? "CATEGORIES" : (cat !== 'all' ? "КАТЕГОРІЯ " + catNameStr : "СПИСОК РЕЦЕПТІВ")}</h1>
                                 <p class="text-subtitle">Discover a limitless world of culinary possibilities...</p>
                             </div>
                             <div class="category-header-actions">
@@ -276,12 +327,17 @@ export default class PageLeft extends Component {
                 <div class="create-mode-content">
                     <h2 class="create-mode-title">Новий рецепт</h2>
                     <section class="create-section">
-                        <h3 class="section-title">Додати до книги</h3>
-                        <div class="create-checklist">
-                            <label class="create-check-item"><input type="checkbox" name="book" value="all" checked> <span>Всі рецепти</span></label>
-                            <label class="create-check-item"><input type="checkbox" name="book" value="personal"> <span>Особисті</span></label>
-                            <label class="create-check-item"><input type="checkbox" name="book" value="guests"> <span>Гості</span></label>
-                            <label class="create-check-item"><input type="checkbox" name="book" value="places"> <span>Заклади</span></label>
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px;">
+                            <h3 class="section-title" style="margin-bottom:0;">Група рецептів</h3>
+                        </div>
+                        <div class="create-checklist" id="create-group-checklist" style="display:flex; flex-wrap:wrap; gap:10px;">
+                            <label class="create-check-item"><input type="checkbox" name="book" value="Всі рецепти" checked> <span>Всі рецепти</span></label>
+                            ${dynamicGroups.map(g => `<label class="create-check-item"><input type="checkbox" name="book" value="${g}"> <span>${g}</span></label>`).join('')}
+                            
+                            <div id="new-group-container" style="display:flex; align-items:center; height: 24px;">
+                                <input type="text" id="new-group-input" placeholder="Нова група..." style="border: 1px dashed var(--brand-red); border-right: none; border-radius: 12px 0 0 12px; padding: 2px 8px; width: 100px; font-size:12px; height:100%; outline:none; background:none; color: var(--text-main);">
+                                <button type="button" onclick="window.addCustomGroupInline()" title="Створити групу" style="background:var(--brand-red); border:1px solid var(--brand-red); border-radius: 0 12px 12px 0; cursor:pointer; height:100%; color:#fff; display:flex; align-items:center; justify-content:center; padding: 0 8px;"><i data-lucide="check" style="width:14px; height:14px;"></i></button>
+                            </div>
                         </div>
                     </section>
                     <section class="create-section">

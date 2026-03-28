@@ -5,8 +5,9 @@ export const RecipeService = {
     async fetchAll(filters = {}) {
         try {
             const params = new URLSearchParams(filters);
-            const url = params.toString() ? `${API_BASE}/recipes/?${params.toString()}` : `${API_BASE}/recipes/`;
-            const response = await fetch(url);
+            params.append('_t', new Date().getTime()); // Вбиваємо кеш браузера
+            const url = `${API_BASE}/recipes/?${params.toString()}`;
+            const response = await fetch(url, { cache: 'no-store' });
             return await response.json();
         } catch (error) {
             console.error('API Error fetchAll:', error);
@@ -16,7 +17,7 @@ export const RecipeService = {
 
     async fetchDetail(id) {
         try {
-            const response = await fetch(`${API_BASE}/recipes/${id}/`);
+            const response = await fetch(`${API_BASE}/recipes/${id}/?_t=${new Date().getTime()}`, { cache: 'no-store' });
             return await response.json();
         } catch (error) {
             console.error('API Error fetchDetail:', error);
@@ -42,14 +43,27 @@ export const RecipeService = {
     async updateRecipe(id, data) {
         try {
             const response = await fetch(`${API_BASE}/recipes/${id}/`, {
-                method: 'PATCH',
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: data })
+                body: JSON.stringify({ data: data, is_active: true })
             });
             return await response.json();
         } catch (error) {
             console.error('API Error updateRecipe:', error);
             return null;
+        }
+    },
+
+    async deleteRecipe(id) {
+        try {
+            const response = await fetch(`${API_BASE}/recipes/${id}/`, {
+                method: 'DELETE'
+            });
+            if (response.status === 204) return true;
+            return false;
+        } catch (error) {
+            console.error('API Error deleteRecipe:', error);
+            return false;
         }
     },
 

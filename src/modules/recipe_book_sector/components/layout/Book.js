@@ -5,11 +5,13 @@ import PageRight from "./PageRight.js";
 export default class Book extends Component {
   async onMount() {
     this.activeRecipe = null;
+    window.globalActiveRecipe = null;
     
     this.pageLeft = new PageLeft({ 
         recipes: this.props.recipes || [],
         onRecipeSelect: async (recipe) => {
             this.activeRecipe = recipe;
+            window.globalActiveRecipe = recipe;
             if (this.pageRight) {
                 await this.pageRight.update({ recipe: this.activeRecipe });
             }

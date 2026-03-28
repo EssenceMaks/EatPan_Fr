@@ -590,9 +590,25 @@ window.toggleCreateRecipe = function() {
             if (isCreate) {
                 ico.setAttribute('data-lucide', 'arrow-left');
                 txt.textContent = 'До рецептів';
+                
+                const saveBtn = document.getElementById('btn-save-recipe');
+                if (saveBtn) {
+                    saveBtn.innerHTML = window.currentEditingRecipeId 
+                        ? '<i data-lucide="check" style="width:16px;"></i> Зберегти зміни' 
+                        : '<i data-lucide="check" style="width:16px;"></i> Зберегти в книгу';
+                }
             } else {
                 ico.setAttribute('data-lucide', 'feather');
                 txt.textContent = 'Створити рецепт';
+                
+                if (window.currentEditingRecipeId) {
+                    window.currentEditingRecipeId = null;
+                    const delBtn = document.getElementById('btn-delete-recipe');
+                    if (delBtn) delBtn.style.display = 'none';
+                    // Simple clear mapping
+                    const titleEl = document.querySelector('.create-input-title');
+                    if (titleEl) titleEl.value = '';
+                }
             }
         }
         lucide.createIcons();
@@ -601,6 +617,264 @@ window.toggleCreateRecipe = function() {
     setTimeout(() => {
         pages.forEach(p => p.classList.remove('page--flipping'));
     }, 600);
+};
+
+window.openEditRecipe = function() {
+    if (!window.globalActiveRecipe) {
+        alert("Оберіть рецепт для редагування");
+        return;
+    }
+    const r = window.globalActiveRecipe;
+    const data = r.data || {};
+    window.currentEditingRecipeId = r.id; 
+
+    // Populate Fields
+    document.querySelector('.create-input-title').value = data.title || '';
+    document.querySelector('.create-input-subtitle').value = data.subtitle || '';
+    const stats = document.querySelectorAll('.create-stats-row .create-stat-input input');
+    if(stats[0]) stats[0].value = data.time_str || '';
+    if(stats[1]) stats[1].value = data.portions_str || '';
+    
+    // Books Checkboxes (Groups)
+    const books = data.books || [];
+    const checklistItems = document.querySelectorAll('.create-checklist input[type="checkbox"]');
+    checklistItems.forEach(cb => cb.checked = false);
+
+    const checklistContainer = document.getElementById('create-group-checklist');
+    const inputContainer = document.getElementById('new-group-container');
+    
+    books.forEach(bk => {
+        const cb = document.querySelector(`.create-checklist input[type="checkbox"][value="${bk}"]`);
+        if (cb) {
+            cb.checked = true;
+        } else if (checklistContainer) {
+            const label = document.createElement('label');
+            label.className = 'create-check-item';
+            label.innerHTML = `<input type="checkbox" name="book" value="${bk}" checked> <span>${bk}</span>`;
+            if (inputContainer) {
+                checklistContainer.insertBefore(label, inputContainer);
+            } else {
+                checklistContainer.appendChild(label);
+            }
+        }
+    });
+
+    // Category
+    const categoryName = data.category || '';
+    let catFound = false;
+    document.querySelectorAll('.create-category-grid .create-cat-btn').forEach(btn => {
+        if (btn.innerText.trim().toLowerCase() === categoryName.toLowerCase()) {
+            btn.classList.add('selected');
+            catFound = true;
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+
+    if (categoryName && !catFound) {
+        const grid = document.querySelector('.create-category-grid');
+        if (grid) {
+            const btn = document.createElement('button');
+            btn.className = 'create-cat-btn selected';
+            btn.type = 'button';
+            btn.onclick = function() { window.selectCategory(this); };
+            const fallbackIcon = window.getMainGroupIconDef ? window.getMainGroupIconDef(categoryName) : 'utensils';
+            btn.innerHTML = `<i data-lucide="${fallbackIcon}" style="width:18px;"></i><span>${categoryName}</span>`;
+            grid.appendChild(btn);
+        }
+    }
+
+    // Ingredients
+    const ingList = document.getElementById('create-ingredients-list');
+    if (ingList) {
+        ingList.innerHTML = '';
+        const ings = data.ingredients || [];
+        ings.forEach(ing => {
+            const row = document.createElement('div');
+            row.className = 'create-ingredient-row';
+            row.innerHTML = `
+                <input type="text" class="create-ing-name" placeholder="Інгредієнт" value="${(ing.name||'').replace(/"/g, '&quot;')}">
+                <input type="text" class="create-ing-amount" placeholder="К-сть" value="${(ing.amount||'').replace(/"/g, '&quot;')}">
+                <button type="button" class="create-remove-btn" onclick="this.parentElement.remove()"><i data-lucide="x" style="width:12px;"></i></button>
+            `;
+            ingList.appendChild(row);
+        });
+    }
+
+    // Steps
+    const stepList = document.getElementById('create-steps-list');
+    if (stepList) {
+        stepList.innerHTML = '';
+        const steps = data.steps || [];
+        steps.forEach((st, idx) => {
+            const row = document.createElement('div');
+            row.className = 'create-step-row';
+            row.innerHTML = `
+                <div class="create-step-num">${String(idx + 1).padStart(2, '0')}</div>
+                <div class="create-step-fields">
+                    <input type="text" placeholder="Назва кроку" value="${(st.title||'').replace(/"/g, '&quot;')}">
+                    <textarea placeholder="Опис кроку..." rows="2">${(st.text||'').replace(/</g, '&lt;')}</textarea>
+                </div>
+                <button type="button" class="create-remove-btn" onclick="this.parentElement.remove()"><i data-lucide="x" style="width:12px;"></i></button>
+            `;
+            stepList.appendChild(row);
+        });
+    }
+
+    // Secret & Serving
+    document.querySelector('.create-secret-textarea').value = data.secret || '';
+    document.querySelector('.create-serving-textarea').value = data.serving || '';
+
+    // Show delete button
+    const delBtn = document.getElementById('btn-delete-recipe');
+    if(delBtn) delBtn.style.display = 'flex';
+
+    window.toggleCreateRecipe();
+};
+
+window.deleteActiveRecipe = async function() {
+    if (!window.currentEditingRecipeId) return;
+    if (!confirm("Ви впевнені, що хочете видалити цей рецепт? Дія незворотна.")) return;
+    
+    try {
+        const success = await RecipeService.deleteRecipe(window.currentEditingRecipeId);
+        if (success) {
+            window.toggleCreateRecipe();
+            if (window.activeBookModule) {
+                window.globalActiveRecipe = null;
+                await window.activeBookModule.loadData();
+            }
+        } else {
+            alert('Помилка при видаленні рецепту.');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Помилка підключення.');
+    }
+};
+
+// ==========================================
+// GROUP MANAGEMENT
+// ==========================================
+window.renameRecipeGroup = async function(oldName) {
+    if (['Особисті', 'Гості', 'Заклади'].includes(oldName)) {
+        alert("Неможливо перейменувати базову групу.");
+        return;
+    }
+    const newName = prompt(`Введіть нову назву для групи "${oldName}":`, oldName);
+    if (!newName || newName.trim() === '' || newName === oldName) return;
+
+    if (!window.activeBookModule || !window.activeBookModule.recipes) return;
+    
+    // Find all recipes with this group and update them
+    const recipesToUpdate = window.activeBookModule.recipes.filter(r => r.data && r.data.books && r.data.books.includes(oldName));
+    
+    let updatedCount = 0;
+    for (const r of recipesToUpdate) {
+        const updatedBooks = r.data.books.map(b => b === oldName ? newName.trim() : b);
+        r.data.books = updatedBooks;
+        const success = await window.RecipeService.updateRecipe(r.id, r.data);
+        if (success) updatedCount++;
+    }
+    
+    alert(`Група "${oldName}" перейменована на "${newName}". Оновлено рецептів: ${updatedCount}`);
+    
+    // Refresh UI
+    if (window.activeBookModule) {
+        await window.activeBookModule.loadData();
+    }
+};
+
+window.deleteRecipeGroup = async function(groupName) {
+    if (['Особисті', 'Гості', 'Заклади'].includes(groupName)) {
+        alert("Неможливо видалити базову групу.");
+        return;
+    }
+    
+    const confirmDeleteGroup = confirm(`Ви хочете ВИДАЛИТИ групу "${groupName}"?`);
+    if (!confirmDeleteGroup) return;
+
+    const confirmDeleteRecipes = confirm(`Бажаєте також НАЗАВЖДИ ВИДАЛИТИ всі рецепти, які належать лише до цієї групи?\n\n[OK] - Видалити рецепти\n[Скасувати] - Залишити рецепти (видалити лише групу)`);
+
+    if (!window.activeBookModule || !window.activeBookModule.recipes) return;
+
+    const recipesInGroup = window.activeBookModule.recipes.filter(r => r.data && r.data.books && r.data.books.includes(groupName));
+    let affectedCount = 0;
+
+    for (const r of recipesInGroup) {
+        if (confirmDeleteRecipes) {
+            // Delete the entire recipe
+            const success = await window.RecipeService.deleteRecipe(r.id);
+            if (success) affectedCount++;
+        } else {
+            // Just remove the group from the recipe
+            r.data.books = r.data.books.filter(b => b !== groupName);
+            // If it has no books left, maybe optionally add "Всі рецепти" or something
+            if (r.data.books.length === 0) r.data.books.push("Всі рецепти");
+            
+            const success = await window.RecipeService.updateRecipe(r.id, r.data);
+            if (success) affectedCount++;
+        }
+    }
+    
+    alert(`Дію виконано успішно. Оброблено рецептів: ${affectedCount}`);
+    
+    if (window.activeBookModule) {
+        // Switch back to "all" if we were inside the deleted group
+        if (window.activeBookModule.state.activeBook === groupName) {
+            window.activeBookModule.state.activeBook = 'all';
+        }
+        await window.activeBookModule.loadData();
+    }
+};
+
+window.addCustomGroupInline = function() {
+    const input = document.getElementById('new-group-input');
+    if (!input) return;
+    const name = input.value.trim();
+    if (!name) return;
+    
+    const checklist = document.getElementById('create-group-checklist');
+    if (!checklist) return;
+    
+    // Check if already exists
+    const existing = Array.from(checklist.querySelectorAll('input[type="checkbox"]')).map(cb => cb.value);
+    if (existing.includes(name)) {
+        alert("Така група вже існує");
+        return;
+    }
+
+    const label = document.createElement('label');
+    label.className = 'create-check-item';
+    label.innerHTML = `<input type="checkbox" name="book" value="${name}" checked> <span>${name}</span>`;
+    
+    const container = document.getElementById('new-group-container');
+    if (container) {
+        checklist.insertBefore(label, container);
+    } else {
+        checklist.appendChild(label);
+    }
+    input.value = '';
+};
+
+window.addCustomGroup = function() {
+    const name = prompt("Введіть назву нової групи рецептів:");
+    if (!name || !name.trim()) return;
+    
+    const checklist = document.getElementById('create-group-checklist');
+    if (!checklist) return;
+
+    const label = document.createElement('label');
+    label.className = 'create-check-item';
+    label.innerHTML = `<input type="checkbox" name="book" value="${name.trim()}" checked> <span>${name.trim()}</span>`;
+    
+    // Insert before the last element if it's the plus button
+    const btn = checklist.querySelector('button');
+    if (btn) {
+        checklist.insertBefore(label, btn);
+    } else {
+        checklist.appendChild(label);
+    }
 };
 
 window.selectCategory = function(btn) {
@@ -734,22 +1008,38 @@ window.saveRecipe = async function() {
             serving
         };
 
-        console.log('Sending Recipe:', payload);
-        const result = await RecipeService.createRecipe(payload);
-        
-        if (result && !result.error && typeof result.id !== 'undefined') {
-            console.log("Success! Recipe Created", result);
-            window.toggleCreateRecipe(); // Close modal
-            
-            // Re-fetch data and re-render BookModule smoothly
-            if (window.activeBookModule) {
-                await window.activeBookModule.loadData();
+        if (window.currentEditingRecipeId) {
+            console.log('Sending Update:', payload);
+            const result = await RecipeService.updateRecipe(window.currentEditingRecipeId, payload);
+            if (result && !result.error) {
+                console.log("Success! Recipe Updated", result);
+                window.currentEditingRecipeId = null; // Clear
+                window.toggleCreateRecipe(); // Close modal
+                if (window.activeBookModule) {
+                    window.globalActiveRecipe = { id: result.id, data: result.data }; // Update locally
+                    await window.activeBookModule.loadData();
+                }
             } else {
-                window.location.reload();
+                alert('Помилка при оновленні рецепту. Сервер не повернув 200.');
             }
         } else {
-            console.error('Failed response:', result);
-            alert('Помилка при збереженні (сервер не відповів "201 Created"). Перевір консоль (F12).');
+            console.log('Sending Recipe:', payload);
+            const result = await RecipeService.createRecipe(payload);
+            
+            if (result && !result.error && typeof result.id !== 'undefined') {
+                console.log("Success! Recipe Created", result);
+                window.toggleCreateRecipe(); // Close modal
+                
+                // Re-fetch data and re-render BookModule smoothly
+                if (window.activeBookModule) {
+                    await window.activeBookModule.loadData();
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                console.error('Failed response:', result);
+                alert('Помилка при збереженні (сервер не відповів "201 Created"). Перевір консоль (F12).');
+            }
         }
 
     } catch (e) {

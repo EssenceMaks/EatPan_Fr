@@ -125,7 +125,7 @@ export default class PageRight extends Component {
                 </div>
                 <!-- RIGHT SIDE VARIANT TABS -->
                 <aside class="side-tabs-container side-tabs--right-bottom">
-                    <div class="side-tab--right" title="Редагувати" onclick="window.toggleCreateRecipe()"><i data-lucide="feather" style="width: 16px;"></i></div>
+                    <div class="side-tab--right" title="Редагувати" onclick="window.openEditRecipe()"><i data-lucide="feather" style="width: 16px;"></i></div>
                     <div class="side-tab--right" title="Роздрукувати"><i data-lucide="printer" style="width: 16px;"></i></div>
                     <div class="side-tab--right active"><span>1 в.</span></div>
                     <div class="side-tab--right"><span>2 в.</span></div>
@@ -189,8 +189,11 @@ export default class PageRight extends Component {
                             <h3 class="section-title">Подача</h3>
                             <textarea class="create-serving-textarea" placeholder="Рекомендація до подачі..." rows="2"></textarea>
                         </section>
+                        <button type="button" id="btn-delete-recipe" onclick="window.deleteActiveRecipe()" class="create-save-btn" style="display:none; background:transparent; color:var(--brand-red); border:1px solid var(--brand-red); width:100%; margin-bottom: 10px; justify-content:center;">
+                            <i data-lucide="trash-2" style="width:16px; margin-right:8px;"></i> Видалити рецепт
+                        </button>
                         <div class="create-form-actions">
-                            <button type="button" class="create-save-btn" onclick="window.saveRecipe()">
+                            <button type="button" id="btn-save-recipe" class="create-save-btn" onclick="window.saveRecipe()">
                                 <i data-lucide="check" style="width:16px;"></i> Зберегти в книгу
                             </button>
                             <button type="button" class="create-cancel-btn" onclick="window.toggleCreateRecipe()">Скасувати</button>
