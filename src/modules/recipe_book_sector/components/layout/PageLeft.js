@@ -420,30 +420,54 @@ export default class PageLeft extends Component {
                 window.requestAnimationFrame(() => {
                     const bookCover = document.querySelector('.book-cover');
                     
-                    // FIX 3: Dynamic Column Break!
-                    // The flex-container spans full height now, but we must protect the bottom corner (health tabs).
-                    const tabs = Array.from(tabsContainer.querySelectorAll('.side-tab--left'));
+                    // FIX 3: Dynamic Column Break using a dedicated DOM Spacer!
+                    // This creates a clean layout wrap without polluting individual tabs with massive margins.
+                    let spacer = tabsContainer.querySelector('.tab-col-spacer');
+                    if (!spacer) {
+                        spacer = document.createElement('div');
+                        spacer.className = 'tab-col-spacer';
+                        spacer.style.width = '10px';
+                        spacer.style.pointerEvents = 'none';
+                        spacer.style.visibility = 'hidden';
+                        tabsContainer.appendChild(spacer);
+                    }
+
+                    const tabs = Array.from(tabsContainer.querySelectorAll('.side-tab--left:not(.tab-col-spacer)'));
                     const containerHeight = tabsContainer.offsetHeight;
                     
-                    if (tabs.length > 0 && containerHeight > 300) {
-                        tabs.forEach(t => t.style.marginBottom = '0px'); // Reset first
-                        
-                        // Protect bottom ~250px area + 15px safety = 265px
-                        const safeCol1Height = containerHeight - 265;
+                    if (tabs.length > 0 && containerHeight > 250) {
+                        // Exact height of the 5 bottom health tabs is ~191px + 15px gap = 206px
+                        const safeCol1Height = containerHeight - 206; 
                         const maxTabsCol1 = Math.max(1, Math.floor(safeCol1Height / 39));
                         
                         if (tabs.length > maxTabsCol1) {
-                            // Assign exact margin equivalent to the danger zone to trigger flex-wrap!
-                            tabs[maxTabsCol1 - 1].style.marginBottom = '280px'; 
+                            const targetTab = tabs[maxTabsCol1 - 1];
+                            // Inject spacer right after the last allowed tab in Col 1
+                            if (targetTab.nextSibling !== spacer) {
+                                targetTab.parentNode.insertBefore(spacer, targetTab.nextSibling);
+                            }
+                            
+                            // CALCULATE EXACT HEIGHT WITHOUT OVERFLOWING!
+                            // If spacer exceeds containerHeight, flexbox will place the spacer ITSELF into Col 2!
+                            // maxTabsCol1 * 39 accounts for all tabs and their trailing gaps.
+                            // -1px ensures we defeat any subpixel browser rounding and stay securely inside Col 1.
+                            const exactHeight = containerHeight - (maxTabsCol1 * 39) - 1;
+                            spacer.style.height = Math.max(0, exactHeight) + 'px';
+                        } else {
+                            if (spacer.parentNode) spacer.parentNode.removeChild(spacer);
                         }
+                    } else {
+                        if (spacer.parentNode) spacer.parentNode.removeChild(spacer);
                     }
 
                     if (bookCover) {
                         // FIX 1: Bypass Chromium flex-column wrap intrinsic width bug
-                        let minOffset = 0;
+                        let minOffset = Infinity;
                         for (let tab of tabs) {
                             if (tab.offsetLeft < minOffset) minOffset = tab.offsetLeft;
                         }
+                        if (minOffset === Infinity) minOffset = 0;
+                        
                         const trueWidth = tabsContainer.offsetWidth - minOffset; 
                         const newPadding = Math.max(60, trueWidth - 20);
                         bookCover.style.paddingLeft = newPadding + 'px';
