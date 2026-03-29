@@ -53,6 +53,13 @@
 - [x] Keep only the login trigger in the header and open registration from the form
 - [x] Add forgot-password flow from the login form
 - [x] Improve auth email validation and add smooth form animations
+- [x] Make auth form switching smoother and add a dev avatar drawer next to login
+
+#### Frontend (Profile)
+
+- [x] Add a dedicated profile module with full-page view, summary stats, and recipe previews
+- [x] Restyle profile drawer and profile page closer to the recipe-book visual language
+- [x] Keep the profile drawer within the content area, add explicit close action, and support closing with `Esc`
 
 #### Frontend (Recipe Book)
 

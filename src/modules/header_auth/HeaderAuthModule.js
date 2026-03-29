@@ -1,4 +1,5 @@
 import Component from '../../core/Component.js';
+import { buildProfilePayload, getProfilePayload } from '../profile/profileData.js';
 
 const SESSION_KEY = 'eatpan_header_auth_user';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -6,11 +7,23 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 export default class HeaderAuthModule extends Component {
     constructor(props = {}) {
         super(props);
+        const storedUser = this.readStoredUser();
         this.state = {
+            isDrawerOpen: false,
             panel: null,
+            profile: buildProfilePayload(storedUser, []),
             recoveryEmail: '',
-            user: this.readStoredUser()
+            user: storedUser
         };
+        this.globalListenersAttached = false;
+        this.handleDocumentKeydown = async (event) => {
+            if (event.key !== 'Escape') return;
+            if (!this.state.isDrawerOpen) return;
+
+            event.preventDefault();
+            await this.closePanel();
+        };
+        this.profileInitialized = false;
     }
 
     readStoredUser() {
@@ -91,39 +104,120 @@ export default class HeaderAuthModule extends Component {
         return true;
     }
 
+    async onMount() {
+        if (!this.globalListenersAttached) {
+            document.addEventListener('keydown', this.handleDocumentKeydown);
+            this.globalListenersAttached = true;
+        }
+
+        if (window.lucide) {
+            window.lucide.createIcons({ root: this.element });
+        }
+
+        if (this.profileInitialized) return;
+
+        this.profileInitialized = true;
+        await this.loadProfileData();
+    }
+
+    getProfileIdentity() {
+        return this.state.user || this.state.profile?.user || null;
+    }
+
+    async loadProfileData(shouldRefresh = true) {
+        this.state.profile = await getProfilePayload(this.getProfileIdentity());
+
+        if (window.profileModule?.setUser) {
+            await window.profileModule.setUser(this.state.profile.user);
+        }
+
+        if (shouldRefresh) {
+            await this.refresh();
+        }
+    }
+
+    isGuestPanel(panel) {
+        return ['login', 'register', 'forgot', 'forgot-sent'].includes(panel);
+    }
+
+    async animateGuestPanelOut() {
+        const popover = this.element?.querySelector('.header-auth-popover--guest');
+        if (!popover) return;
+
+        popover.classList.add('header-auth-popover--leaving');
+        await new Promise(resolve => window.setTimeout(resolve, 160));
+    }
+
     async refresh() {
         await this.update({});
     }
 
-    openPanel(panel) {
-        this.state.panel = this.state.panel === panel ? null : panel;
+    async openPanel(panel) {
+        const nextPanel = this.state.panel === panel ? null : panel;
+
+        if (this.state.panel && nextPanel && this.isGuestPanel(this.state.panel) && this.isGuestPanel(nextPanel)) {
+            await this.animateGuestPanelOut();
+        }
+
+        this.state.isDrawerOpen = false;
+        this.state.panel = nextPanel;
+
         if (this.state.panel !== 'forgot-sent') {
             this.state.recoveryEmail = '';
         }
-        return this.refresh();
+
+        await this.refresh();
     }
 
     async closePanel() {
-        if (!this.state.panel) return;
+        if (!this.state.panel && !this.state.isDrawerOpen) return;
+
+        if (this.state.panel && this.isGuestPanel(this.state.panel)) {
+            await this.animateGuestPanelOut();
+        }
+
+        this.state.isDrawerOpen = false;
         this.state.panel = null;
         this.state.recoveryEmail = '';
         await this.refresh();
     }
 
-    completeAuth(user) {
+    async toggleProfileDrawer() {
+        const willOpen = !this.state.isDrawerOpen;
+
+        if (willOpen && this.state.panel && this.isGuestPanel(this.state.panel)) {
+            await this.animateGuestPanelOut();
+        }
+
+        this.state.isDrawerOpen = willOpen;
+        this.state.panel = null;
+        this.state.recoveryEmail = '';
+
+        if (willOpen) {
+            await this.loadProfileData(false);
+        }
+
+        await this.refresh();
+    }
+
+    async completeAuth(user) {
         this.state.user = user;
+        this.state.isDrawerOpen = false;
         this.state.panel = null;
         this.state.recoveryEmail = '';
         this.storeUser(user);
-        return this.refresh();
+        await this.loadProfileData(false);
+        await this.refresh();
     }
 
-    logout() {
+    async logout() {
         this.state.user = null;
+        this.state.isDrawerOpen = false;
         this.state.panel = null;
         this.state.recoveryEmail = '';
         this.clearStoredUser();
-        return this.refresh();
+        await this.loadProfileData(false);
+        await this.refresh();
     }
 
     renderGuestPanel(mode) {
@@ -149,7 +243,7 @@ export default class HeaderAuthModule extends Component {
             : 'Фронтенд-демо: після відправки форми бекенд поки не викликається.';
 
         return `
-            <div class="header-auth-popover" data-auth-mode="${mode}" role="dialog" aria-modal="false" aria-label="${ariaLabel}">
+            <div class="header-auth-popover header-auth-popover--guest" data-auth-mode="${mode}" role="dialog" aria-modal="false" aria-label="${ariaLabel}">
                 <div class="header-auth-popover-head">
                     <div class="header-auth-heading">
                         <span class="header-auth-kicker">Kitchen Pass</span>
@@ -205,7 +299,7 @@ export default class HeaderAuthModule extends Component {
 
     renderRecoverySuccessPanel() {
         return `
-            <div class="header-auth-popover" data-auth-mode="forgot-sent" role="dialog" aria-modal="false" aria-label="Підтвердження відновлення доступу">
+            <div class="header-auth-popover header-auth-popover--guest header-auth-popover--success" data-auth-mode="forgot-sent" role="dialog" aria-modal="false" aria-label="Підтвердження відновлення доступу">
                 <div class="header-auth-popover-head">
                     <div class="header-auth-heading">
                         <span class="header-auth-kicker">Kitchen Pass</span>
@@ -223,47 +317,66 @@ export default class HeaderAuthModule extends Component {
         `;
     }
 
-    renderUserPanel(user) {
+    renderProfileDrawer() {
+        const profile = this.state.profile;
+        const user = profile.user;
+
         return `
-            <div class="header-auth-popover header-auth-popover--user" data-auth-mode="user" role="dialog" aria-modal="false" aria-label="Панель користувача">
-                <div class="header-auth-user-card">
-                    <div class="header-auth-user-avatar">${this.escapeHtml(this.getInitials(user))}</div>
-                    <div class="header-auth-user-copy">
-                        <span class="header-auth-kicker">Signed In</span>
-                        <strong class="header-auth-user-name">${this.escapeHtml(user.name)}</strong>
-                        <span class="header-auth-user-email">${this.escapeHtml(user.email)}</span>
+            <div class="header-profile-layer">
+                <div class="header-profile-backdrop" data-profile-drawer-close></div>
+                <aside class="header-profile-drawer" role="dialog" aria-modal="false" aria-label="Панель профілю користувача">
+                    <div class="header-profile-drawer-head">
+                        <div class="header-profile-drawer-avatar">${this.escapeHtml(user.initials)}</div>
+                        <div class="header-profile-drawer-copy">
+                            <span class="header-auth-kicker">Kitchen Profile</span>
+                            <strong class="header-auth-user-name">${this.escapeHtml(user.name)}</strong>
+                            <span class="header-profile-drawer-handle">${this.escapeHtml(user.handle)}</span>
+                            <span class="header-auth-user-email">${this.escapeHtml(user.email)}</span>
+                        </div>
+                        <button class="header-auth-close" type="button" data-profile-drawer-close aria-label="Закрити профіль">×</button>
                     </div>
-                </div>
-                <div class="header-auth-user-actions">
-                    <button class="header-auth-submit" type="button" data-auth-logout>Вийти</button>
-                </div>
+                    <p class="header-profile-drawer-bio">${this.escapeHtml(user.bio)}</p>
+                    <div class="header-profile-stat-grid">
+                        ${profile.stats.map(stat => `
+                            <div class="header-profile-stat-card">
+                                <span class="header-profile-stat-value">${this.escapeHtml(stat.value)}</span>
+                                <span class="header-profile-stat-label">${this.escapeHtml(stat.label)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="header-profile-drawer-highlights">
+                        ${profile.highlights.slice(0, 2).map(item => `
+                            <p>${this.escapeHtml(item)}</p>
+                        `).join('')}
+                    </div>
+                    <div class="header-profile-drawer-actions">
+                        <button class="header-auth-submit" type="button" data-profile-open-page>Відкрити профіль</button>
+                        <button class="header-auth-trigger" type="button" data-profile-drawer-close-button>Закрити</button>
+                        <button class="header-auth-trigger" type="button" data-auth-logout>Вийти</button>
+                    </div>
+                </aside>
             </div>
         `;
     }
 
     template() {
-        const user = this.state.user;
-
-        if (user) {
-            return `
-                <div class="header-auth-shell">
-                    <button class="header-auth-avatar" type="button" data-auth-toggle-user aria-label="Відкрити панель користувача">
-                        ${this.escapeHtml(this.getInitials(user))}
-                    </button>
-                    ${this.state.panel === 'user' ? this.renderUserPanel(user) : ''}
-                </div>
-            `;
-        }
+        const profileUser = this.state.profile.user;
 
         return `
-            <div class="header-auth-shell">
-                <div class="header-auth-buttons">
-                    <button class="header-auth-trigger header-auth-trigger--primary" type="button" data-auth-open="login">Вхід</button>
+            <div class="header-auth-root">
+                <div class="header-auth-shell">
+                    <div class="header-auth-buttons">
+                        <button class="header-auth-trigger header-auth-trigger--primary" type="button" data-auth-open="login">Вхід</button>
+                        <button class="header-auth-avatar header-auth-avatar--dev" type="button" data-profile-drawer-toggle aria-label="Відкрити профіль користувача">
+                            ${this.escapeHtml(profileUser.initials)}
+                        </button>
+                    </div>
+                    ${this.state.panel === 'login' ? this.renderGuestPanel('login') : ''}
+                    ${this.state.panel === 'register' ? this.renderGuestPanel('register') : ''}
+                    ${this.state.panel === 'forgot' ? this.renderGuestPanel('forgot') : ''}
+                    ${this.state.panel === 'forgot-sent' ? this.renderRecoverySuccessPanel() : ''}
                 </div>
-                ${this.state.panel === 'login' ? this.renderGuestPanel('login') : ''}
-                ${this.state.panel === 'register' ? this.renderGuestPanel('register') : ''}
-                ${this.state.panel === 'forgot' ? this.renderGuestPanel('forgot') : ''}
-                ${this.state.panel === 'forgot-sent' ? this.renderRecoverySuccessPanel() : ''}
+                ${this.state.isDrawerOpen ? this.renderProfileDrawer() : ''}
             </div>
         `;
     }
@@ -283,13 +396,29 @@ export default class HeaderAuthModule extends Component {
             }
 
             if (event.target.closest('[data-auth-close]')) {
-                this.state.panel = null;
+                await this.closePanel();
+                return;
+            }
+
+            if (event.target.closest('[data-profile-drawer-toggle]')) {
+                await this.toggleProfileDrawer();
+                return;
+            }
+
+            if (event.target.closest('[data-profile-drawer-close]')) {
+                this.state.isDrawerOpen = false;
                 await this.refresh();
                 return;
             }
 
-            if (event.target.closest('[data-auth-toggle-user]')) {
-                await this.openPanel('user');
+            if (event.target.closest('[data-profile-drawer-close-button]')) {
+                await this.closePanel();
+                return;
+            }
+
+            if (event.target.closest('[data-profile-open-page]')) {
+                await this.closePanel();
+                window.openProfilePage?.();
                 return;
             }
 
@@ -327,6 +456,7 @@ export default class HeaderAuthModule extends Component {
             if (mode === 'forgot') {
                 this.state.recoveryEmail = email;
                 this.state.panel = 'forgot-sent';
+                this.state.isDrawerOpen = false;
                 await this.refresh();
                 return;
             }
