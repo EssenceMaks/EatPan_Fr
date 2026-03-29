@@ -7,8 +7,8 @@
     width: max-content;
     /* Ensure container tightly hugs its columns */
     top: 130px;
-    height: calc(100% - 380px);
-    /* Explicit height to force wrapping */
+    bottom: 50px;
+    /* Explicitly span to bottom to allow deep columns */
     z-index: 5;
     display: flex;
     flex-direction: column;
@@ -26,7 +26,7 @@
     position: absolute;
     top: -130px;
     /* Stretch to top of book */
-    bottom: -256px;
+    bottom: -56px;
     /* Stretch to bottom of book */
     left: 48px;
     /* Recess 20px so tabs stick out from the "paper" */
@@ -115,25 +115,31 @@
     gap: 4px;
 }
 
-/* RIGHT SIDE INTERACTION TABS */
-.side-tabs--right {
+/* WRAPPER FOR ALL RIGHT TABS to prevent overlap */
+.right-tabs-wrapper {
     position: absolute;
     right: -3px;
     top: 120px;
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.side-tabs--right-bottom {
-    position: absolute;
-    right: -3px;
     bottom: 250px;
     z-index: 5;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+    /* Let clicks pass between the gap */
+    gap: 16px;
+    /* Minimum gap when completely squeezed */
+}
+
+/* RIGHT SIDE INTERACTION TABS */
+.side-tabs--right,
+.side-tabs--right-bottom {
+    position: relative;
+    display: flex;
+    flex-direction: column;
     gap: 4px;
+    pointer-events: auto;
+    /* Restore clicks */
 }
 
 .side-tab--right {

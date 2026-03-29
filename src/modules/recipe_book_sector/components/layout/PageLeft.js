@@ -419,10 +419,28 @@ export default class PageLeft extends Component {
             window.tabsResizeObserver = new ResizeObserver(() => {
                 window.requestAnimationFrame(() => {
                     const bookCover = document.querySelector('.book-cover');
+                    
+                    // FIX 3: Dynamic Column Break!
+                    // The flex-container spans full height now, but we must protect the bottom corner (health tabs).
+                    const tabs = Array.from(tabsContainer.querySelectorAll('.side-tab--left'));
+                    const containerHeight = tabsContainer.offsetHeight;
+                    
+                    if (tabs.length > 0 && containerHeight > 300) {
+                        tabs.forEach(t => t.style.marginBottom = '0px'); // Reset first
+                        
+                        // Protect bottom ~250px area + 15px safety = 265px
+                        const safeCol1Height = containerHeight - 265;
+                        const maxTabsCol1 = Math.max(1, Math.floor(safeCol1Height / 39));
+                        
+                        if (tabs.length > maxTabsCol1) {
+                            // Assign exact margin equivalent to the danger zone to trigger flex-wrap!
+                            tabs[maxTabsCol1 - 1].style.marginBottom = '280px'; 
+                        }
+                    }
+
                     if (bookCover) {
                         // FIX 1: Bypass Chromium flex-column wrap intrinsic width bug
                         let minOffset = 0;
-                        const tabs = tabsContainer.querySelectorAll('.side-tab--left');
                         for (let tab of tabs) {
                             if (tab.offsetLeft < minOffset) minOffset = tab.offsetLeft;
                         }

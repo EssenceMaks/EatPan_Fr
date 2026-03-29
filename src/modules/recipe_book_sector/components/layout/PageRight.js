@@ -56,17 +56,26 @@ export default class PageRight extends Component {
                     <button class="bookmark-bottom prepared active" onclick="this.classList.toggle('active')"><i data-lucide="soup" style="width: 25px; height: 25px;"></i></button>
                     <button class="bookmark-bottom planned" onclick="this.classList.toggle('active')"><i data-lucide="timer" style="width: 25px; height: 25px;"></i></button>
                 </div>
-                <!-- RIGHT SIDE INTERACTION TABS -->
-                <aside class="side-tabs-container side-tabs--right">
-                    <div class="side-tab--right">
-                        <i data-lucide="heart" style="width: 16px;"></i><span class="side-tab-count">124</span>
+                <!-- RIGHT SIDE TABS WRAPPER -->
+                <aside class="right-tabs-wrapper">
+                    <div class="side-tabs-container side-tabs--right">
+                        <div class="side-tab--right">
+                            <i data-lucide="heart" style="width: 16px;"></i><span class="side-tab-count">124</span>
+                        </div>
+                        <div class="side-tab--right"><i data-lucide="send" style="width: 16px;"></i></div>
+                        <div class="side-tab--right">
+                            <i data-lucide="repeat" style="width: 16px;"></i><span class="side-tab-count">42</span>
+                        </div>
+                        <div class="side-tab--right">
+                            <i data-lucide="message-square" style="width: 16px;"></i><span class="side-tab-count">18</span>
+                        </div>
                     </div>
-                    <div class="side-tab--right"><i data-lucide="send" style="width: 16px;"></i></div>
-                    <div class="side-tab--right">
-                        <i data-lucide="repeat" style="width: 16px;"></i><span class="side-tab-count">42</span>
-                    </div>
-                    <div class="side-tab--right">
-                        <i data-lucide="message-square" style="width: 16px;"></i><span class="side-tab-count">18</span>
+                    <div class="side-tabs-container side-tabs--right-bottom">
+                        <div class="side-tab--right" title="Редагувати" onclick="window.openEditRecipe()"><i data-lucide="feather" style="width: 16px;"></i></div>
+                        <div class="side-tab--right" title="Роздрукувати"><i data-lucide="printer" style="width: 16px;"></i></div>
+                        <div class="side-tab--right active"><span>1 в.</span></div>
+                        <div class="side-tab--right"><span>2 в.</span></div>
+                        <div class="side-tab--right" title="Додати варіант"><i data-lucide="plus" style="width: 16px;"></i></div>
                     </div>
                 </aside>
                 <div class="scrollable-area right-page-inner">
@@ -123,14 +132,6 @@ export default class PageRight extends Component {
                         </div>
                     </div>
                 </div>
-                <!-- RIGHT SIDE VARIANT TABS -->
-                <aside class="side-tabs-container side-tabs--right-bottom">
-                    <div class="side-tab--right" title="Редагувати" onclick="window.openEditRecipe()"><i data-lucide="feather" style="width: 16px;"></i></div>
-                    <div class="side-tab--right" title="Роздрукувати"><i data-lucide="printer" style="width: 16px;"></i></div>
-                    <div class="side-tab--right active"><span>1 в.</span></div>
-                    <div class="side-tab--right"><span>2 в.</span></div>
-                    <div class="side-tab--right" title="Додати варіант"><i data-lucide="plus" style="width: 16px;"></i></div>
-                </aside>
 
                 <!-- CREATE MODE OVERLAY -->
                 <div class="create-mode-content">
