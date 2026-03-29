@@ -54,6 +54,8 @@
 - [x] Add forgot-password flow from the login form
 - [x] Improve auth email validation and add smooth form animations
 - [x] Make auth form switching smoother and add a dev avatar drawer next to login
+- [x] Move the profile avatar into the left header avatar slot and place the login trigger to its right
+- [x] Open auth forms and the profile drawer from the left side of the screen
 
 #### Frontend (Profile)
 

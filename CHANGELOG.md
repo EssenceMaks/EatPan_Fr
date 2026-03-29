@@ -27,10 +27,12 @@
 - **Header dev profile access** — у header тимчасово відображаються і `Вхід`, і аватар; drawer профілю виїжджає справа та використовує спільні profile-дані з окремою сторінкою профілю.
 - **Recipe-book profile polish** — profile page перебудовано у формат розвороту книги з parchment-сторінками, spine, вкладками дій і картками рецептів у стилі cookbook-модуля.
 - **Profile drawer bounds + close UX** — drawer профілю тепер обмежений лише content-area між header/footer, має окрему кнопку `Закрити` і закривається по `Esc`.
+- **Left-side header auth layout** — інтерактивний аватар профілю перенесено в лівий avatar-slot хедера, кнопку `Вхід` поставлено праворуч від нього, а сам avatar у хедері тепер має квадратніший `border-radius: 4px`.
+- **Left-opening auth surfaces** — popup-форми `Вхід` / `Реєстрація` / `Забули пароль?` та drawer профілю тепер відкриваються і позиціонуються з лівого боку інтерфейсу.
 
 ### Documentation
 
-- Оновлено `docs/tasks.md` — додано виконані пункти про smoother auth transitions, dev profile drawer, окремий profile module/page і recipe-book polish для profile UX.
+- Оновлено `docs/tasks.md` — додано виконані пункти про smoother auth transitions, dev profile drawer, окремий profile module/page, recipe-book polish для profile UX і нове лівостороннє розміщення header auth/profile controls.
 
 **Назва коміту:**
 `refactor: extract header auth into dedicated module`

@@ -366,10 +366,10 @@ export default class HeaderAuthModule extends Component {
             <div class="header-auth-root">
                 <div class="header-auth-shell">
                     <div class="header-auth-buttons">
-                        <button class="header-auth-trigger header-auth-trigger--primary" type="button" data-auth-open="login">Вхід</button>
                         <button class="header-auth-avatar header-auth-avatar--dev" type="button" data-profile-drawer-toggle aria-label="Відкрити профіль користувача">
                             ${this.escapeHtml(profileUser.initials)}
                         </button>
+                        <button class="header-auth-trigger header-auth-trigger--primary" type="button" data-auth-open="login">Вхід</button>
                     </div>
                     ${this.state.panel === 'login' ? this.renderGuestPanel('login') : ''}
                     ${this.state.panel === 'register' ? this.renderGuestPanel('register') : ''}
