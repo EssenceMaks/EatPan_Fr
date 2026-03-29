@@ -51,6 +51,17 @@
 - [x] Move header auth into a separate module with forms and avatar state
 - [x] Close header auth popovers on block open and raise them above active blocks
 - [x] Keep only the login trigger in the header and open registration from the form
+- [x] Add forgot-password flow from the login form
+- [x] Improve auth email validation and add smooth form animations
+- [x] Make auth form switching smoother and add a dev avatar drawer next to login
+- [x] Move the profile avatar into the left header avatar slot and place the login trigger to its right
+- [x] Open auth forms and the profile drawer from the left side of the screen
+
+#### Frontend (Profile)
+
+- [x] Add a dedicated profile module with full-page view, summary stats, and recipe previews
+- [x] Restyle profile drawer and profile page closer to the recipe-book visual language
+- [x] Keep the profile drawer within the content area, add explicit close action, and support closing with `Esc`
 
 #### Frontend (Recipe Book)
 

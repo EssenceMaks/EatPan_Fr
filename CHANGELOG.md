@@ -11,6 +11,8 @@
 
 - **Header auth module** — додано окремий модуль `src/modules/header_auth/HeaderAuthModule.js`, який рендериться в header через mount-point і не захаращує `index.html` та `global.css` великою inline-формою.
 - **Auth / register forms** — реалізовано фронтенд-only popup-форми для `Вхід` та `Реєстрація`, де login-панель відкривається кнопкою в хедері, а перехід до реєстрації виконується всередині форми.
+- **Forgot-password flow** — з login-форми додано посилання `Забули пароль?`, яке відкриває окрему форму відновлення доступу та success-стан із підтвердженням для введеного email.
+- **Profile drawer + profile page** — додано dev-аватар поруч із `Вхід`, праву drawer-панель профілю з базовою статистикою та кнопку переходу в окрему full-page сторінку профілю, реалізовану модулем `src/modules/profile/ProfileModule.js`.
 - **Authorized avatar state** — після фронтенд-відправки форми auth-блок переходить у стан авторизованого користувача й показує аватар з ініціалами та міні-панель з кнопкою `Вийти`.
 
 ### Changed
@@ -19,10 +21,18 @@
 - **Module-scoped styling** — стилі header auth винесено в `src/modules/header_auth/styles/header-auth.css`, а в `global.css` прибрано попередні великі стилі auth-картки.
 - **Header auth overlay behavior** — відкриті auth-popover тепер примусово закриваються перед відкриттям `original-block` або clock-mode, а сам header auth піднято над `.section_block.active`, щоб форма відкривалась поверх активного блоку.
 - **Single header auth trigger** — окрему кнопку `Реєстрація` прибрано з хедера; тепер у шапці лишається лише `Вхід`, а перехід до реєстрації виконується з посилання всередині login-форми.
+- **Email validation** — auth-форми тепер не покладаються лише на `type="email"`: додано нормалізацію email через `trim().toLowerCase()`, regex-перевірку та власне повідомлення помилки для некоректного формату.
+- **Popover animations** — для форм `Вхід`, `Реєстрація`, `Забули пароль?` і recovery success-стану додано плавну анімацію появи.
+- **Smoother auth switching** — перехід між `Вхід`, `Реєстрація` та `Забули пароль?` тепер має окрему leave/enter логіку та стабільнішу висоту guest-popover, що прибирає різкий візуальний "стрибок".
+- **Header dev profile access** — у header тимчасово відображаються і `Вхід`, і аватар; drawer профілю виїжджає справа та використовує спільні profile-дані з окремою сторінкою профілю.
+- **Recipe-book profile polish** — profile page перебудовано у формат розвороту книги з parchment-сторінками, spine, вкладками дій і картками рецептів у стилі cookbook-модуля.
+- **Profile drawer bounds + close UX** — drawer профілю тепер обмежений лише content-area між header/footer, має окрему кнопку `Закрити` і закривається по `Esc`.
+- **Left-side header auth layout** — інтерактивний аватар профілю перенесено в лівий avatar-slot хедера, кнопку `Вхід` поставлено праворуч від нього, а сам avatar у хедері тепер має квадратніший `border-radius: 4px`.
+- **Left-opening auth surfaces** — popup-форми `Вхід` / `Реєстрація` / `Забули пароль?` та drawer профілю тепер відкриваються і позиціонуються з лівого боку інтерфейсу.
 
 ### Documentation
 
-- Оновлено `docs/tasks.md` — додано виконаний пункт про єдиний trigger `Вхід` у хедері та перехід до реєстрації з форми.
+- Оновлено `docs/tasks.md` — додано виконані пункти про smoother auth transitions, dev profile drawer, окремий profile module/page, recipe-book polish для profile UX і нове лівостороннє розміщення header auth/profile controls.
 
 **Назва коміту:**
 `refactor: extract header auth into dedicated module`

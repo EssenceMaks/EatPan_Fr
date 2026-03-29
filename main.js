@@ -1,6 +1,7 @@
 import BookModule from './src/modules/recipe_book_sector/BookModule.js';
 import { initCraftSpace } from './src/modules/craft_space/craft_space.js';
 import HeaderAuthModule from './src/modules/header_auth/HeaderAuthModule.js';
+import ProfileModule from './src/modules/profile/ProfileModule.js';
 import { RecipeService } from './src/api/RecipeService.js';
 
 // --- ALL JS LOGIC FROM EatPan_SPA.html ---
@@ -12,6 +13,7 @@ const clockBlock = document.getElementById('clockBlock');
 const bigClockFace = document.getElementById('bigClockFace');
 const bigClockHand = document.getElementById('bigClockHand');
 const bigTimeDisplay = document.getElementById('bigTimeDisplay');
+const profileBlock = document.getElementById('profileBlock');
 const menuBtn = document.getElementById('menuBtn');
 const backBtn = document.getElementById('backBtn');
 const col3 = document.getElementById('col-3-container');
@@ -91,6 +93,20 @@ function getCurrentBlockIndex() {
     return closestIdx;
 }
 
+function resolveStateTarget(state) {
+    if (!state) return null;
+
+    if (state.type === 'block') {
+        return document.querySelector(`.original-block[data-index="${state.index}"]`);
+    }
+
+    if (state.type === 'profile') {
+        return profileBlock;
+    }
+
+    return null;
+}
+
 // --- SEC: LOOPING ---
 let isJumping = false;
 let pendingBlockNavTarget = null;
@@ -98,7 +114,7 @@ let blockNavFinalizeTimer = null;
 
 function wrapToOriginalIfNeeded() {
     const centerX = sectionBlocks.scrollLeft + sectionBlocks.clientWidth / 2;
-    const allBlocks = Array.from(sectionBlocks.querySelectorAll('.section_block:not(#clockBlock)'));
+    const allBlocks = Array.from(sectionBlocks.querySelectorAll('.section_block:not(#clockBlock):not(.section_block--utility-page)'));
     let closest = null;
     let minDist = Infinity;
     allBlocks.forEach(b => {
@@ -210,7 +226,7 @@ function updateSmallClock() {
 function scrollToAdjacentBlock(direction) {
     if (isJumping) return;
     const centerX = sectionBlocks.scrollLeft + sectionBlocks.clientWidth / 2;
-    const blocks = Array.from(sectionBlocks.querySelectorAll('.section_block:not(#clockBlock)'));
+    const blocks = Array.from(sectionBlocks.querySelectorAll('.section_block:not(#clockBlock):not(.section_block--utility-page)'));
     let currentIdx = 0;
     let minDist = Infinity;
     blocks.forEach((b, i) => {
@@ -444,6 +460,39 @@ function performBlockActivation(element) {
     moveElementWithAnimate(menuBtn, col3);
 }
 
+function activateUtilityPage(type, element) {
+    if (!element) return;
+
+    window.headerAuthModule?.closePanel();
+
+    if (body.classList.contains('clock-mode')) {
+        history.pushState({ type }, null, '');
+        deactivateClockWithAnimation({ type });
+        return;
+    }
+
+    if (!body.classList.contains('active-mode')) {
+        savedBlockIndex = getCurrentBlockIndex();
+    }
+
+    const currentActive = document.querySelector('.section_block.active');
+    if (currentActive && currentActive !== element) {
+        currentActive.classList.remove('active');
+    }
+
+    if (history.state && history.state.type) {
+        history.replaceState({ type }, null, '');
+    } else {
+        history.pushState({ type }, null, '');
+    }
+
+    performBlockActivation(element);
+}
+
+window.openProfilePage = function() {
+    activateUtilityPage('profile', profileBlock);
+};
+
 function activateClock() {
     if (body.classList.contains('clock-mode')) return;
     window.headerAuthModule?.closePanel();
@@ -497,9 +546,10 @@ function deactivateClockWithAnimation(nextState) {
         clockBlock.style.opacity = ''; 
         bigClockFace.style.transform = '';
 
-        if (nextState && nextState.type === 'block') {
-            const block = document.querySelector(`.original-block[data-index="${nextState.index}"]`);
-            if (block) block.classList.add('active'); 
+        const nextTarget = resolveStateTarget(nextState);
+
+        if (nextTarget) {
+            nextTarget.classList.add('active'); 
         } else {
             body.classList.remove('active-mode');
             restoreScroll();
@@ -1077,6 +1127,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const headerAuthElement = await headerAuthModule.render();
         headerAuthMount.appendChild(headerAuthElement);
     }
+
+    const profileArea = document.getElementById('profile-section');
+    if (profileArea) {
+        const profileModule = new ProfileModule({ user: window.headerAuthModule?.getProfileIdentity?.() || null });
+        window.profileModule = profileModule;
+        const profileElement = await profileModule.render();
+        profileArea.appendChild(profileElement);
+    }
     
     // Inject the isolated Book Module into its block
     const cookbookArea = document.getElementById('cookbook-section');
@@ -1118,9 +1176,10 @@ window.addEventListener('popstate', (event) => {
 
     resetVisualState();
 
-    if (state && state.type === 'block') {
-        const block = document.querySelector(`.original-block[data-index="${state.index}"]`);
-        if (block) performBlockActivation(block);
+    const nextTarget = resolveStateTarget(state);
+
+    if (nextTarget) {
+        performBlockActivation(nextTarget);
     } else {
         restoreScroll();
         moveElementWithAnimate(menuBtn, col4);
