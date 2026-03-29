@@ -1165,9 +1165,9 @@ window.addEventListener('popstate', (event) => {
         return; 
     }
 
-    // Catch if a recipe is currently open and user hit "Back".
+    // Catch if a recipe is currently open and user hit "Back" (ONLY ON MOBILE OVERLAY).
     const activeRecipeRight = document.querySelector('.page--right.is-open');
-    if (activeRecipeRight) {
+    if (activeRecipeRight && window.innerWidth <= 1024) {
         if (typeof window.closeActiveRecipe === 'function') {
             window.closeActiveRecipe();
         }
