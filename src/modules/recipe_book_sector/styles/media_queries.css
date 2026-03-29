@@ -85,7 +85,7 @@
 /* Портретна: ВМІЩАТИ ПО ШИРИНІ */
 @media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
     :root {
-        --book-width: 93vw;
+        --book-width: calc(100vw - 120px); /* 60px buffer for side tabs */
         --page-padding: 1.5rem;
         --grid-columns: 2;
         --category-rows: 3;
@@ -104,7 +104,7 @@
 @media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
     :root {
         --header-height: clamp(45px, 8vh, 60px);
-        --book-width: min(95vw, calc((100vh - var(--header-height) * 2 - 40px) * 1.4));
+        --book-width: min(calc(100vw - 120px), calc((100vh - var(--header-height) * 2 - 40px) * 1.4));
         --page-padding: 1.5rem;
         --grid-columns: 2;
         --category-rows: 2;
@@ -134,7 +134,7 @@
 /* Портретна: ВМІЩАТИ ПО ШИРИНІ */
 @media (min-width: 1024px) and (max-width: 1199px) and (orientation: portrait) {
     :root {
-        --book-width: 93vw;
+        --book-width: calc(100vw - 120px); /* Strict buffer */
         /* Строго по ширині */
         --page-padding: 2rem;
         --grid-columns: 2;
@@ -147,8 +147,12 @@
         width: var(--book-width);
         max-width: 100%;
         height: auto;
+        margin: 0 auto;
     }
 }
+
+
+
 
 /* Альбомна: ВМІЩАТИ ПО ВИСОТІ */
 @media (min-width: 1024px) and (max-width: 1199px) and (orientation: landscape) {
@@ -319,7 +323,6 @@
         grid-template-columns: 1fr;
         padding-left: 0 !important;
         padding-right: 0 !important;
-        overflow: hidden;
     }
 
     .spine {
@@ -347,12 +350,20 @@
         z-index: 9999;
         background-color: var(--parchment);
         box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
-        overflow-y: auto;
+        overflow: hidden;
         overscroll-behavior: contain;
     }
 
     .page--right.is-open {
         transform: translateX(0);
+    }
+
+    /* Bring right tabs inside the view since the fixed sheet spans the entire 100vw screen */
+    .right-tabs-wrapper {
+        right: 20px !important;
+        transform: scale(0.85);
+        transform-origin: right center;
+        z-index: 1000;
     }
 }
 

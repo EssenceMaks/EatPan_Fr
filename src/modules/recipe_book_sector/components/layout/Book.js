@@ -18,7 +18,14 @@ export default class Book extends Component {
                 // On selection, toggle right page visibility for single-page overlays
                 const prEl = this.element.querySelector('.page--right');
                 if (prEl) {
-                    prEl.classList.add('is-open');
+                    // Double requestAnimationFrame to ensure the browser paints the 
+                    // initial translated state before triggering the CSS transition
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            prEl.classList.add('is-open');
+                        });
+                    });
+                    
                     if (window.innerWidth <= 1024) {
                         history.pushState({ type: 'recipe' }, null, "");
                     }
