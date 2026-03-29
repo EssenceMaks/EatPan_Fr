@@ -11,6 +11,7 @@
 
 - **Header auth module** — додано окремий модуль `src/modules/header_auth/HeaderAuthModule.js`, який рендериться в header через mount-point і не захаращує `index.html` та `global.css` великою inline-формою.
 - **Auth / register forms** — реалізовано фронтенд-only popup-форми для `Вхід` та `Реєстрація`, де login-панель відкривається кнопкою в хедері, а перехід до реєстрації виконується всередині форми.
+- **Forgot-password flow** — з login-форми додано посилання `Забули пароль?`, яке відкриває окрему форму відновлення доступу та success-стан із підтвердженням для введеного email.
 - **Authorized avatar state** — після фронтенд-відправки форми auth-блок переходить у стан авторизованого користувача й показує аватар з ініціалами та міні-панель з кнопкою `Вийти`.
 
 ### Changed
@@ -19,10 +20,12 @@
 - **Module-scoped styling** — стилі header auth винесено в `src/modules/header_auth/styles/header-auth.css`, а в `global.css` прибрано попередні великі стилі auth-картки.
 - **Header auth overlay behavior** — відкриті auth-popover тепер примусово закриваються перед відкриттям `original-block` або clock-mode, а сам header auth піднято над `.section_block.active`, щоб форма відкривалась поверх активного блоку.
 - **Single header auth trigger** — окрему кнопку `Реєстрація` прибрано з хедера; тепер у шапці лишається лише `Вхід`, а перехід до реєстрації виконується з посилання всередині login-форми.
+- **Email validation** — auth-форми тепер не покладаються лише на `type="email"`: додано нормалізацію email через `trim().toLowerCase()`, regex-перевірку та власне повідомлення помилки для некоректного формату.
+- **Popover animations** — для форм `Вхід`, `Реєстрація`, `Забули пароль?` і recovery success-стану додано плавну анімацію появи.
 
 ### Documentation
 
-- Оновлено `docs/tasks.md` — додано виконаний пункт про єдиний trigger `Вхід` у хедері та перехід до реєстрації з форми.
+- Оновлено `docs/tasks.md` — додано виконані пункти про forgot-password flow, покращену email-валідацію та анімацію auth-форм.
 
 **Назва коміту:**
 `refactor: extract header auth into dedicated module`

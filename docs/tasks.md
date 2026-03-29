@@ -51,6 +51,8 @@
 - [x] Move header auth into a separate module with forms and avatar state
 - [x] Close header auth popovers on block open and raise them above active blocks
 - [x] Keep only the login trigger in the header and open registration from the form
+- [x] Add forgot-password flow from the login form
+- [x] Improve auth email validation and add smooth form animations
 
 #### Frontend (Recipe Book)
 

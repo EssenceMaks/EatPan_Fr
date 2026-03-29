@@ -1,12 +1,14 @@
 import Component from '../../core/Component.js';
 
 const SESSION_KEY = 'eatpan_header_auth_user';
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 
 export default class HeaderAuthModule extends Component {
     constructor(props = {}) {
         super(props);
         this.state = {
             panel: null,
+            recoveryEmail: '',
             user: this.readStoredUser()
         };
     }
@@ -59,24 +61,59 @@ export default class HeaderAuthModule extends Component {
         return parts.slice(0, 2).map(part => part.charAt(0).toUpperCase()).join('');
     }
 
+    normalizeEmail(email) {
+        return String(email ?? '').trim().toLowerCase();
+    }
+
+    isValidEmail(email) {
+        return EMAIL_PATTERN.test(this.normalizeEmail(email));
+    }
+
+    applyEmailValidity(input) {
+        if (!(input instanceof HTMLInputElement) || input.name !== 'email') {
+            return true;
+        }
+
+        const rawValue = String(input.value ?? '');
+        const normalizedEmail = this.normalizeEmail(rawValue);
+
+        if (!normalizedEmail) {
+            input.setCustomValidity('');
+            return false;
+        }
+
+        if (!this.isValidEmail(normalizedEmail)) {
+            input.setCustomValidity('Вкажіть коректну email-адресу.');
+            return false;
+        }
+
+        input.setCustomValidity('');
+        return true;
+    }
+
     async refresh() {
         await this.update({});
     }
 
     openPanel(panel) {
         this.state.panel = this.state.panel === panel ? null : panel;
+        if (this.state.panel !== 'forgot-sent') {
+            this.state.recoveryEmail = '';
+        }
         return this.refresh();
     }
 
     async closePanel() {
         if (!this.state.panel) return;
         this.state.panel = null;
+        this.state.recoveryEmail = '';
         await this.refresh();
     }
 
     completeAuth(user) {
         this.state.user = user;
         this.state.panel = null;
+        this.state.recoveryEmail = '';
         this.storeUser(user);
         return this.refresh();
     }
@@ -84,18 +121,39 @@ export default class HeaderAuthModule extends Component {
     logout() {
         this.state.user = null;
         this.state.panel = null;
+        this.state.recoveryEmail = '';
         this.clearStoredUser();
         return this.refresh();
     }
 
     renderGuestPanel(mode) {
         const isRegister = mode === 'register';
+        const isForgot = mode === 'forgot';
+        const title = isRegister
+            ? 'Створити акаунт'
+            : isForgot
+                ? 'Відновити доступ'
+                : 'Увійти в книгу';
+        const ariaLabel = isRegister
+            ? 'Форма реєстрації'
+            : isForgot
+                ? 'Форма відновлення доступу'
+                : 'Форма авторизації';
+        const submitLabel = isRegister
+            ? 'Створити профіль'
+            : isForgot
+                ? 'Відновити доступ'
+                : 'Увійти';
+        const note = isForgot
+            ? 'Фронтенд-демо: тут буде сценарій відновлення доступу без реальної відправки листа.'
+            : 'Фронтенд-демо: після відправки форми бекенд поки не викликається.';
+
         return `
-            <div class="header-auth-popover" role="dialog" aria-modal="false" aria-label="${isRegister ? 'Форма реєстрації' : 'Форма авторизації'}">
+            <div class="header-auth-popover" data-auth-mode="${mode}" role="dialog" aria-modal="false" aria-label="${ariaLabel}">
                 <div class="header-auth-popover-head">
                     <div class="header-auth-heading">
                         <span class="header-auth-kicker">Kitchen Pass</span>
-                        <h3 class="header-auth-title">${isRegister ? 'Створити акаунт' : 'Увійти в книгу'}</h3>
+                        <h3 class="header-auth-title">${title}</h3>
                     </div>
                     <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
                 </div>
@@ -108,33 +166,66 @@ export default class HeaderAuthModule extends Component {
                     ` : ''}
                     <label class="header-auth-field">
                         <span class="header-auth-label">Email</span>
-                        <input class="header-auth-input" type="email" name="email" placeholder="name@example.com" autocomplete="email" required />
+                        <input class="header-auth-input" type="email" name="email" placeholder="name@example.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" required />
                     </label>
-                    <label class="header-auth-field">
-                        <span class="header-auth-label">Пароль</span>
-                        <input class="header-auth-input" type="password" name="password" placeholder="••••••••" autocomplete="${isRegister ? 'new-password' : 'current-password'}" required />
-                    </label>
+                    ${isForgot ? '' : `
+                        <label class="header-auth-field">
+                            <span class="header-auth-label">Пароль</span>
+                            <input class="header-auth-input" type="password" name="password" placeholder="••••••••" autocomplete="${isRegister ? 'new-password' : 'current-password'}" required />
+                        </label>
+                    `}
                     ${isRegister ? `
                         <label class="header-auth-field">
                             <span class="header-auth-label">Повторіть пароль</span>
                             <input class="header-auth-input" type="password" name="confirmPassword" placeholder="••••••••" autocomplete="new-password" required />
                         </label>
                     ` : ''}
+                    ${mode === 'login' ? `
+                        <button class="header-auth-switch header-auth-switch--subtle" type="button" data-auth-switch="forgot">
+                            Забули пароль?
+                        </button>
+                    ` : ''}
                     <div class="header-auth-actions-row">
-                        <button class="header-auth-submit" type="submit">${isRegister ? 'Створити профіль' : 'Увійти'}</button>
+                        <button class="header-auth-submit" type="submit">${submitLabel}</button>
                     </div>
-                    <button class="header-auth-switch" type="button" data-auth-switch="${isRegister ? 'login' : 'register'}">
-                        ${isRegister ? 'Уже є акаунт? Увійти' : 'Ще немає акаунта? Реєстрація'}
-                    </button>
-                    <p class="header-auth-note">Фронтенд-демо: після відправки форми бекенд поки не викликається.</p>
+                    ${isForgot ? `
+                        <button class="header-auth-switch" type="button" data-auth-switch="login">
+                            Назад до входу
+                        </button>
+                    ` : `
+                        <button class="header-auth-switch" type="button" data-auth-switch="${isRegister ? 'login' : 'register'}">
+                            ${isRegister ? 'Уже є акаунт? Увійти' : 'Ще немає акаунта? Реєстрація'}
+                        </button>
+                    `}
+                    <p class="header-auth-note">${note}</p>
                 </form>
+            </div>
+        `;
+    }
+
+    renderRecoverySuccessPanel() {
+        return `
+            <div class="header-auth-popover" data-auth-mode="forgot-sent" role="dialog" aria-modal="false" aria-label="Підтвердження відновлення доступу">
+                <div class="header-auth-popover-head">
+                    <div class="header-auth-heading">
+                        <span class="header-auth-kicker">Kitchen Pass</span>
+                        <h3 class="header-auth-title">Лист майже в дорозі</h3>
+                    </div>
+                    <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
+                </div>
+                <div class="header-auth-success-panel">
+                    <p class="header-auth-note">Ми підготували інструкцію для <strong>${this.escapeHtml(this.state.recoveryEmail)}</strong>. У демо-режимі лист не надсилається, але сценарій відновлення вже змодельовано.</p>
+                    <div class="header-auth-actions-row">
+                        <button class="header-auth-submit" type="button" data-auth-switch="login">Повернутися до входу</button>
+                    </div>
+                </div>
             </div>
         `;
     }
 
     renderUserPanel(user) {
         return `
-            <div class="header-auth-popover header-auth-popover--user" role="dialog" aria-modal="false" aria-label="Панель користувача">
+            <div class="header-auth-popover header-auth-popover--user" data-auth-mode="user" role="dialog" aria-modal="false" aria-label="Панель користувача">
                 <div class="header-auth-user-card">
                     <div class="header-auth-user-avatar">${this.escapeHtml(this.getInitials(user))}</div>
                     <div class="header-auth-user-copy">
@@ -171,6 +262,8 @@ export default class HeaderAuthModule extends Component {
                 </div>
                 ${this.state.panel === 'login' ? this.renderGuestPanel('login') : ''}
                 ${this.state.panel === 'register' ? this.renderGuestPanel('register') : ''}
+                ${this.state.panel === 'forgot' ? this.renderGuestPanel('forgot') : ''}
+                ${this.state.panel === 'forgot-sent' ? this.renderRecoverySuccessPanel() : ''}
             </div>
         `;
     }
@@ -205,20 +298,42 @@ export default class HeaderAuthModule extends Component {
             }
         });
 
+        this.element.addEventListener('input', (event) => {
+            const emailInput = event.target.closest('input[name="email"]');
+            if (emailInput) {
+                this.applyEmailValidity(emailInput);
+            }
+        });
+
         this.element.addEventListener('submit', async (event) => {
             const form = event.target.closest('[data-auth-form]');
             if (!form) return;
 
             event.preventDefault();
 
+            const emailInput = form.querySelector('input[name="email"]');
+            if (emailInput) {
+                this.applyEmailValidity(emailInput);
+            }
+
             if (!form.reportValidity()) return;
 
             const formData = new FormData(form);
             const mode = form.dataset.authForm;
-            const email = String(formData.get('email') || '').trim();
+            const email = this.normalizeEmail(formData.get('email'));
+
+            if (!email) return;
+
+            if (mode === 'forgot') {
+                this.state.recoveryEmail = email;
+                this.state.panel = 'forgot-sent';
+                await this.refresh();
+                return;
+            }
+
             const password = String(formData.get('password') || '').trim();
 
-            if (!email || !password) return;
+            if (!password) return;
 
             if (mode === 'register') {
                 const name = String(formData.get('name') || '').trim();
