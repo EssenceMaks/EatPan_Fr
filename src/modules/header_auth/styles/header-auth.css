@@ -29,7 +29,7 @@
 .header-auth-buttons {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0;
 }
 
 .header-auth-trigger,

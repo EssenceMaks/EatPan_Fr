@@ -168,7 +168,6 @@ export default class HeaderAuthModule extends Component {
             <div class="header-auth-shell">
                 <div class="header-auth-buttons">
                     <button class="header-auth-trigger header-auth-trigger--primary" type="button" data-auth-open="login">Вхід</button>
-                    <button class="header-auth-trigger header-auth-trigger--secondary" type="button" data-auth-open="register">Реєстрація</button>
                 </div>
                 ${this.state.panel === 'login' ? this.renderGuestPanel('login') : ''}
                 ${this.state.panel === 'register' ? this.renderGuestPanel('register') : ''}
