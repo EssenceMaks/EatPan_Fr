@@ -45,6 +45,17 @@
 - [x] Add keyboard arrow navigation for slide switching
 - [x] Add `Esc` to close the currently open block
 
+#### Frontend (Header UI)
+
+- [x] Add cookbook-style auth/register form next to the header clock
+- [x] Move header auth into a separate module with forms and avatar state
+- [x] Close header auth popovers on block open and raise them above active blocks
+- [x] Keep only the login trigger in the header and open registration from the form
+
+#### Frontend (Recipe Book)
+
+- [x] Reduce left side tabs and bottom ribbons on low-height desktops
+
 #### Project Maintenance
 
 - [x] Log completed changes in CHANGELOG.md and update tasks.md

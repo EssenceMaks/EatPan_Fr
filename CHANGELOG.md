@@ -5,6 +5,30 @@
 
 ---
 
+## [0.5.3] - 2026-03-28
+
+### Added
+
+- **Header auth module** — додано окремий модуль `src/modules/header_auth/HeaderAuthModule.js`, який рендериться в header через mount-point і не захаращує `index.html` та `global.css` великою inline-формою.
+- **Auth / register forms** — реалізовано фронтенд-only popup-форми для `Вхід` та `Реєстрація`, де login-панель відкривається кнопкою в хедері, а перехід до реєстрації виконується всередині форми.
+- **Authorized avatar state** — після фронтенд-відправки форми auth-блок переходить у стан авторизованого користувача й показує аватар з ініціалами та міні-панель з кнопкою `Вийти`.
+
+### Changed
+
+- **Compact header controls** — завеликий inline auth-блок у шапці замінено на компактний trigger `Вхід`, а форми винесено в окремі випадаючі панелі.
+- **Module-scoped styling** — стилі header auth винесено в `src/modules/header_auth/styles/header-auth.css`, а в `global.css` прибрано попередні великі стилі auth-картки.
+- **Header auth overlay behavior** — відкриті auth-popover тепер примусово закриваються перед відкриттям `original-block` або clock-mode, а сам header auth піднято над `.section_block.active`, щоб форма відкривалась поверх активного блоку.
+- **Single header auth trigger** — окрему кнопку `Реєстрація` прибрано з хедера; тепер у шапці лишається лише `Вхід`, а перехід до реєстрації виконується з посилання всередині login-форми.
+
+### Documentation
+
+- Оновлено `docs/tasks.md` — додано виконаний пункт про єдиний trigger `Вхід` у хедері та перехід до реєстрації з форми.
+
+**Назва коміту:**
+`refactor: extract header auth into dedicated module`
+
+---
+
 ## [0.5.2] - 2026-03-28
 
 ### Fixed

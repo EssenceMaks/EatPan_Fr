@@ -1,5 +1,6 @@
 import BookModule from './src/modules/recipe_book_sector/BookModule.js';
 import { initCraftSpace } from './src/modules/craft_space/craft_space.js';
+import HeaderAuthModule from './src/modules/header_auth/HeaderAuthModule.js';
 import { RecipeService } from './src/api/RecipeService.js';
 
 // --- ALL JS LOGIC FROM EatPan_SPA.html ---
@@ -425,6 +426,7 @@ function handleBlockClick(element) {
 }
 
 function activateBlock(element) {
+    window.headerAuthModule?.closePanel();
     savedBlockIndex = getCurrentBlockIndex();
     const index = element.dataset.index;
     if (history.state && history.state.type) {
@@ -444,6 +446,7 @@ function performBlockActivation(element) {
 
 function activateClock() {
     if (body.classList.contains('clock-mode')) return;
+    window.headerAuthModule?.closePanel();
     if (!body.classList.contains('active-mode')) {
         savedBlockIndex = getCurrentBlockIndex();
     }
@@ -1066,6 +1069,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     createClockFace();
+
+    const headerAuthMount = document.getElementById('headerAuthMount');
+    if (headerAuthMount) {
+        const headerAuthModule = new HeaderAuthModule();
+        window.headerAuthModule = headerAuthModule;
+        const headerAuthElement = await headerAuthModule.render();
+        headerAuthMount.appendChild(headerAuthElement);
+    }
     
     // Inject the isolated Book Module into its block
     const cookbookArea = document.getElementById('cookbook-section');
