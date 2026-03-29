@@ -14,9 +14,25 @@ export default class Book extends Component {
             window.globalActiveRecipe = recipe;
             if (this.pageRight) {
                 await this.pageRight.update({ recipe: this.activeRecipe });
+
+                // On selection, toggle right page visibility for single-page overlays
+                const prEl = this.element.querySelector('.page--right');
+                if (prEl) {
+                    prEl.classList.add('is-open');
+                    if (window.innerWidth <= 1024) {
+                        history.pushState({ type: 'recipe' }, null, "");
+                    }
+                }
             }
         }
     });
+
+    window.closeActiveRecipe = () => {
+        this.activeRecipe = null;
+        window.globalActiveRecipe = null;
+        const prEl = this.element?.querySelector('.page--right');
+        if (prEl) prEl.classList.remove('is-open');
+    };
     
     this.pageRight = new PageRight({ recipe: this.activeRecipe });
 

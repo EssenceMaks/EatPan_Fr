@@ -308,3 +308,68 @@
         --category-card-size: 160px;
     }
 }
+
+/* =========================================
+   NEW: MOBILE SINGLE PAGE & TABS
+   ========================================= */
+
+@media (max-width: 1024px) {
+    /* 1. Switch to 1-column single page overlay mode */
+    .book-cover {
+        grid-template-columns: 1fr;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        overflow: hidden;
+    }
+
+    .spine {
+        display: none !important;
+    }
+
+    .page--left {
+        margin: 0 !important;
+        border-radius: 12px;
+        box-shadow: none;
+        width: 100%;
+    }
+
+    /* 2. PageRight becomes a fixed bounding sliding sheet */
+    .page--right {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100dvh;
+        margin: 0 !important;
+        border-radius: 0;
+        transform: translateX(110%);
+        transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+        z-index: 9999;
+        background-color: var(--parchment);
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .page--right.is-open {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 767px) {
+    /* Hide Side Tabs */
+    .side-tabs--left-top,
+    .side-tabs--left-bottom,
+    #side-tabs-categories {
+        display: none !important;
+    }
+
+    /* Show Mobile Top Tabs */
+    .mobile-top-tabs-container {
+        display: flex !important;
+    }
+    
+    .mobile-main-title {
+        display: block;
+    }
+}

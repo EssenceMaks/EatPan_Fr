@@ -459,3 +459,68 @@
     background: var(--brand-red);
     color: white;
 }
+
+/* MOBILE TOP TABS (CATEGORIES) */
+.mobile-top-tabs-container {
+    display: none;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    padding-top: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+}
+
+.mobile-top-tabs-container::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+}
+
+.mobile-tab-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: var(--page-bg);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.5);
+    transition: var(--transition-main);
+}
+
+.mobile-tab-item.active .mobile-tab-icon {
+    background: var(--brand-red);
+    color: white;
+    border-color: var(--brand-red);
+    box-shadow: 0 6px 12px rgba(107, 13, 18, 0.25);
+    transform: translateY(-2px);
+}
+
+.mobile-tab-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(0, 0, 0, 0.6);
+    transition: var(--transition-main);
+    text-align: center;
+}
+
+.mobile-tab-item.active .mobile-tab-label {
+    color: var(--brand-red);
+}

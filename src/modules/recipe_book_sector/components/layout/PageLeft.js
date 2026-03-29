@@ -312,6 +312,24 @@ export default class PageLeft extends Component {
                             </div>
                         </div>
                         
+                        <!-- MOBILE HORIZONTAL TABS (Hidden on Desktop) -->
+                        <div class="mobile-top-tabs-container">
+                            ${cat !== 'all' ? `
+                            <div class="mobile-tab-item active" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })">
+                                <div class="mobile-tab-icon" style="color: var(--brand-red);"><i data-lucide="x" style="width:20px; height:20px;"></i></div>
+                                <span class="mobile-tab-label">Скинути</span>
+                            </div>` : ''}
+
+                            ${allCats.map(c => `
+                                <div class="mobile-tab-item ${cat === c ? 'active' : ''}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
+                                    <div class="mobile-tab-icon">
+                                        <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(c) : 'utensils'}" style="width:20px; height:20px;"></i>
+                                    </div>
+                                    <span class="mobile-tab-label">${c}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
                         <!-- MAIN CONTENT LIST OR GRID -->
                         ${viewContentHTML}
 
