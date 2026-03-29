@@ -475,6 +475,17 @@ body.clock-mode .clock-placeholder {
     }
 }
 
-.categories-list-view, .categories-grid-view {
+.categories-list-view {
+    animation: slideFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    overflow-y: auto;
+    max-height: 60vh; /* Prevents infinite book expansion causing tab overlapping */
+    scrollbar-width: none;
+    padding-right: 5px;
+}
+.categories-list-view::-webkit-scrollbar {
+    display: none;
+}
+
+.categories-grid-view {
     animation: slideFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }

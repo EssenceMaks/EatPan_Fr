@@ -4,7 +4,7 @@
     width: 100%;
     display: grid;
     place-items: center;
-    padding: 1rem;
+    padding: 5px;
 }
 
 .book-wrapper {
@@ -17,12 +17,15 @@
     width: 100%;
     background: var(--book-bg);
     border-radius: 12px;
+    border: double 1px gold;
     box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
     position: relative;
     display: grid;
     grid-template-columns: 1fr 32px 1fr;
     overflow: visible;
     padding: 12px 0;
+    padding-left: 140px;
+    /* Extend leather cover leftwards to encompass tabs securely */
     transition: var(--transition-main);
 }
 
@@ -38,20 +41,38 @@
     position: relative;
     z-index: 10;
     min-height: min(850px, calc(100vh - 200px));
+    height: 100%;
     background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
 }
 
 .page--left {
     border-radius: 4px 0 0 4px;
-    box-shadow: inset -30px 0 40px rgba(0, 0, 0, 0.1), 5px 0 15px rgba(0, 0, 0, 0.2);
+    box-shadow:
+        inset -30px 0 40px rgba(0, 0, 0, 0.1),
+        -1px 2px 0 0 var(--parchment),
+        -2px 3px 0 0 rgba(0, 0, 0, 0.1),
+        -2px 4px 0 0 var(--parchment),
+        -3px 5px 0 0 rgba(0, 0, 0, 0.1),
+        -3px 6px 0 0 var(--parchment),
+        -4px 7px 0 0 rgba(0, 0, 0, 0.1),
+        -6px 10px 20px rgba(0, 0, 0, 0.3);
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto 1fr;
+    /* Properly distribute grid rows to restrict scrollable-area height */
     margin-left: 20px;
 }
 
 .page--right {
     border-radius: 0 4px 4px 0;
-    box-shadow: inset 30px 0 40px rgba(0, 0, 0, 0.1), -5px 0 15px rgba(0, 0, 0, 0.2);
+    box-shadow:
+        inset 30px 0 40px rgba(0, 0, 0, 0.1),
+        1px 2px 0 0 var(--parchment),
+        2px 3px 0 0 rgba(0, 0, 0, 0.1),
+        2px 4px 0 0 var(--parchment),
+        3px 5px 0 0 rgba(0, 0, 0, 0.1),
+        3px 6px 0 0 var(--parchment),
+        4px 7px 0 0 rgba(0, 0, 0, 0.1),
+        6px 10px 20px rgba(0, 0, 0, 0.3);
     display: grid;
     grid-template-rows: 1fr;
     margin-right: 20px;
@@ -60,6 +81,8 @@
 .scrollable-area {
     overflow-y: auto;
     scrollbar-width: none;
+    min-height: 0;
+    min-width: 0;
 }
 
 .scrollable-area::-webkit-scrollbar {
@@ -69,6 +92,11 @@
 /* CONTENT STYLES */
 .page-content-wrapper {
     padding: 1.5rem 2.5rem 2.5rem;
+    height: 100%;
+    /* Match scrollable-area height */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .categories-header-wrap {
@@ -76,22 +104,46 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    flex-shrink: 0;
+    /* Protect header size */
 }
 
+/* Make grid dynamically distribute its available height evenly for rows! */
 .category-cards-grid {
+    flex: 1;
+    min-height: 0;
+    height: 100%; /* Force definite height */
+    box-sizing: border-box;
+
     display: grid;
-    grid-template-columns: repeat(var(--grid-columns), 1fr);
+    grid-auto-flow: column;
+
+    /* Mathematically resolve row/column size */
+    grid-template-rows: repeat(3, minmax(var(--category-card-size, 130px), 1fr));
+    grid-auto-columns: var(--category-card-size, 130px);
+    
     gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    padding-bottom: 0.5rem;
+}
+
+.category-cards-grid::-webkit-scrollbar {
+    display: none;
 }
 
 .category-card {
+    width: 100%;
+    height: 100%;
     position: relative;
     border-radius: 8px;
     overflow: hidden;
-    aspect-ratio: 1;
     cursor: pointer;
-    transition: transform 0.3s;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: var(--transition-main);
+    user-select: none;
+    background-color: var(--page-bg);
 }
 
 .category-card:hover {
@@ -108,15 +160,16 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    right: 0;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    border-top-right-radius: 12px;
     color: white;
-    padding: 1.5rem 0.5rem 0.5rem;
-    text-align: center;
+    padding: 0.6rem 1rem;
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.05em;
 }
 
 .category-card--all {

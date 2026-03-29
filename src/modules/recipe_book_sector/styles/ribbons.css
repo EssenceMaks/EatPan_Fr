@@ -1,65 +1,526 @@
-/* ribbons.css */
-/* SIDE TABS (LEFT - CATEGORIES) */
-.side-tabs--left-top { position: absolute; left: -34px; top: 130px; z-index: 5; display: flex; flex-direction: column; gap: 4px; }
-.side-tab--left { width: 55px; height: 35px; background: var(--tab-bg); color: var(--ink); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; clip-path: polygon(25% 50%, 0% 0%, 100% 0%, 100% 100%, 0% 100%); transform-origin: right center; box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.3); filter: brightness(0.9); }
-.side-tab--left:hover { transform: translateX(4px); filter: brightness(1); }
-.side-tab--left.active { background: var(--brand-red); color: white; transform: translateX(8px); filter: brightness(1.1); box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.4); }
+.side-tabs--left-top {
+    position: absolute;
+    left: 21px;
+    /* The right edge of tabs rests 21px inside the page */
+    transform: translateX(-100%);
+    /* Pushes the entire container to the left safely */
+    width: max-content;
+    /* Ensure container tightly hugs its columns */
+    top: 130px;
+    bottom: 50px;
+    /* Explicitly span to bottom to allow deep columns */
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap-reverse;
+    /* Places new columns to the left */
+    align-content: flex-end;
+    row-gap: 4px;
+    column-gap: 15px;
+    padding: 0;
+}
+
+/* Dynamically generated full-height sheets that adapt to the number of columns! */
+.side-tabs--left-top::before {
+    content: '';
+    position: absolute;
+    top: -130px;
+    /* Stretch to top of book */
+    bottom: -56px;
+    /* Stretch to bottom of book */
+    left: 48px;
+    /* Recess 20px so tabs stick out from the "paper" */
+    right: 0;
+    /* Merge exactly into the book */
+
+    /* Create a repeating paper edge effect every 70px (55px width + 15px gap) */
+    background: repeating-linear-gradient(to right,
+            rgba(0, 0, 0, 0.15) 0px,
+            rgba(0, 0, 0, 0.05) 2px,
+            var(--parchment) 5px,
+            var(--parchment) 70px);
+    border-radius: 18px 0 0 18px;
+    box-shadow: -4px 5px 15px rgba(0, 0, 0, 0.2);
+    /* Deep shadow under the sheets */
+    z-index: -1;
+}
+
+.side-tab--left {
+    position: relative;
+    width: 55px;
+    height: 35px;
+    background: var(--tab-bg);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 12px;
+    clip-path: polygon(25% 50%, 0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    transform-origin: right center;
+    box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.3);
+    filter: brightness(0.9);
+}
+
+.side-tab--left:hover {
+    transform: translateX(4px);
+    filter: brightness(1);
+}
+
+.side-tab--left.active {
+    background: var(--brand-red);
+    color: white;
+    transform: translateX(8px);
+    filter: brightness(1.1);
+    box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Dim all other tabs when one is active */
+.side-tabs-container:has(.side-tab--left.active) .side-tab--left:not(.active):not(.tab-clear-active) {
+    background: #dbd3bb;
+    color: rgba(90, 70, 60, 0.5);
+    box-shadow: none;
+    filter: grayscale(0.6) brightness(0.9);
+}
+
+/* Clear Tab stands out in its own way (acting like the main active component but for Reset) */
+.tab-clear-active {
+    background: var(--brand-red);
+    color: white;
+    filter: brightness(1.1);
+    box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.4);
+    transform: translateX(8px);
+    /* Pop out slightly more! */
+}
+
+/* Ensure inner lucide icon overrides any inline colors */
+.tab-clear-active i {
+    color: white !important;
+}
+
+.tab-clear-active:hover {
+    filter: brightness(1.2);
+    transform: translateX(10px);
+}
 
 /* LEFT BOTTOM RIBBON TABS */
-.side-tabs--left-bottom { position: absolute; left: -34px; bottom: 50px; z-index: 5; display: flex; flex-direction: column; gap: 4px; }
+.side-tabs--left-bottom {
+    position: absolute;
+    left: -34px;
+    bottom: 50px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* WRAPPER FOR ALL RIGHT TABS to prevent overlap */
+.right-tabs-wrapper {
+    position: absolute;
+    right: -3px;
+    top: 120px;
+    bottom: 250px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+    /* Let clicks pass between the gap */
+    gap: 16px;
+    /* Minimum gap when completely squeezed */
+}
 
 /* RIGHT SIDE INTERACTION TABS */
-.side-tabs--right { position: absolute; right: -3px; top: 120px; z-index: 5; display: flex; flex-direction: column; gap: 4px; }
-.side-tabs--right-bottom { position: absolute; right: -3px; bottom: 250px; z-index: 5; display: flex; flex-direction: column; gap: 4px; }
+.side-tabs--right,
+.side-tabs--right-bottom {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    pointer-events: auto;
+    /* Restore clicks */
+}
 
-.side-tab--right { width: 55px; height: 35px; background: var(--tab-bg); color: var(--ink); display: flex; flex-direction: row; align-items: center; justify-content: center; clip-path: polygon(100% 0%, 30% 0%, 0% 50%, 30% 100%, 100% 100%); transition: all 0.2s ease; filter: brightness(0.95); font-size: 10px; font-weight: 700; cursor: pointer; }
-.side-tab--right:hover { transform: translateX(4px); filter: brightness(1); }
-.side-tab--right.active { background: var(--brand-red); color: white; filter: brightness(1.1); }
-.side-tab-count { font-size: 9px; font-weight: 700; margin-top: 2px; opacity: 0.7; font-family: var(--font-serif); }
+.side-tab--right {
+    width: 55px;
+    height: 35px;
+    background: var(--tab-bg);
+    color: var(--ink);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    clip-path: polygon(100% 0%, 30% 0%, 0% 50%, 30% 100%, 100% 100%);
+    transition: all 0.2s ease;
+    filter: brightness(0.95);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.side-tab--right:hover {
+    transform: translateX(4px);
+    filter: brightness(1);
+}
+
+.side-tab--right.active {
+    background: var(--brand-red);
+    color: white;
+    filter: brightness(1.1);
+}
+
+.side-tab-count {
+    font-size: 9px;
+    font-weight: 700;
+    margin-top: 2px;
+    opacity: 0.7;
+    font-family: var(--font-serif);
+}
 
 /* BOOKMARK BUTTON */
-.bookmark-btn { position: absolute; left: calc(50% - 20px); top: -12px; width: 40px; height: 180px; background: var(--brand-red); color: white; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 24px; cursor: pointer; transition: all 0.3s; z-index: 100; clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 90%, 0% 100%); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); border:none; }
-.bookmark-btn:hover { height: 200px; }
-.bookmark-text { writing-mode: vertical-rl; text-transform: uppercase; font-size: 10px; font-weight: 900; letter-spacing: 0.2em; transform: rotate(180deg); margin-top: 10px; }
+.bookmark-btn {
+    position: absolute;
+    left: calc(50% - 20px);
+    top: -12px;
+    width: 40px;
+    height: 180px;
+    background: var(--brand-red);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 100;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 90%, 0% 100%);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    border: none;
+}
+
+.bookmark-btn:hover {
+    height: 200px;
+}
+
+.bookmark-text {
+    writing-mode: vertical-rl;
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    transform: rotate(180deg);
+    margin-top: 10px;
+}
 
 /* BOTTOM RIBBONS */
-.bookmark-bottom-group { position: absolute; left: 30px; bottom: -5px; display: flex; align-items: flex-end; gap: 16px; z-index: 100; }
-.bookmark-bottom { width: 36px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 15px; cursor: pointer; transition: all 0.3s ease; clip-path: polygon(0% 0%, 50% 12%, 100% 0%, 100% 100%, 0% 100%); color: rgba(255, 255, 255, 0.6); font-family: inherit; border: none; background: rgba(0, 0, 0, 0.1); }
-.bookmark-bottom.prepared { padding-top: 20px; background: rgba(46, 96, 58, 0.4); }
-.bookmark-bottom.prepared.active { background: #2E603A; color: white; }
-.bookmark-bottom.planned { padding-top: 20px; background: rgba(107, 13, 18, 0.4); }
-.bookmark-bottom.planned.active { background: var(--brand-red); color: white; }
-.bookmark-bottom:hover { transform: translateY(-5px); }
+.bookmark-bottom-group {
+    position: absolute;
+    left: 30px;
+    bottom: -5px;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    z-index: 100;
+}
+
+.bookmark-bottom {
+    width: 36px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    clip-path: polygon(0% 0%, 50% 12%, 100% 0%, 100% 100%, 0% 100%);
+    color: rgba(255, 255, 255, 0.6);
+    font-family: inherit;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.bookmark-bottom.prepared {
+    padding-top: 20px;
+    background: rgba(46, 96, 58, 0.4);
+}
+
+.bookmark-bottom.prepared.active {
+    background: #2E603A;
+    color: white;
+}
+
+.bookmark-bottom.planned {
+    padding-top: 20px;
+    background: rgba(107, 13, 18, 0.4);
+}
+
+.bookmark-bottom.planned.active {
+    background: var(--brand-red);
+    color: white;
+}
+
+.bookmark-bottom:hover {
+    transform: translateY(-5px);
+}
 
 /* LEFT BOTTOM RIBBONS */
-.bookmark-bottom-group-left { position: absolute; right: 40px; bottom: -5px; display: flex; gap: 16px; z-index: 100; align-items: flex-end; }
-.bookmark-bottom-left { width: 36px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 20px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); clip-path: polygon(0% 0%, 50% 12%, 100% 0%, 100% 100%, 0% 100%); color: rgba(255, 255, 255, 0.6); font-family: inherit; border: none; background: rgba(0, 0, 0, 0.1); outline: none; }
-.bookmark-bottom-left:hover { height: 110px; }
-.bookmark-bottom-left.active { height: 125px; }
-.bookmark-bottom-left.fridge { background: rgba(90, 110, 130, 0.5); }
-.bookmark-bottom-left.fridge.has-items, .bookmark-bottom-left.fridge.active { background: #4A5F70; color: white; }
-.bookmark-bottom-left.ingredients { background: rgba(110, 80, 120, 0.4); }
-.bookmark-bottom-left.ingredients.has-items, .bookmark-bottom-left.ingredients.active { background: #5D4068; color: white; }
-.bookmark-bottom-left.prepared { background: rgba(46, 96, 58, 0.4); }
-.bookmark-bottom-left.prepared.has-items, .bookmark-bottom-left.prepared.active { background: #2E603A; color: white; }
-.bookmark-bottom-left.planned { background: rgba(107, 13, 18, 0.4); }
-.bookmark-bottom-left.planned.has-items, .bookmark-bottom-left.planned.active { background: var(--brand-red); color: white; }
-.bookmark-bottom-left.shopping { background: rgba(128, 85, 51, 0.4); }
-.bookmark-bottom-left.shopping.has-items, .bookmark-bottom-left.shopping.active { background: var(--accent); color: white; }
+.bookmark-bottom-group-left {
+    position: absolute;
+    right: 40px;
+    bottom: -5px;
+    display: flex;
+    gap: 16px;
+    z-index: 100;
+    align-items: flex-end;
+}
+
+.bookmark-bottom-left {
+    width: 36px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    clip-path: polygon(0% 0%, 50% 12%, 100% 0%, 100% 100%, 0% 100%);
+    color: rgba(255, 255, 255, 0.6);
+    font-family: inherit;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+    outline: none;
+}
+
+.bookmark-bottom-left:hover {
+    height: 110px;
+}
+
+.bookmark-bottom-left.active {
+    height: 125px;
+}
+
+.bookmark-bottom-left.fridge {
+    background: rgba(90, 110, 130, 0.5);
+}
+
+.bookmark-bottom-left.fridge.has-items,
+.bookmark-bottom-left.fridge.active {
+    background: #4A5F70;
+    color: white;
+}
+
+.bookmark-bottom-left.ingredients {
+    background: rgba(110, 80, 120, 0.4);
+}
+
+.bookmark-bottom-left.ingredients.has-items,
+.bookmark-bottom-left.ingredients.active {
+    background: #5D4068;
+    color: white;
+}
+
+.bookmark-bottom-left.prepared {
+    background: rgba(46, 96, 58, 0.4);
+}
+
+.bookmark-bottom-left.prepared.has-items,
+.bookmark-bottom-left.prepared.active {
+    background: #2E603A;
+    color: white;
+}
+
+.bookmark-bottom-left.planned {
+    background: rgba(107, 13, 18, 0.4);
+}
+
+.bookmark-bottom-left.planned.has-items,
+.bookmark-bottom-left.planned.active {
+    background: var(--brand-red);
+    color: white;
+}
+
+.bookmark-bottom-left.shopping {
+    background: rgba(128, 85, 51, 0.4);
+}
+
+.bookmark-bottom-left.shopping.has-items,
+.bookmark-bottom-left.shopping.active {
+    background: var(--accent);
+    color: white;
+}
 
 /* TOP TABS */
-.inner-tabs-header { padding: 1.5rem 2.5rem 0.5rem; display: flex; justify-content: space-between; align-items: center; }
-.inner-tabs-group { display: flex; gap: 1rem; border-bottom: 1px solid rgba(0, 0, 0, 0.1); width: 100%; }
-.tab-btn--top { padding: 0.5rem 0.25rem; font-weight: 700; font-size: 0.8rem; color: rgba(0, 0, 0, 0.4); text-transform: uppercase; position: relative; transition: color 0.2s; white-space: nowrap; border:none; background:transparent; cursor:pointer;}
-.tab-btn--top.active { color: var(--brand-red); }
-.tab-btn--top.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--brand-red); }
+.inner-tabs-header {
+    padding: 1.5rem 2.5rem 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inner-tabs-group {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.tab-btn--top {
+    padding: 0.5rem 0.25rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.4);
+    text-transform: uppercase;
+    position: relative;
+    transition: color 0.2s;
+    white-space: nowrap;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.tab-btn--top.active {
+    color: var(--brand-red);
+}
+
+.tab-btn--top.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--brand-red);
+}
 
 /* BOTTOM TABS */
-.inner-tabs-footer, .variant-tabs-footer { margin: 0 10px; padding: 0 2.5rem; align-self: end; min-height: fit-content; border-top: 1px solid #805533; display: flex; gap: 4px; height: 40px; align-items: flex-start; }
-.tab-btn--bottom, .tab-btn--variant { background: var(--tab-bg); padding: 8px 16px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), inset 0 10px 10px -5px rgba(0, 0, 0, 0.1); transition: all 0.2s; border-top: 1px solid rgba(0, 0, 0, 0.1); position: relative; border:none;}
-.tab-btn--bottom::before, .tab-btn--variant::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: rgba(0, 0, 0, 0.05); }
-.tab-btn--bottom:hover, .tab-btn--variant:hover { transform: translateY(4px); }
-.bg-allergen { background: #dcc99e; }
-.bg-e-additives { background: var(--brand-red); color: white; }
-.bg-firstaid { background: #dcc99e; }
-.tab-btn--variant.active { background: var(--brand-red); color: white; }
+.inner-tabs-footer,
+.variant-tabs-footer {
+    margin: 0 10px;
+    padding: 0 2.5rem;
+    align-self: end;
+    min-height: fit-content;
+    border-top: 1px solid #805533;
+    display: flex;
+    gap: 4px;
+    height: 40px;
+    align-items: flex-start;
+}
+
+.tab-btn--bottom,
+.tab-btn--variant {
+    background: var(--tab-bg);
+    padding: 8px 16px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), inset 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+    border: none;
+}
+
+.tab-btn--bottom::before,
+.tab-btn--variant::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.tab-btn--bottom:hover,
+.tab-btn--variant:hover {
+    transform: translateY(4px);
+}
+
+.bg-allergen {
+    background: #dcc99e;
+}
+
+.bg-e-additives {
+    background: var(--brand-red);
+    color: white;
+}
+
+.bg-firstaid {
+    background: #dcc99e;
+}
+
+.tab-btn--variant.active {
+    background: var(--brand-red);
+    color: white;
+}
+
+/* MOBILE TOP TABS (CATEGORIES) */
+.mobile-top-tabs-container {
+    display: none;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    padding-top: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x mandatory;
+}
+
+.mobile-top-tabs-container::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+}
+
+.mobile-tab-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: var(--page-bg);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgba(0, 0, 0, 0.5);
+    transition: var(--transition-main);
+}
+
+.mobile-tab-item.active .mobile-tab-icon {
+    background: var(--brand-red);
+    color: white;
+    border-color: var(--brand-red);
+    box-shadow: 0 6px 12px rgba(107, 13, 18, 0.25);
+    transform: translateY(-2px);
+}
+
+.mobile-tab-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(0, 0, 0, 0.6);
+    transition: var(--transition-main);
+    text-align: center;
+}
+
+.mobile-tab-item.active .mobile-tab-label {
+    color: var(--brand-red);
+}

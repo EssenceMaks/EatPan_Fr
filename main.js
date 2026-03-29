@@ -1164,6 +1164,16 @@ window.addEventListener('popstate', (event) => {
         deactivateClockWithAnimation(state);
         return; 
     }
+
+    // Catch if a recipe is currently open and user hit "Back".
+    const activeRecipeRight = document.querySelector('.page--right.is-open');
+    if (activeRecipeRight) {
+        if (typeof window.closeActiveRecipe === 'function') {
+            window.closeActiveRecipe();
+        }
+        return;
+    }
+
     resetVisualState();
 
     const nextTarget = resolveStateTarget(state);

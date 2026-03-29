@@ -8,7 +8,7 @@ export default class PageLeft extends Component {
             viewMode: 'grid',  // 'grid', 'list'
             activeCategory: 'all' // icon key or 'all'
         };
-        
+
         // Expose state mutator so inline HTML string clicks can update state
         window.setPageLeftState = (newState) => {
             this.state = { ...this.state, ...newState };
@@ -26,7 +26,7 @@ export default class PageLeft extends Component {
 
     getFilteredRecipes() {
         if (!this.props.recipes) return [];
-        
+
         // Handle BOTH legacy hardcoded activeBooks ('my', 'guests', etc) AND exact dynamically mapped strings!
         const bookNameBase = {
             'all': 'Всі рецепти',
@@ -50,7 +50,7 @@ export default class PageLeft extends Component {
                 if (cat === "М'ясо") { mainGroup = "М'ясні страви"; }
                 if (cat === "Птиця") { mainGroup = "М'ясні страви"; }
                 if (cat === "Паста" || cat === "Салати") { mainGroup = "Гарніри"; }
-                
+
                 return mainGroup === this.state.activeCategory;
             });
         }
@@ -63,12 +63,12 @@ export default class PageLeft extends Component {
         recipes.forEach(r => {
             let cat = r.data && r.data.category ? r.data.category : 'Без категорії';
             let mainGroup = cat; // Default
-            
+
             // Re-map per UI logic
             if (cat === "М'ясо") { mainGroup = "М'ясні страви"; cat = "Яловичина"; }
             if (cat === "Птиця") { mainGroup = "М'ясні страви"; cat = "Курка"; }
             if (cat === "Паста" || cat === "Салати") { mainGroup = "Гарніри"; }
-            
+
             if (!hierarchy[mainGroup]) hierarchy[mainGroup] = {};
             if (!hierarchy[mainGroup][cat]) hierarchy[mainGroup][cat] = [];
             hierarchy[mainGroup][cat].push(r);
@@ -137,9 +137,9 @@ export default class PageLeft extends Component {
                 "Паста": "https://lh3.googleusercontent.com/aida-public/AB6AXuBQmrfvgR4KaIXMFA7ntHy2Gz0DnWzWIjXcXRU8RmbPTtRelOa1zfZD7JZj_HrtOzcovTbia8ogFhYQI5IWUXYLE6yV0HQQJQlhEuTeCSH_x8ld0S_u_qzom5VbGJWTrcLWKITzcVg2O5mRkIIyzlGVhDSVEM3_qwuNQ3_NtWdJLAnDUXXxFYLjlIQefu6X8Dr1b0n9O7Hq-Rjbq1TO905pvIV8es1xQ-uIGd_OonIdQaENOZLRCT8N7J_6MgzVM20Jq6WDdpzdgYOK",
                 "Супи": "https://images.unsplash.com/photo-1547592180-85f173990554",
             };
-            
+
             const existingCats = new Set(recipes.map(r => r.data && r.data.category ? r.data.category : "Без категорії"));
-            
+
             const cards = Array.from(existingCats).map(cat => {
                 const img = catImgs[cat] || catImgs["Супи"]; // fallback
                 return `
@@ -149,7 +149,7 @@ export default class PageLeft extends Component {
                     </div>
                 `;
             });
-            
+
             return `
                 <div class="category-cards-grid">
                     ${cards.join('')}
@@ -163,7 +163,7 @@ export default class PageLeft extends Component {
             if (recipes.length === 0) {
                 return `<div style="padding: 20px; text-align: center; color: var(--text-muted);">Тут пусто. Створіть новий рецепт.</div>`;
             }
-            
+
             const recCards = recipes.map(r => `
                 <div class="category-card" onclick="window.onRecipeSelectCall(${r.id})" style="border: 2px solid #5a4f45; border-radius: 8px; overflow: hidden; position: relative;">
                     <div style="background: var(--brand-red); width: 100%; height: 100px; display:flex; align-items:center; justify-content:center;">
@@ -177,9 +177,9 @@ export default class PageLeft extends Component {
                     </div>
                 </div>
             `).join('');
-            
+
             return `
-                <div class="category-cards-grid recipe-cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
+                <div class="category-cards-grid recipe-cards-grid">
                     ${recCards}
                 </div>
             `;
@@ -187,24 +187,24 @@ export default class PageLeft extends Component {
     }
 
     template() {
-window.getMainGroupIconDef = (name) => {
-    const lower = name.toLowerCase();
-    if (lower.includes('м\'яс') || lower.includes('beef') || lower.includes('lamb') || lower.includes('pork')) return 'beef';
-    if (lower.includes('суп') || lower.includes('soup')) return 'soup';
-    if (lower.includes('гарнір') || lower.includes('випіч') || lower.includes('wheat') || lower.includes('rice') || lower.includes('pasta')) return 'wheat';
-    if (lower.includes('риба') || lower.includes('море') || lower.includes('fish') || lower.includes('shrimp')) return 'fish';
-    if (lower.includes('десерт') || lower.includes('cake') || lower.includes('dessert')) return 'cake-slice';
-    if (lower.includes('напій') || lower.includes('coffee') || lower.includes('drink')) return 'coffee';
-    if (lower.includes('пт') || lower.includes('chicken') || lower.includes('turkey')) return 'drumstick';
-    if (lower.includes('салат') || lower.includes('veg') || lower.includes('leaf')) return 'leaf';
-    if (lower.includes('паста') || lower.includes('macaroni')) return 'utensils';
-    return "utensils";
-};
+        window.getMainGroupIconDef = (name) => {
+            const lower = name.toLowerCase();
+            if (lower.includes('м\'яс') || lower.includes('beef') || lower.includes('lamb') || lower.includes('pork')) return 'beef';
+            if (lower.includes('суп') || lower.includes('soup')) return 'soup';
+            if (lower.includes('гарнір') || lower.includes('випіч') || lower.includes('wheat') || lower.includes('rice') || lower.includes('pasta')) return 'wheat';
+            if (lower.includes('риба') || lower.includes('море') || lower.includes('fish') || lower.includes('shrimp')) return 'fish';
+            if (lower.includes('десерт') || lower.includes('cake') || lower.includes('dessert')) return 'cake-slice';
+            if (lower.includes('напій') || lower.includes('coffee') || lower.includes('drink')) return 'coffee';
+            if (lower.includes('пт') || lower.includes('chicken') || lower.includes('turkey')) return 'drumstick';
+            if (lower.includes('салат') || lower.includes('veg') || lower.includes('leaf')) return 'leaf';
+            if (lower.includes('паста') || lower.includes('macaroni')) return 'utensils';
+            return "utensils";
+        };
 
         const book = this.state.activeBook;
         const view = this.state.viewMode;
         const cat = this.state.activeCategory;
-        
+
         // Data logic
         const activeRecipesForView = this.getFilteredRecipes();
         let hierarchyForList = this.buildHierarchy(activeRecipesForView);
@@ -235,7 +235,7 @@ window.getMainGroupIconDef = (name) => {
         const dynamicGroups = Array.from(uniqueGroupsSet);
 
         // Build View Content
-        const viewContentHTML = view === 'list' 
+        const viewContentHTML = view === 'list'
             ? `<div class="categories-list-view" style="padding-top:10px;">${this.renderListView(hierarchyForList)}</div>`
             : this.renderGridView(activeRecipesForView);
 
@@ -252,8 +252,8 @@ window.getMainGroupIconDef = (name) => {
                     <div class="inner-tabs-group" style="display:flex; flex-wrap:wrap; gap: 4px; align-items:center;">
                         <button class="tab-btn--top ${book === 'all' ? 'active' : ''}" onclick="window.setPageLeftState({ activeBook: 'all' })">Всі рецепти</button>
                         ${dynamicGroups.map(g => {
-                            const customStyle = !['Особисті', 'Гості', 'Заклади'].includes(g) ? 'font-style: italic; color: var(--accent);' : '';
-                            return `
+            const customStyle = !['Особисті', 'Гості', 'Заклади'].includes(g) ? 'font-style: italic; color: var(--accent);' : '';
+            return `
                                 <div class="group-tab-wrap" style="position:relative; display:inline-flex; align-items:center;" onmouseover="this.querySelector('.grp-actions').style.display='flex'" onmouseout="this.querySelector('.grp-actions').style.display='none'">
                                     <button class="tab-btn--top ${book === g ? 'active' : ''}" style="${customStyle}" onclick="window.setPageLeftState({ activeBook: '${g.replace(/'/g, "\\'")}' })">${g}</button>
                                     <div class="grp-actions" style="display:none; position:absolute; top:-12px; right:-10px; gap:2px; background:var(--parchment); border-radius:4px; border:1px solid rgba(0,0,0,0.1); padding:2px;">
@@ -262,7 +262,7 @@ window.getMainGroupIconDef = (name) => {
                                     </div>
                                 </div>
                             `;
-                        }).join('')}
+        }).join('')}
                     </div>
                     <div>
                         <button class="tab-btn--top" onclick="window.toggleCreateRecipe()"><i data-lucide="plus" style="width: 14px; height: 14px;"></i></button>
@@ -271,13 +271,17 @@ window.getMainGroupIconDef = (name) => {
 
                 <!-- LEFT SIDE CATEGORY TABS -->
                 <aside class="side-tabs-container side-tabs--left-top" id="side-tabs-categories">
-                    ${allCats.map(c => `
-                        <div class="side-tab--left ${cat === c ? 'active' : ''}" title="${c}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
+                    <!-- Click active selected tab again to reset to 'all' -->
+                    ${cat !== 'all' ? `
+                    <div class="side-tab--left tab-clear-active" style="z-index:999; border-left: 3px solid var(--brand-red);" title="Скинути категорію" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })">
+                        <i data-lucide="x" style="width: 18px; color: var(--parchment);"></i>
+                    </div>` : ''}
+
+                    ${allCats.map((c, i) => `
+                        <div class="side-tab--left ${cat === c ? 'active' : ''}" style="z-index:${100 - i}" title="${c}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
                             <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(c) : 'utensils'}" style="width: 18px;"></i>
                         </div>
                     `).join('')}
-                    <!-- Click active selected tab again to reset to 'all' -->
-                    ${cat !== 'all' ? `<div class="side-tab--left" style="margin-top:20px; color:var(--brand-red);" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })"><i data-lucide="x" style="width: 18px;"></i></div>` : ''}
                 </aside>
 
                 <!-- LEFT SIDE HEALTH TABS -->
@@ -304,10 +308,28 @@ window.getMainGroupIconDef = (name) => {
                             </div>
                             <div class="category-header-actions">
                                 <button class="btn-action--tactile ${view === 'grid' ? 'active' : ''}" onclick="window.setPageLeftState({ viewMode: 'grid' })" title="Show Grid View"><i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i></button>
-                                <button class="btn-action--tactile ${view === 'list'  ? 'active' : ''}" onclick="window.setPageLeftState({ viewMode: 'list' })" title="Show List View"><i data-lucide="list" style="width: 16px; height: 16px;"></i></button>
+                                <button class="btn-action--tactile ${view === 'list' ? 'active' : ''}" onclick="window.setPageLeftState({ viewMode: 'list' })" title="Show List View"><i data-lucide="list" style="width: 16px; height: 16px;"></i></button>
                             </div>
                         </div>
                         
+                        <!-- MOBILE HORIZONTAL TABS (Hidden on Desktop) -->
+                        <div class="mobile-top-tabs-container">
+                            ${cat !== 'all' ? `
+                            <div class="mobile-tab-item active" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })">
+                                <div class="mobile-tab-icon" style="color: var(--brand-red);"><i data-lucide="x" style="width:20px; height:20px;"></i></div>
+                                <span class="mobile-tab-label">Скинути</span>
+                            </div>` : ''}
+
+                            ${allCats.map(c => `
+                                <div class="mobile-tab-item ${cat === c ? 'active' : ''}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
+                                    <div class="mobile-tab-icon">
+                                        <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(c) : 'utensils'}" style="width:20px; height:20px;"></i>
+                                    </div>
+                                    <span class="mobile-tab-label">${c}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
                         <!-- MAIN CONTENT LIST OR GRID -->
                         ${viewContentHTML}
 
@@ -399,10 +421,104 @@ window.getMainGroupIconDef = (name) => {
     }
 
     async onMount() {
-        if(window.lucide) {
+        if (window.lucide) {
             window.lucide.createIcons({
                 root: this.element
             });
         }
+
+        // Dynamic book cover padding based on tabs container width!
+        const tabsContainer = this.element.querySelector('.side-tabs--left-top');
+
+        if (tabsContainer) {
+            if (window.tabsResizeObserver) {
+                window.tabsResizeObserver.disconnect();
+            }
+            window.tabsResizeObserver = new ResizeObserver(() => {
+                window.requestAnimationFrame(() => {
+                    const bookCover = document.querySelector('.book-cover');
+                    
+                    // FIX 3: Dynamic Column Break using a dedicated DOM Spacer!
+                    // This creates a clean layout wrap without polluting individual tabs with massive margins.
+                    let spacer = tabsContainer.querySelector('.tab-col-spacer');
+                    if (!spacer) {
+                        spacer = document.createElement('div');
+                        spacer.className = 'tab-col-spacer';
+                        spacer.style.width = '10px';
+                        spacer.style.pointerEvents = 'none';
+                        spacer.style.visibility = 'hidden';
+                        tabsContainer.appendChild(spacer);
+                    }
+
+                    const tabs = Array.from(tabsContainer.querySelectorAll('.side-tab--left:not(.tab-col-spacer)'));
+                    const containerHeight = tabsContainer.offsetHeight;
+                    
+                    if (tabs.length > 0 && containerHeight > 250) {
+                        // Exact height of the 5 bottom health tabs is ~191px + 15px gap = 206px
+                        const safeCol1Height = containerHeight - 206; 
+                        const maxTabsCol1 = Math.max(1, Math.floor(safeCol1Height / 39));
+                        
+                        if (tabs.length > maxTabsCol1) {
+                            const targetTab = tabs[maxTabsCol1 - 1];
+                            // Inject spacer right after the last allowed tab in Col 1
+                            if (targetTab.nextSibling !== spacer) {
+                                targetTab.parentNode.insertBefore(spacer, targetTab.nextSibling);
+                            }
+                            
+                            // CALCULATE EXACT HEIGHT WITHOUT OVERFLOWING!
+                            // If spacer exceeds containerHeight, flexbox will place the spacer ITSELF into Col 2!
+                            // maxTabsCol1 * 39 accounts for all tabs and their trailing gaps.
+                            // -1px ensures we defeat any subpixel browser rounding and stay securely inside Col 1.
+                            const exactHeight = containerHeight - (maxTabsCol1 * 39) - 1;
+                            spacer.style.height = Math.max(0, exactHeight) + 'px';
+                        } else {
+                            if (spacer.parentNode) spacer.parentNode.removeChild(spacer);
+                        }
+                    } else {
+                        if (spacer.parentNode) spacer.parentNode.removeChild(spacer);
+                    }
+
+                    if (bookCover) {
+                        // FIX 1: Bypass Chromium flex-column wrap intrinsic width bug
+                        let minOffset = Infinity;
+                        for (let tab of tabs) {
+                            if (tab.offsetLeft < minOffset) minOffset = tab.offsetLeft;
+                        }
+                        if (minOffset === Infinity) minOffset = 0;
+                        
+                        const trueWidth = tabsContainer.offsetWidth - minOffset; 
+                        const newPadding = Math.max(60, trueWidth - 20);
+                        bookCover.style.paddingLeft = newPadding + 'px';
+                    }
+
+                    // FIX 2: Dynamically calculate rows relative to the functional BOOK PAGE height!
+                    const grids = document.querySelectorAll('.category-cards-grid');
+                    for (let grid of grids) {
+                        const h = grid.offsetHeight;
+                        if (h > 50) { // Safety threshold
+                            // Ideal card size is ~140px + 16px gap = 156px.
+                            let rows = Math.round((h + 16) / 156);
+                            if (rows < 1) rows = 1;
+                            grid.style.setProperty('--category-rows', rows);
+                        }
+                    }
+                });
+            });
+            // Observe both tabs container and the parent page content layer to catch vertical resizes
+            window.tabsResizeObserver.observe(tabsContainer);
+            const pageView = this.element.querySelector('.categories-grid-view');
+            if (pageView) window.tabsResizeObserver.observe(pageView);
+        }
+
+        // Enable horizontal scrolling via vertical mouse wheel in grid containers
+        const grids = this.element.querySelectorAll('.category-cards-grid');
+        grids.forEach(grid => {
+            grid.addEventListener('wheel', (e) => {
+                if (Math.abs(e.deltaY) > 0) {
+                    e.preventDefault();
+                    grid.scrollLeft += e.deltaY;
+                }
+            }, { passive: false });
+        });
     }
 }

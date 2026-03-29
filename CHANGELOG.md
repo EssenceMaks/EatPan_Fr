@@ -46,6 +46,7 @@
 - **Trackpad overshoot / blink** — доопрацьовано SPA-навігацію `ORIGINAL BLOCKS` у `main.js`, щоб один inertial swipe на MacBook trackpad більше не провокував другий автоперехід і коротке блимання інтерфейсу.
 - **Horizontal trackpad jitter** — прибрано зайвий короткий зсув слайдера при горизонтальних свайпах, коли контейнер починав рухатися до сусіднього блоку, але навігація ще не була підтверджена порогом жесту.
 - **Consecutive swipe delay** — прибрано надмірну паузу між сусідніми свайпами: після одного переходу користувач тепер може значно швидше перейти до наступного слайду без очікування 1-3 секунди.
+- **Low-height recipe-book controls** — зменшено ліві `side tabs` та нижні `ribbons` у `PageLeft` для невисоких landscape/desktop екранів, щоб вони не виглядали надто масивними.
 
 ### Changed
 
@@ -54,10 +55,11 @@
 - **Programmatic centering** — замість `scrollIntoView()` для переходів між блоками тепер використовується точний `scrollTo()` через `scrollBlockToCenter()`, а `scroll-snap` тимчасово вимикається на час програмного скролу і повертається після завершення.
 - **Scroll settle detection** — завершення програмного переходу тепер відстежується не лише таймером, а й досягненням цільової `scrollLeft` позиції (`pendingBlockNavTarget`), що зменшує видимий дриг при horizontal wheel gestures.
 - **Responsive gesture release** — таймінги `wheel`-lock скорочено, lock тепер скидається одразу після фактичного завершення переходу, а дрібна інерція трекпада більше не продовжує блокування нового свайпу так довго.
+- **Low-height media tuning** — у `recipe_book_sector/styles/media_queries.css` додано окремий `@media (min-width: 768px) and (orientation: landscape) and (max-height: 900px)`, який зменшує геометрію лівих табів і нижніх лівих стрічок, а іконки — лише помірно.
 
 ### Documentation
 
-- Оновлено `docs/tasks.md` — додано виконані follow-up пункти про усунення overshoot/blink, horizontal jitter, затримки між сусідніми свайпами на трекпаді та відкривання слайду клавішею `Enter`.
+- Оновлено `docs/tasks.md` — додано виконані follow-up пункти про усунення overshoot/blink, horizontal jitter, затримки між сусідніми свайпами на трекпаді, відкривання слайду клавішею `Enter` та зменшення recipe-book control ribbons/tabs на невисоких екранах.
 
 **Назва коміту:**
 `fix: prevent inertial trackpad overshoot and block blink`
