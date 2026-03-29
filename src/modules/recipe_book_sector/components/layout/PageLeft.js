@@ -179,7 +179,7 @@ export default class PageLeft extends Component {
             `).join('');
             
             return `
-                <div class="category-cards-grid recipe-cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
+                <div class="category-cards-grid recipe-cards-grid">
                     ${recCards}
                 </div>
             `;
@@ -271,13 +271,13 @@ window.getMainGroupIconDef = (name) => {
 
                 <!-- LEFT SIDE CATEGORY TABS -->
                 <aside class="side-tabs-container side-tabs--left-top" id="side-tabs-categories">
-                    ${allCats.map(c => `
-                        <div class="side-tab--left ${cat === c ? 'active' : ''}" title="${c}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
+                    ${allCats.map((c, i) => `
+                        <div class="side-tab--left ${cat === c ? 'active' : ''}" style="z-index:${100 - i}" title="${c}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
                             <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(c) : 'utensils'}" style="width: 18px;"></i>
                         </div>
                     `).join('')}
                     <!-- Click active selected tab again to reset to 'all' -->
-                    ${cat !== 'all' ? `<div class="side-tab--left" style="margin-top:20px; color:var(--brand-red);" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })"><i data-lucide="x" style="width: 18px;"></i></div>` : ''}
+                    ${cat !== 'all' ? `<div class="side-tab--left" style="margin-top:20px; z-index:1; color:var(--brand-red);" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })"><i data-lucide="x" style="width: 18px;"></i></div>` : ''}
                 </aside>
 
                 <!-- LEFT SIDE HEALTH TABS -->
@@ -404,5 +404,16 @@ window.getMainGroupIconDef = (name) => {
                 root: this.element
             });
         }
+        
+        // Enable horizontal scrolling via vertical mouse wheel in grid containers
+        const grids = this.element.querySelectorAll('.category-cards-grid');
+        grids.forEach(grid => {
+            grid.addEventListener('wheel', (e) => {
+                if (Math.abs(e.deltaY) > 0) {
+                    e.preventDefault();
+                    grid.scrollLeft += e.deltaY;
+                }
+            }, { passive: false });
+        });
     }
 }
