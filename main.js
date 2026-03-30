@@ -1,5 +1,5 @@
 import BookModule from './src/modules/recipe_book_sector/BookModule.js';
-import { initCraftSpace } from './src/modules/craft_space/craft_space.js';
+import { initCraftSpace } from './src/modules/craft_space/craft_space.js?v=2';
 import HeaderAuthModule from './src/modules/header_auth/HeaderAuthModule.js';
 import ProfileModule from './src/modules/profile/ProfileModule.js';
 import { RecipeService } from './src/api/RecipeService.js';
@@ -1102,9 +1102,95 @@ window.saveRecipe = async function() {
 };
 
 
+async function loadProjectStatus() {
+    try {
+        const response = await fetch('./PROJECT_STATUS.md');
+        if (!response.ok) return;
+        const text = await response.text();
+        const lines = text.split('\n');
+
+        let htmlLeft = '<div class="status-col">';
+        let htmlRight = '<div class="status-col">';
+        let currentSection = 0; // 1 for Objectives, 2 for Status
+        
+        for (const line of lines) {
+            if (line.includes('1. Що ми прагнемо зробити')) {
+                currentSection = 1;
+                continue;
+            }
+            if (line.includes('2. Що вже готово')) {
+                currentSection = 2;
+                continue;
+            }
+            
+            if (currentSection === 0) continue;
+
+            // Check for section header
+            const sectionMatch = line.match(/^\s*\*\s+\*\*(.*?)\*\*/);
+            if (sectionMatch) {
+                const headerHtml = `<div class="status-section-title">${sectionMatch[1]}</div>`;
+                if (currentSection === 1) htmlRight += headerHtml;
+                if (currentSection === 2) htmlLeft += headerHtml;
+                continue;
+            }
+            
+            if (currentSection === 1) {
+                // Parse plain list items
+                const plainMatch = line.match(/^\s*[-\*]\s+(.*)/);
+                if (plainMatch && !plainMatch[1].startsWith('**')) {
+                    const taskText = plainMatch[1]
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/_(.*?)_/g, '<em>$1</em>');
+                    
+                    htmlRight += `
+                        <div class="status-task plain">
+                            <span class="status-text">- ${taskText}</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            if (currentSection === 2) {
+                // Parse checklist items
+                const taskMatch = line.match(/^\s*\*\s+\[(x| )\]\s+(.*)/i);
+                if (taskMatch) {
+                    const isDone = taskMatch[1].toLowerCase() === 'x';
+                    const taskText = taskMatch[2]
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/_(.*?)_/g, '<em>$1</em>');
+                    
+                    htmlLeft += `
+                        <div class="status-task ${isDone ? 'done' : 'pending'}">
+                            <i data-lucide="${isDone ? 'check-circle-2' : 'clock'}" class="status-icon"></i>
+                            <span class="status-text">${taskText}</span>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        htmlLeft += '</div>';
+        htmlRight += '</div>';
+        
+        let html = '<div class="project-status-preview">' + htmlLeft + htmlRight + '</div>';
+        
+        const craftBlock = document.getElementById('craftSpaceBlock');
+        if (craftBlock) {
+            const textEl = craftBlock.querySelector('.section_block-text');
+            if (textEl) {
+                textEl.innerHTML = html;
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+    } catch (e) {
+        console.error('Failed to load project status', e);
+    }
+}
+
 // INIT
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Main SPA Router Started.');
+    loadProjectStatus();
     setInterval(updateSmallClock, 1000);
     updateSmallClock();
     smallClock.addEventListener('click', activateClock);

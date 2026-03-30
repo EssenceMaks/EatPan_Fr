@@ -52,6 +52,8 @@
 
 /* Sidebar for Tasks */
 .raw-tasks-sidebar {
+  min-width: 150px;
+  max-width: 550px;
   overflow-y: scroll;
 }
 
@@ -213,7 +215,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  user-select: none; /* Crucial for starting drag on empty spaces */
+  user-select: none;
+  /* Crucial for starting drag on empty spaces */
   cursor: grab;
 }
 
@@ -304,20 +307,22 @@
 .task-actions {
   display: flex;
   gap: 6px;
-  opacity: 0; /* Hidden by default */
+  opacity: 0;
+  /* Hidden by default */
   transition: opacity 0.2s ease;
 }
 
 .raw-task-item:hover .task-actions,
 .raw-task-item.archived .task-actions,
 .sidebar-icon-btn.linked {
-  opacity: 1; /* Show on hover, or ALWAYS if archived/linked */
+  opacity: 1;
+  /* Show on hover, or ALWAYS if archived/linked */
 }
 
 /* Base style for sidebar icon buttons */
 .sidebar-icon-btn {
   background: none;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   cursor: pointer;
   padding: 4px;
@@ -329,7 +334,7 @@
 }
 
 .sidebar-icon-btn:hover {
-  background: rgba(0,0,0,0.05);
+  background: rgba(0, 0, 0, 0.05);
   transform: scale(1.05);
 }
 
@@ -359,14 +364,21 @@
 
 .btn-sidebar-toggle.active {
   opacity: 1;
-  background-color: rgba(0,0,0,0.03);
+  background-color: rgba(0, 0, 0, 0.03);
   border-color: var(--brand-red);
   color: var(--brand-red);
 }
 
 @keyframes flash-card {
-  0% { box-shadow: 0 0 0 4px var(--brand-red); transform: scale(1.02); }
-  100% { box-shadow: none; transform: scale(1); }
+  0% {
+    box-shadow: 0 0 0 4px var(--brand-red);
+    transform: scale(1.02);
+  }
+
+  100% {
+    box-shadow: none;
+    transform: scale(1);
+  }
 }
 
 .flash-highlight {
@@ -514,7 +526,8 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 15px; /* Add some spacing from bottom */
+  gap: 15px;
+  /* Add some spacing from bottom */
 }
 
 /* Ensure expanded buttons form a 2x2 grid so they don't squish out of boundaries */
