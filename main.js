@@ -1102,9 +1102,66 @@ window.saveRecipe = async function() {
 };
 
 
+async function loadProjectStatus() {
+    try {
+        const response = await fetch('./PROJECT_STATUS.md');
+        if (!response.ok) return;
+        const text = await response.text();
+        const lines = text.split('\n');
+
+        let html = '<div class="project-status-preview">';
+        let inChecklistSection = false;
+        
+        for (const line of lines) {
+            if (line.includes('2. Що вже готово')) {
+                inChecklistSection = true;
+                continue;
+            }
+            if (!inChecklistSection) continue;
+
+            // Check for section header
+            const sectionMatch = line.match(/^\s*\*\s+\*\*(.*?)\*\*/);
+            if (sectionMatch) {
+                html += `<div class="status-section-title">${sectionMatch[1]}</div>`;
+                continue;
+            }
+            
+            // Check for task checklist item
+            const taskMatch = line.match(/^\s*\*\s+\[(x| )\]\s+(.*)/i);
+            if (taskMatch) {
+                const isDone = taskMatch[1].toLowerCase() === 'x';
+                const taskText = taskMatch[2]
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/_(.*?)_/g, '<em>$1</em>');
+                
+                html += `
+                    <div class="status-task ${isDone ? 'done' : 'pending'}">
+                        <i data-lucide="${isDone ? 'check-circle-2' : 'clock'}" class="status-icon"></i>
+                        <span class="status-text">${taskText}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        html += '</div>';
+        
+        const craftBlock = document.getElementById('craftSpaceBlock');
+        if (craftBlock) {
+            const textEl = craftBlock.querySelector('.section_block-text');
+            if (textEl) {
+                textEl.innerHTML = html;
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+    } catch (e) {
+        console.error('Failed to load project status', e);
+    }
+}
+
 // INIT
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Main SPA Router Started.');
+    loadProjectStatus();
     setInterval(updateSmallClock, 1000);
     updateSmallClock();
     smallClock.addEventListener('click', activateClock);
