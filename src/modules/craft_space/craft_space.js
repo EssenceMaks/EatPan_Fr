@@ -110,7 +110,7 @@ export async function initCraftSpace(containerId) {
             
             if (ticket && ticket.status !== newStatus) {
                 ticket.status = newStatus;
-                localStorage.setItem('eatpan_tickets', JSON.stringify(tickets));
+                localStorage.setItem('eatpan_tickets_v2', JSON.stringify(tickets));
                 // We re-render the whole board cleanly to place the ticket in its new column
                 renderBoard(); 
             }
@@ -123,39 +123,59 @@ export async function initCraftSpace(containerId) {
 
 async function loadData() {
     try {
-        // Load MD tasks (with chapters)
-        const mdRes = await fetch('./docs/tasks.md');
+        // Load MD tasks (with chapters) from PROJECT_STATUS.md
+        const mdRes = await fetch('./PROJECT_STATUS.md');
         if (mdRes.ok) {
             const mdText = await mdRes.text();
+            let currentSection = 0;
             rawTasks = mdText.split('\n').reduce((acc, line) => {
                 const trimmed = line.trim();
-                // Match subheaders e.g. "#### Frontend"
-                if (trimmed.startsWith('#### ')) {
-                    acc.push({ type: 'subchapter', text: trimmed.replace(/^####\s+/, '') });
+                if (trimmed.includes('2. Що вже готово')) {
+                    currentSection = 2;
+                    return acc;
                 }
-                // Match headers e.g. "### TRENDING CREATORS"
-                else if (trimmed.startsWith('### ')) {
-                    acc.push({ type: 'chapter', text: trimmed.replace(/^###\s+/, '') });
-                } 
+                if (currentSection !== 2) return acc;
+                
+                // Match headers e.g. "*   **Title**"
+                const headerMatch = trimmed.match(/^\*\s+\*\*(.*?)\*\*/);
+                if (headerMatch) {
+                    acc.push({ type: 'chapter', text: headerMatch[1] });
+                }
                 // Match tasks
-                else if (trimmed.startsWith('- [')) {
-                    const isDone = trimmed.includes('- [x]') || trimmed.includes('- [X]');
-                    const text = trimmed.replace(/- \[[ xX]\] /, '').trim();
+                const taskMatch = trimmed.match(/^\*\s+\[(x| )\]\s+(.*)/i);
+                if (taskMatch) {
+                    const isDone = taskMatch[1].toLowerCase() === 'x';
+                    const text = taskMatch[2].replace(/\*\*(.*?)\*\*/g, '$1').replace(/_(.*?)_/g, '$1').trim();
                     acc.push({ type: 'task', text, isDone });
                 }
                 return acc;
             }, []);
         }
 
-        // Load Tickets from localStorage OR fallback to JSON
-        const storedTickets = localStorage.getItem('eatpan_tickets');
+        // Load Tickets from localStorage OR generate from rawTasks
+        // Changed prefix to avoid conflicts with old data
+        const storedTickets = localStorage.getItem('eatpan_tickets_v2'); 
         if (storedTickets) {
             tickets = JSON.parse(storedTickets);
         } else {
-            const diffRes = await fetch('./src/api/tickets.json');
-            if (diffRes.ok) {
-                tickets = await diffRes.json();
-            }
+            // Generate tickets locally
+            tickets = [];
+            rawTasks.filter(t => t.type === 'task').forEach((t, i) => {
+                const id = Date.now().toString() + i;
+                tickets.push({
+                    id: id,
+                    title: t.text,
+                    type: 'TASK',
+                    typeLabel: 'MD TASK',
+                    tags: [],
+                    checkpoints: [],
+                    status: t.isDone ? 'DONE' : 'GET', // Put finished tasks in DONE, pending in GET
+                    cost: '-',
+                    timeLabel: 'est',
+                    timeline: { start: '00:00', end: '00:00', date: '-' }
+                });
+            });
+            localStorage.setItem('eatpan_tickets_v2', JSON.stringify(tickets));
         }
 
         // Load Sidebar Mappings state
@@ -335,7 +355,7 @@ function renderSidebar() {
                             timeline: { start: '00:00', end: '00:00', date: '-' }
                         };
                         tickets.push(newTicket);
-                        localStorage.setItem('eatpan_tickets', JSON.stringify(tickets));
+                        localStorage.setItem('eatpan_tickets_v2', JSON.stringify(tickets));
                         
                         sidebarState.linkedTickets[taskText] = newId;
                         saveSidebarState();
@@ -560,7 +580,7 @@ function createTicketNode(ticket) {
             const idx = item.dataset.idx;
             // Toggle ticket.checkpoints[idx]
             ticket.checkpoints[idx].done = !ticket.checkpoints[idx].done;
-            localStorage.setItem('eatpan_tickets', JSON.stringify(tickets));
+            localStorage.setItem('eatpan_tickets_v2', JSON.stringify(tickets));
             renderBoard(); // re-render board entirely to update state
         });
     });
@@ -591,7 +611,7 @@ function moveTicket(id, newStatus) {
         ticket.status = newStatus;
         
         // 3. Sync to persistence
-        localStorage.setItem('eatpan_tickets', JSON.stringify(tickets));
+        localStorage.setItem('eatpan_tickets_v2', JSON.stringify(tickets));
         
         // 4. Force robust visual update. Rebuilding preserves flex states perfectly.
         renderBoard();
