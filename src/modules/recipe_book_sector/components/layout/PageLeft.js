@@ -518,16 +518,13 @@ export default class PageLeft extends Component {
 
         // Dynamically align side ribbons wrapper to start exactly below filters (aligned with categories)
         this.heightObserver = new ResizeObserver(() => {
-            const categoriesEl = this.element.querySelector('.grid-categories');
+            const ribbonsContainer = this.element.querySelector('.side-tabs-grid');
             const liveInner = this.element.querySelector('.side-tabs-grid-inner');
-            if (categoriesEl && liveInner) {
-                // OffsetTop of categories gives exactly the height of groups + filters
-                const offset = categoriesEl.offsetTop;
-                liveInner.style.top = `${offset}px`;
-                
-                // Dynamically fit rows in available space
-                // Available height uses the new offset (categories offset) which means more space for tabs!
-                const availableHeight = this.element.clientHeight - offset - 10; // 10px safety bottom
+            if (ribbonsContainer && liveInner) {
+                liveInner.style.top = '0px';
+
+                // Dynamically fit rows in the actual ribbon area
+                const availableHeight = ribbonsContainer.clientHeight - 10; // 10px safety bottom
                 let newMaxRows = Math.floor((availableHeight + 8) / 43); // 35px height + 8px gap
                 if (newMaxRows < 8) newMaxRows = 8; // min 8 to support the 7 required health slots + 1 for safety
                 

@@ -2,15 +2,22 @@
 /* BOOK CONTAINER */
 .book-module-wrapper {
     width: 100%;
+    height: 100%;
     display: grid;
     place-items: center;
     padding: 5px;
 }
 
+.book-module-slot {
+    height: 100%;
+}
+
 .book-wrapper {
     width: 100%;
+    height: 100%;
     max-width: 1280px;
     perspective: 2000px;
+    padding: 20px 0;
 }
 
 .book-cover {
@@ -68,6 +75,7 @@
         "side_ribbons content"
         "side_ribbons bottom_ribbons";
     grid-template-columns: max-content 1fr;
+    /* grid-template-rows: auto auto auto minmax(0, 1fr) auto; */
     grid-template-rows: auto auto auto minmax(0, 1fr) auto;
     padding: 1.5rem 2.5rem 2.5rem 0;
     box-sizing: border-box;

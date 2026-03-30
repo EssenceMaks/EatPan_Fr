@@ -10,15 +10,10 @@ export default class BookModule extends Component {
     async loadData() {
         console.log('BookModule mounting... Fetching data.');
         this.recipes = await RecipeService.fetchAll();
-        
-        // Clear previous contents
-        this.element.innerHTML = this.template();
-        
+
         const book = new Book({ recipes: this.recipes });
-        const bookElement = await book.render();
-        
-        this.element.appendChild(bookElement);
-        
+        await this.replaceContent(book, '[data-book-mount]');
+
         if (window.lucide) {
             window.lucide.createIcons();
         }
@@ -27,7 +22,7 @@ export default class BookModule extends Component {
     template() {
         return `
             <div class="book-module-wrapper">
-                <!-- Book will be injected here via onMount -->
+                <div class="book-module-slot" data-book-mount></div>
             </div>
         `;
     }
