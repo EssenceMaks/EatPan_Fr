@@ -1,136 +1,135 @@
 <!doctype html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>EatPan Modular SPA</title>
 
-    <!-- Google Fonts -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Work+Sans:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>EatPan Modular SPA</title>
 
-    <!-- Core & Module CSS -->
-    <link rel="stylesheet" href="./src/styles/global.css" />
-    <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/book.css" />
-    <link
-      rel="stylesheet"
-      href="./src/modules/recipe_book_sector/styles/ribbons.css"
-    />
-    <link
-      rel="stylesheet"
-      href="./src/modules/recipe_book_sector/styles/create-recipe.css"
-    />
-    <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/media_queries.css" />
-    <link rel="stylesheet" href="./src/modules/craft_space/styles/kanban.css" />
-    <link rel="stylesheet" href="./src/modules/header_auth/styles/header-auth.css" />
-    <link rel="stylesheet" href="./src/modules/profile/styles/profile.css" />
-  </head>
-  <body>
-    <!-- LAYER 1: CONTENT -->
-    <div id="content" class="layer">
-      <div class="content-header">
-        <div id="headerAuthMount"></div>
-        <div></div>
-        <div></div>
-        <!-- Header Clock -->
-        <div class="header-tools">
-          <div class="clock-container">
-            <div class="clock-placeholder">24:00</div>
-            <div class="clock" id="smallClock">00:00</div>
-          </div>
-        </div>
-      </div>
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Work+Sans:wght@300;400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-      <div class="content_sectionBlocks" id="sectionBlocks">
-        <!-- SPECIAL BLOCK: BIG CLOCK -->
-        <div class="section_block" id="clockBlock">
-          <div class="big-clock-face" id="bigClockFace">
-            <div class="clock-center-dot"></div>
-            <div class="clock-hand" id="bigClockHand"></div>
-          </div>
-          <div class="selected-time-display" id="bigTimeDisplay">12:00</div>
-        </div>
+  <!-- Core & Module CSS -->
+  <link rel="stylesheet" href="./src/styles/global.css" />
+  <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/book.css" />
+  <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/ribbons.css" />
+  <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/create-recipe.css" />
+  <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/media_queries.css" />
+  <link rel="stylesheet" href="./src/modules/craft_space/styles/kanban.css" />
+  <link rel="stylesheet" href="./src/modules/header_auth/styles/header-auth.css" />
+  <link rel="stylesheet" href="./src/modules/profile/styles/profile.css" />
+</head>
 
-        <!-- ORIGINAL BLOCKS -->
-        <div class="section_block original-block" data-index="0">
-          <h2>Section Hero</h2>
-          <p class="section_block-text">Tap to open</p>
-          <div class="section_block-inner-content">
-            <p>Block 1 content...</p>
-            <p>Detailed information goes here...</p>
-          </div>
-        </div>
-
-        <div class="section_block original-block" data-index="1">
-          <h2>Section My Kitchen</h2>
-          <p class="section_block-text">Tap to open</p>
-          <div class="section_block-inner-content"><p>Block 2 content</p></div>
-        </div>
-
-        <!-- My Cookbook Block. We place the BookModule hook here -->
-        <div class="section_block original-block" data-index="2">
-          <h2>Section Recipe Book</h2>
-          <p class="section_block-text">Tap to open</p>
-          <div
-            class="section_block-inner-content"
-            id="cookbook-section"
-            style="padding: 0; overflow-y: auto;"
-          ></div>
-        </div>
-
-        <div class="section_block original-block" data-index="3" id="craftSpaceBlock">
-          <h2>Craft Space</h2>
-          <p class="section_block-text">Manage Tickets</p>
-          <div class="section_block-inner-content" id="craftSpaceInner"></div>
-        </div>
-
-        <div class="section_block original-block" data-index="4">
-          <h2>Timetable & Calendar</h2>
-          <p class="section_block-text">Tap to open</p>
-          <div class="section_block-inner-content"><p>Block 5 content</p></div>
-        </div>
-
-        <div class="section_block section_block--utility-page" id="profileBlock">
-          <h2>User Profile</h2>
-          <p class="section_block-text">Profile page</p>
-          <div class="section_block-inner-content" id="profile-section"></div>
-        </div>
-      </div>
-
-      <div class="content-footer"></div>
-    </div>
-
-    <!-- LAYER 2: CONTROL PANEL -->
-    <div id="control_panel" class="layer">
-      <div class="cp-header"></div>
-      <div class="nav_panel"></div>
-
-      <div class="controls">
-        <div class="col-1"></div>
-        <div class="col-2"></div>
-        <div class="col-3" id="col-3-container"></div>
-        <div class="col-4" id="col-4-container">
-          <button class="btn btn-menu" id="menuBtn">☰</button>
-          <button class="btn btn-back" id="backBtn" onclick="goBack()">
-            ⬅
-          </button>
+<body>
+  <!-- LAYER 1: CONTENT -->
+  <div id="content" class="layer">
+    <div class="content-header">
+      <div id="headerAuthMount"></div>
+      <div></div>
+      <div></div>
+      <!-- Header Clock -->
+      <div class="header-tools">
+        <div class="clock-container">
+          <div class="clock-placeholder">24:00</div>
+          <div class="clock" id="smallClock">00:00</div>
         </div>
       </div>
     </div>
 
-    <!-- Editor modal from my_recipes.html -->
-    <div class="modal-overlay hidden" id="edit-modal">
-      <div class="modal-content">
-        <button
-          onclick="window.toggleEdit()"
-          style="
+    <div class="content_sectionBlocks" id="sectionBlocks">
+      <!-- SPECIAL BLOCK: BIG CLOCK -->
+      <div class="section_block" id="clockBlock">
+        <div class="big-clock-face" id="bigClockFace">
+          <div class="clock-center-dot"></div>
+          <div class="clock-hand" id="bigClockHand"></div>
+        </div>
+        <div class="selected-time-display" id="bigTimeDisplay">12:00</div>
+      </div>
+
+      <!-- ORIGINAL BLOCKS -->
+      <div class="section_block original-block" data-index="0">
+        <h2>Section Hero</h2>
+        <p class="section_block-text">Tap to open</p>
+        <div class="section_block-inner-content">
+          <p>Block 1 content...</p>
+          <p>Detailed information goes here...</p>
+        </div>
+      </div>
+
+      <div class="section_block original-block" data-index="1">
+        <h2>Section My Kitchen</h2>
+        <p class="section_block-text">Tap to open</p>
+        <div class="section_block-inner-content">
+          <p>Block 2 content</p>
+        </div>
+      </div>
+
+      <!-- My Cookbook Block. We place the BookModule hook here -->
+      <div class="section_block original-block" data-index="2">
+        <div class="section_block-text book-cover-preview">
+
+          <div class="book-titles">
+            <h3>RECIPE <span>BOOK</span></h3>
+            <div class="book-sub-title">Collection of your recipes</div>
+          </div>
+          <div class="book-cover-footer">
+            Створюйте свої рецепти для освіченого харчування<br>
+            <strong>- EatPan</strong>
+          </div>
+        </div>
+        <div class="section_block-inner-content" id="cookbook-section" style="padding: 0; overflow-y: auto;"></div>
+      </div>
+
+      <div class="section_block original-block" data-index="3" id="craftSpaceBlock">
+        <h2>Craft Space</h2>
+        <p class="section_block-text">Manage Tickets</p>
+        <div class="section_block-inner-content" id="craftSpaceInner"></div>
+      </div>
+
+      <div class="section_block original-block" data-index="4">
+        <h2>Timetable & Calendar</h2>
+        <p class="section_block-text">Tap to open</p>
+        <div class="section_block-inner-content">
+          <p>Block 5 content</p>
+        </div>
+      </div>
+
+      <div class="section_block section_block--utility-page" id="profileBlock">
+        <h2>User Profile</h2>
+        <p class="section_block-text">Profile page</p>
+        <div class="section_block-inner-content" id="profile-section"></div>
+      </div>
+    </div>
+
+    <div class="content-footer"></div>
+  </div>
+
+  <!-- LAYER 2: CONTROL PANEL -->
+  <div id="control_panel" class="layer">
+    <div class="cp-header"></div>
+    <div class="nav_panel"></div>
+
+    <div class="controls">
+      <div class="col-1"></div>
+      <div class="col-2"></div>
+      <div class="col-3" id="col-3-container"></div>
+      <div class="col-4" id="col-4-container">
+        <button class="btn btn-menu" id="menuBtn">☰</button>
+        <button class="btn btn-back" id="backBtn" onclick="goBack()">
+          ⬅
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor modal from my_recipes.html -->
+  <div class="modal-overlay hidden" id="edit-modal">
+    <div class="modal-content">
+      <button onclick="window.toggleEdit()" style="
             position: absolute;
             top: 1.5rem;
             right: 1.5rem;
@@ -138,27 +137,21 @@
             border: none;
             color: inherit;
             cursor: pointer;
-          "
-        >
-          <i data-lucide="x"></i>
-        </button>
-        <h2
-          class="text-h2"
-          style="
+          ">
+        <i data-lucide="x"></i>
+      </button>
+      <h2 class="text-h2" style="
             text-align: center;
             border: none;
             font-family: var(--font-title);
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--brand-red);
-          "
-        >
-          Записати новий шедевр
-        </h2>
-        <div style="display: grid; gap: 1.5rem; margin-top: 2rem">
-          <input
-            placeholder="Назва рецепта"
-            style="
+          ">
+        Записати новий шедевр
+      </h2>
+      <div style="display: grid; gap: 1.5rem; margin-top: 2rem">
+        <input placeholder="Назва рецепта" style="
               width: 100%;
               padding: 1rem;
               border: none;
@@ -168,12 +161,8 @@
               font-size: 2rem;
               text-align: center;
               font-style: italic;
-            "
-            type="text"
-          />
-          <button
-            onclick="window.toggleEdit()"
-            style="
+            " type="text" />
+        <button onclick="window.toggleEdit()" style="
               background: var(--brand-red);
               color: white;
               padding: 1.25rem;
@@ -185,15 +174,15 @@
               box-shadow: 0 10px 20px rgba(107, 13, 18, 0.3);
               border: none;
               cursor: pointer;
-            "
-          >
-            Зберегти в книгу
-          </button>
-        </div>
+            ">
+          Зберегти в книгу
+        </button>
       </div>
     </div>
+  </div>
 
-    <!-- Main ES Module Application Entry -->
-    <script type="module" src="./main.js?v=2"></script>
-  </body>
+  <!-- Main ES Module Application Entry -->
+  <script type="module" src="./main.js?v=2"></script>
+</body>
+
 </html>

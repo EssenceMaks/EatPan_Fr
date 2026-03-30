@@ -1136,7 +1136,7 @@ async function loadProjectStatus() {
             
             if (currentSection === 1) {
                 // Parse plain list items
-                const plainMatch = line.match(/^\s*\*\s+(.*)/);
+                const plainMatch = line.match(/^\s*[-\*]\s+(.*)/);
                 if (plainMatch && !plainMatch[1].startsWith('**')) {
                     const taskText = plainMatch[1]
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
