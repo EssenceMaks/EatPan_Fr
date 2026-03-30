@@ -407,8 +407,8 @@ export default class PageLeft extends Component {
                 </div>
 
                 <!-- Scrollable Content -->
-                <div class="scrollable-area page-content-wrapper grid-content">
-                    <div class="categories-grid-view" style="padding: 0 2.5rem 2.5rem;">
+                <div class="scrollable-area page-content-wrapper grid-content" style="${view === 'grid' ? 'overflow-y: hidden;' : ''}">
+                    <div class="categories-grid-view" style="padding: 0 2.5rem 2.5rem; ${view === 'grid' ? 'position: absolute; inset: 0;' : 'flex: none; height: auto;'}">
                         <!-- MAIN CONTENT LIST OR GRID -->
                         ${viewContentHTML}
                     </div>
