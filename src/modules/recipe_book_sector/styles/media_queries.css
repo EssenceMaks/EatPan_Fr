@@ -85,7 +85,8 @@
 /* Портретна: ВМІЩАТИ ПО ШИРИНІ */
 @media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
     :root {
-        --book-width: calc(100vw - 120px); /* 60px buffer for side tabs */
+        --book-width: calc(100vw - 120px);
+        /* 60px buffer for side tabs */
         --page-padding: 1.5rem;
         --grid-columns: 2;
         --category-rows: 3;
@@ -134,7 +135,8 @@
 /* Портретна: ВМІЩАТИ ПО ШИРИНІ */
 @media (min-width: 1024px) and (max-width: 1199px) and (orientation: portrait) {
     :root {
-        --book-width: calc(100vw - 120px); /* Strict buffer */
+        --book-width: calc(100vw - 120px);
+        /* Strict buffer */
         /* Строго по ширині */
         --page-padding: 2rem;
         --grid-columns: 2;
@@ -372,10 +374,10 @@
    ========================================= */
 
 @media (max-width: 1024px) {
+
     /* 1. Switch to 1-column single page overlay mode */
     .book-cover {
         grid-template-columns: 1fr;
-        padding-left: 0 !important;
         padding-right: 0 !important;
     }
 
@@ -422,7 +424,12 @@
 }
 
 @media (max-width: 767px) {
+    .book-cover {
+        padding-left: 0 !important;
+    }
+
     /* Hide Side Tabs */
+    .side-tabs-grid,
     .side-tabs--left-top,
     .side-tabs--left-bottom,
     #side-tabs-categories {
@@ -433,7 +440,7 @@
     .mobile-top-tabs-container {
         display: flex !important;
     }
-    
+
     .mobile-main-title {
         display: block;
     }

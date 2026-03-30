@@ -6,7 +6,8 @@ export default class PageLeft extends Component {
         this.state = {
             activeBook: 'all', // 'all', 'my', 'guests', 'places'
             viewMode: 'grid',  // 'grid', 'list'
-            activeCategory: 'all' // icon key or 'all'
+            activeCategory: 'all', // icon key or 'all'
+            maxRibbonRows: 9 // dynamically updated based on screen height
         };
 
         // Expose state mutator so inline HTML string clicks can update state
@@ -212,7 +213,6 @@ export default class PageLeft extends Component {
             hierarchyForList = { [cat]: hierarchyForList[cat] || {} };
         }
 
-        // Recipes filtered ONLY by the current group (to know which categories actually exist in it)
         const recipesInCurrentBook = (this.props.recipes || []).filter(r => {
             if (book === 'all') return true;
             return r.data && r.data.books && r.data.books.includes(book);
@@ -221,7 +221,6 @@ export default class PageLeft extends Component {
         const bookHier = this.buildHierarchy(recipesInCurrentBook);
         const allCats = Object.keys(bookHier).filter(c => c !== 'Без категорії').sort();
 
-        // Extract all dynamic groups
         const uniqueGroupsSet = new Set(['Особисті', 'Гості', 'Заклади']);
         (this.props.recipes || []).forEach(r => {
             if (r.data && Array.isArray(r.data.books)) {
@@ -234,110 +233,189 @@ export default class PageLeft extends Component {
         });
         const dynamicGroups = Array.from(uniqueGroupsSet);
 
-        // Build View Content
         const viewContentHTML = view === 'list'
             ? `<div class="categories-list-view" style="padding-top:10px;">${this.renderListView(hierarchyForList)}</div>`
             : this.renderGridView(activeRecipesForView);
 
         const catNameStr = cat !== 'all' ? cat.toUpperCase() : '';
 
-        return `
-            <section class="page page--left">
-                <div class="mobile-main-title">
-                    <h1 class="text-h1 uppercase">ВСІ РЕЦЕПТИ</h1>
-                    <p class="text-subtitle">Discover a limitless world of culinary possibilities...</p>
-                </div>
-                <!-- Inner Header Tabs -->
-                <header class="inner-tabs-header">
-                    <div class="inner-tabs-group" style="display:flex; flex-wrap:wrap; gap: 4px; align-items:center;">
-                        <button class="tab-btn--top ${book === 'all' ? 'active' : ''}" onclick="window.setPageLeftState({ activeBook: 'all' })">Всі рецепти</button>
-                        ${dynamicGroups.map(g => {
-            const customStyle = !['Особисті', 'Гості', 'Заклади'].includes(g) ? 'font-style: italic; color: var(--accent);' : '';
+        // Ribbons Grid Calculation
+        const healthTabsDef = [
+            { invisible: true },
+            { id: 'fruct', title: 'Фрукти', icon: 'banana', color: '' },
+            { id: 'bads', title: 'Бади', icon: 'pill', color: '' },
+            { id: 'first-aid', title: 'Аптечка', icon: 'circle-plus', color: 'var(--brand-red)' },
+            { id: 'allergens', title: 'Алергени', icon: 'alert-triangle', color: 'var(--brand-red)' },
+            { id: 'e-additives', title: 'Е-Добавки', icon: 'skull', color: 'var(--brand-red)', extra: 'E' },
+            { invisible: true }
+        ];
+
+        let maxRows = this.state.maxRibbonRows || 9;
+
+        let catCount = allCats.length + (cat !== 'all' ? 1 : 0);
+        let requiredCols = 1;
+        
+        // Health tabs column (rightmost) uses 7 slots at the bottom (1 empty, 5 tabs, 1 empty)
+        let rightmostCatSlots = maxRows - 7;
+        if (rightmostCatSlots < 0) rightmostCatSlots = 0;
+        
+        let cLeft = catCount;
+        cLeft -= rightmostCatSlots; // Health tabs column supports rightmostCatSlots cats on top
+        while (cLeft > 0) {
+            requiredCols++;
+            cLeft -= maxRows;
+        }
+
+        let targetCol = requiredCols;
+        let targetRow = 1;
+        let renderedRibbons = [];
+        let activeCols = new Set([requiredCols]); 
+
+        if (cat !== 'all') {
+            renderedRibbons.push({ type: 'reset', col: targetCol, row: targetRow++ });
+        }
+
+        allCats.forEach(c => {
+            if (targetCol === requiredCols && targetRow > rightmostCatSlots) {
+                targetCol--;
+                targetRow = 1;
+                activeCols.add(targetCol);
+            } else if (targetCol < requiredCols && targetRow > maxRows) {
+                targetCol--;
+                targetRow = 1;
+                activeCols.add(targetCol);
+            }
+            if (targetCol < 1) targetCol = 1;
+            renderedRibbons.push({ type: 'cat', name: c, col: targetCol, row: targetRow });
+            targetRow++;
+            activeCols.add(targetCol);
+        });
+
+        const coverPadding = requiredCols * 55 + (requiredCols - 1) * 15 + 40;
+        const bookCover = document.querySelector('.book-cover');
+        if (bookCover) {
+            bookCover.style.paddingLeft = `${coverPadding}px`;
+        }
+
+        // Generate background sheets
+        const bgSheetsHTML = Array.from(activeCols).map(col => `
+            <div class="side-tabs-bg-sheet" style="grid-column: ${col}; grid-row: 1 / -1;"></div>
+        `).join('');
+
+        const healthTabsHTML = healthTabsDef.map((ht, idx) => {
+            if (ht.invisible) return '';
             return `
-                                <div class="group-tab-wrap" style="position:relative; display:inline-flex; align-items:center;" onmouseover="this.querySelector('.grp-actions').style.display='flex'" onmouseout="this.querySelector('.grp-actions').style.display='none'">
-                                    <button class="tab-btn--top ${book === g ? 'active' : ''}" style="${customStyle}" onclick="window.setPageLeftState({ activeBook: '${g.replace(/'/g, "\\'")}' })">${g}</button>
-                                    <div class="grp-actions" style="display:none; position:absolute; top:-12px; right:-10px; gap:2px; background:var(--parchment); border-radius:4px; border:1px solid rgba(0,0,0,0.1); padding:2px;">
-                                        <i data-lucide="edit-2" style="width:12px; height:12px; cursor:pointer; color:var(--ink);" onclick="window.renameRecipeGroup('${g.replace(/'/g, "\\'")}')" title="Перейменувати"></i>
-                                        <i data-lucide="trash-2" style="width:12px; height:12px; cursor:pointer; color:var(--brand-red);" onclick="window.deleteRecipeGroup('${g.replace(/'/g, "\\'")}')" title="Видалити"></i>
+            <div class="side-tab--left" title="${ht.title}" style="grid-column: ${requiredCols}; grid-row: ${(maxRows - 6) + idx};">
+                <i data-lucide="${ht.icon}" style="width: 18px; ${ht.color ? `color: ${ht.color};` : ''}"></i>${ht.extra ? ht.extra : ''}
+            </div>
+            `;
+        }).join('');
+
+        const ribbonsHTML = renderedRibbons.map((rib, i) => {
+            if (rib.type === 'reset') {
+                return `
+                <div class="side-tab--left tab-clear-active" style="grid-column: ${rib.col}; grid-row: ${rib.row}; z-index:999; border-left: 3px solid var(--brand-red);" title="Скинути категорію" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })">
+                    <i data-lucide="x" style="width: 18px; color: var(--parchment);"></i>
+                </div>`;
+            } else {
+                return `
+                <div class="side-tab--left ${cat === rib.name ? 'active' : ''}" style="grid-column: ${rib.col}; grid-row: ${rib.row}; z-index:${100 - i}" title="${rib.name}" onclick="window.setPageLeftState({ activeCategory: '${rib.name.replace(/'/g, "\\'")}', viewMode: 'list' })">
+                    <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(rib.name) : 'utensils'}" style="width: 18px;"></i>
+                </div>`;
+            }
+        }).join('');
+
+        return `
+            <section class="page page--left page--left-grid-layout" style="--dynamic-book-padding: ${coverPadding}px;">
+                <!-- Inner Header Tabs (Groups) -->
+                <div class="grid-groups">
+                    <div class="mobile-main-title">
+                        <h1 class="text-h1 uppercase">ВСІ РЕЦЕПТИ</h1>
+                        <p class="text-subtitle">Discover a limitless world of culinary possibilities...</p>
+                    </div>
+                    <header class="inner-tabs-header">
+                        <div class="inner-tabs-group" style="display:flex; flex-wrap:wrap; gap: 4px; align-items:center;">
+                            <button class="tab-btn--top ${book === 'all' ? 'active' : ''}" onclick="window.setPageLeftState({ activeBook: 'all' })">Всі рецепти</button>
+                            ${dynamicGroups.map(g => {
+                const customStyle = !['Особисті', 'Гості', 'Заклади'].includes(g) ? 'font-style: italic; color: var(--accent);' : '';
+                return `
+                                    <div class="group-tab-wrap" style="position:relative; display:inline-flex; align-items:center;" onmouseover="this.querySelector('.grp-actions').style.display='flex'" onmouseout="this.querySelector('.grp-actions').style.display='none'">
+                                        <button class="tab-btn--top ${book === g ? 'active' : ''}" style="${customStyle}" onclick="window.setPageLeftState({ activeBook: '${g.replace(/'/g, "\\'")}' })">${g}</button>
+                                        <div class="grp-actions" style="display:none; position:absolute; top:-12px; right:-10px; gap:2px; background:var(--parchment); border-radius:4px; border:1px solid rgba(0,0,0,0.1); padding:2px;">
+                                            <i data-lucide="edit-2" style="width:12px; height:12px; cursor:pointer; color:var(--ink);" onclick="window.renameRecipeGroup('${g.replace(/'/g, "\\'")}')" title="Перейменувати"></i>
+                                            <i data-lucide="trash-2" style="width:12px; height:12px; cursor:pointer; color:var(--brand-red);" onclick="window.deleteRecipeGroup('${g.replace(/'/g, "\\'")}')" title="Видалити"></i>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
-        }).join('')}
-                    </div>
-                    <div>
-                        <button class="tab-btn--top" onclick="window.toggleCreateRecipe()"><i data-lucide="plus" style="width: 14px; height: 14px;"></i></button>
-                    </div>
-                </header>
-
-                <!-- LEFT SIDE CATEGORY TABS -->
-                <aside class="side-tabs-container side-tabs--left-top" id="side-tabs-categories">
-                    <!-- Click active selected tab again to reset to 'all' -->
-                    ${cat !== 'all' ? `
-                    <div class="side-tab--left tab-clear-active" style="z-index:999; border-left: 3px solid var(--brand-red);" title="Скинути категорію" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })">
-                        <i data-lucide="x" style="width: 18px; color: var(--parchment);"></i>
-                    </div>` : ''}
-
-                    ${allCats.map((c, i) => `
-                        <div class="side-tab--left ${cat === c ? 'active' : ''}" style="z-index:${100 - i}" title="${c}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
-                            <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(c) : 'utensils'}" style="width: 18px;"></i>
+                                `;
+            }).join('')}
                         </div>
-                    `).join('')}
+                        <div>
+                            <button class="tab-btn--top" onclick="window.toggleCreateRecipe()"><i data-lucide="plus" style="width: 14px; height: 14px;"></i></button>
+                        </div>
+                    </header>
+                </div>
+
+                <div class="grid-filter">
+                   <!-- Filter reserved area, currently empty in UI -->
+                </div>
+
+                <!-- LEFT SIDE RIBBONS GRID -->
+                <aside class="side-tabs-grid grid-side_ribbons">
+                    <div class="side-tabs-bg-wrapper" style="position: absolute; right: 24px; top: -1.5rem; bottom: -2.5rem; display: grid; grid-template-columns: repeat(${requiredCols}, 55px); column-gap: 15px; direction: ltr; justify-content: end; z-index: -1;">
+                        ${bgSheetsHTML}
+                    </div>
+                    <div class="side-tabs-grid-inner" style="grid-template-columns: repeat(${requiredCols}, 55px); grid-template-rows: repeat(${maxRows}, 35px);">
+                        ${ribbonsHTML}
+                        ${healthTabsHTML}
+                    </div>
                 </aside>
 
-                <!-- LEFT SIDE HEALTH TABS -->
-                <aside class="side-tabs-container side-tabs--left-bottom">
-                    <div class="side-tab--left" title="Фрукти"><i data-lucide="banana" style="width: 18px;"></i></div>
-                    <div class="side-tab--left" title="Бади"><i data-lucide="pill" style="width: 18px;"></i></div>
-                    <div class="side-tab--left" title="Аптечка"><i data-lucide="circle-plus" style="width: 18px; color: var(--brand-red);"></i></div>
-                    <div class="side-tab--left" title="Алергени"><i data-lucide="alert-triangle" style="width: 18px; color: var(--brand-red);"></i></div>
-                    <div class="side-tab--left" title="Е-Добавки"><i data-lucide="skull" style="width: 18px; color: var(--brand-red);"></i>E</div>
-                </aside>
+                <div class="grid-categories">
+                    <div class="categories-header-wrap" style="padding: 0 2.5rem; margin-top: 2rem;">
+                        <div>
+                            ${cat !== 'all' ? `
+                            <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 5px; cursor: pointer; color: var(--brand-red); font-weight: bold; font-family: var(--font-serif); font-size: 14px;" onclick="window.setPageLeftState({activeCategory: 'all', viewMode: 'grid'})">
+                                <i data-lucide="arrow-left" style="width:16px;"></i> КАТЕГОРІЇ
+                            </div>
+                            ` : ''}
+                            <h1 class="text-h1">${cat === 'all' && view === 'grid' ? "CATEGORIES" : (cat !== 'all' ? "КАТЕГОРІЯ " + catNameStr : "СПИСОК РЕЦЕПТІВ")}</h1>
+                            <p class="text-subtitle">Discover a limitless world of culinary possibilities...</p>
+                        </div>
+                        <div class="category-header-actions">
+                            <button class="btn-action--tactile ${view === 'grid' ? 'active' : ''}" onclick="window.setPageLeftState({ viewMode: 'grid' })" title="Show Grid View"><i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i></button>
+                            <button class="btn-action--tactile ${view === 'list' ? 'active' : ''}" onclick="window.setPageLeftState({ viewMode: 'list' })" title="Show List View"><i data-lucide="list" style="width: 16px; height: 16px;"></i></button>
+                        </div>
+                    </div>
+                    
+                    <!-- MOBILE HORIZONTAL TABS (Hidden on Desktop) -->
+                    <div class="mobile-top-tabs-container" style="padding: 0 2.5rem;">
+                        ${cat !== 'all' ? `
+                        <div class="mobile-tab-item active" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })">
+                            <div class="mobile-tab-icon" style="color: var(--brand-red);"><i data-lucide="x" style="width:20px; height:20px;"></i></div>
+                            <span class="mobile-tab-label">Скинути</span>
+                        </div>` : ''}
+
+                        ${allCats.map(c => `
+                            <div class="mobile-tab-item ${cat === c ? 'active' : ''}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
+                                <div class="mobile-tab-icon">
+                                    <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(c) : 'utensils'}" style="width:20px; height:20px;"></i>
+                                </div>
+                                <span class="mobile-tab-label">${c}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
 
                 <!-- Scrollable Content -->
-                <div class="scrollable-area page-content-wrapper">
-                    <div class="categories-grid-view">
-                        <div class="categories-header-wrap">
-                            <div>
-                                ${cat !== 'all' ? `
-                                <div style="display:flex; align-items:center; gap: 8px; margin-bottom: 5px; cursor: pointer; color: var(--brand-red); font-weight: bold; font-family: var(--font-serif); font-size: 14px;" onclick="window.setPageLeftState({activeCategory: 'all', viewMode: 'grid'})">
-                                    <i data-lucide="arrow-left" style="width:16px;"></i> КАТЕГОРІЇ
-                                </div>
-                                ` : ''}
-                                <h1 class="text-h1">${cat === 'all' && view === 'grid' ? "CATEGORIES" : (cat !== 'all' ? "КАТЕГОРІЯ " + catNameStr : "СПИСОК РЕЦЕПТІВ")}</h1>
-                                <p class="text-subtitle">Discover a limitless world of culinary possibilities...</p>
-                            </div>
-                            <div class="category-header-actions">
-                                <button class="btn-action--tactile ${view === 'grid' ? 'active' : ''}" onclick="window.setPageLeftState({ viewMode: 'grid' })" title="Show Grid View"><i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i></button>
-                                <button class="btn-action--tactile ${view === 'list' ? 'active' : ''}" onclick="window.setPageLeftState({ viewMode: 'list' })" title="Show List View"><i data-lucide="list" style="width: 16px; height: 16px;"></i></button>
-                            </div>
-                        </div>
-                        
-                        <!-- MOBILE HORIZONTAL TABS (Hidden on Desktop) -->
-                        <div class="mobile-top-tabs-container">
-                            ${cat !== 'all' ? `
-                            <div class="mobile-tab-item active" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })">
-                                <div class="mobile-tab-icon" style="color: var(--brand-red);"><i data-lucide="x" style="width:20px; height:20px;"></i></div>
-                                <span class="mobile-tab-label">Скинути</span>
-                            </div>` : ''}
-
-                            ${allCats.map(c => `
-                                <div class="mobile-tab-item ${cat === c ? 'active' : ''}" onclick="window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
-                                    <div class="mobile-tab-icon">
-                                        <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(c) : 'utensils'}" style="width:20px; height:20px;"></i>
-                                    </div>
-                                    <span class="mobile-tab-label">${c}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-
+                <div class="scrollable-area page-content-wrapper grid-content">
+                    <div class="categories-grid-view" style="padding: 0 2.5rem 2.5rem;">
                         <!-- MAIN CONTENT LIST OR GRID -->
                         ${viewContentHTML}
-
                     </div>
                 </div>
 
                 <!-- LEFT BOTTOM RIBBONS -->
-                <div class="bookmark-bottom-group-left">
+                <div class="bookmark-bottom-group-left grid-bottom_ribbons">
                     <button class="bookmark-bottom-left fridge"><i data-lucide="refrigerator" style="width: 25px; height: 25px;"></i></button>
                     <button class="bookmark-bottom-left ingredients"><i data-lucide="flask-conical" style="width: 25px; height: 25px;"></i></button>
                     <button class="bookmark-bottom-left prepared has-items"><i data-lucide="soup" style="width: 25px; height: 25px;"></i></button>
@@ -427,89 +505,6 @@ export default class PageLeft extends Component {
             });
         }
 
-        // Dynamic book cover padding based on tabs container width!
-        const tabsContainer = this.element.querySelector('.side-tabs--left-top');
-
-        if (tabsContainer) {
-            if (window.tabsResizeObserver) {
-                window.tabsResizeObserver.disconnect();
-            }
-            window.tabsResizeObserver = new ResizeObserver(() => {
-                window.requestAnimationFrame(() => {
-                    const bookCover = document.querySelector('.book-cover');
-                    
-                    // FIX 3: Dynamic Column Break using a dedicated DOM Spacer!
-                    // This creates a clean layout wrap without polluting individual tabs with massive margins.
-                    let spacer = tabsContainer.querySelector('.tab-col-spacer');
-                    if (!spacer) {
-                        spacer = document.createElement('div');
-                        spacer.className = 'tab-col-spacer';
-                        spacer.style.width = '10px';
-                        spacer.style.pointerEvents = 'none';
-                        spacer.style.visibility = 'hidden';
-                        tabsContainer.appendChild(spacer);
-                    }
-
-                    const tabs = Array.from(tabsContainer.querySelectorAll('.side-tab--left:not(.tab-col-spacer)'));
-                    const containerHeight = tabsContainer.offsetHeight;
-                    
-                    if (tabs.length > 0 && containerHeight > 250) {
-                        // Exact height of the 5 bottom health tabs is ~191px + 15px gap = 206px
-                        const safeCol1Height = containerHeight - 206; 
-                        const maxTabsCol1 = Math.max(1, Math.floor(safeCol1Height / 39));
-                        
-                        if (tabs.length > maxTabsCol1) {
-                            const targetTab = tabs[maxTabsCol1 - 1];
-                            // Inject spacer right after the last allowed tab in Col 1
-                            if (targetTab.nextSibling !== spacer) {
-                                targetTab.parentNode.insertBefore(spacer, targetTab.nextSibling);
-                            }
-                            
-                            // CALCULATE EXACT HEIGHT WITHOUT OVERFLOWING!
-                            // If spacer exceeds containerHeight, flexbox will place the spacer ITSELF into Col 2!
-                            // maxTabsCol1 * 39 accounts for all tabs and their trailing gaps.
-                            // -1px ensures we defeat any subpixel browser rounding and stay securely inside Col 1.
-                            const exactHeight = containerHeight - (maxTabsCol1 * 39) - 1;
-                            spacer.style.height = Math.max(0, exactHeight) + 'px';
-                        } else {
-                            if (spacer.parentNode) spacer.parentNode.removeChild(spacer);
-                        }
-                    } else {
-                        if (spacer.parentNode) spacer.parentNode.removeChild(spacer);
-                    }
-
-                    if (bookCover) {
-                        // FIX 1: Bypass Chromium flex-column wrap intrinsic width bug
-                        let minOffset = Infinity;
-                        for (let tab of tabs) {
-                            if (tab.offsetLeft < minOffset) minOffset = tab.offsetLeft;
-                        }
-                        if (minOffset === Infinity) minOffset = 0;
-                        
-                        const trueWidth = tabsContainer.offsetWidth - minOffset; 
-                        const newPadding = Math.max(60, trueWidth - 20);
-                        bookCover.style.paddingLeft = newPadding + 'px';
-                    }
-
-                    // FIX 2: Dynamically calculate rows relative to the functional BOOK PAGE height!
-                    const grids = document.querySelectorAll('.category-cards-grid');
-                    for (let grid of grids) {
-                        const h = grid.offsetHeight;
-                        if (h > 50) { // Safety threshold
-                            // Ideal card size is ~140px + 16px gap = 156px.
-                            let rows = Math.round((h + 16) / 156);
-                            if (rows < 1) rows = 1;
-                            grid.style.setProperty('--category-rows', rows);
-                        }
-                    }
-                });
-            });
-            // Observe both tabs container and the parent page content layer to catch vertical resizes
-            window.tabsResizeObserver.observe(tabsContainer);
-            const pageView = this.element.querySelector('.categories-grid-view');
-            if (pageView) window.tabsResizeObserver.observe(pageView);
-        }
-
         // Enable horizontal scrolling via vertical mouse wheel in grid containers
         const grids = this.element.querySelectorAll('.category-cards-grid');
         grids.forEach(grid => {
@@ -520,5 +515,36 @@ export default class PageLeft extends Component {
                 }
             }, { passive: false });
         });
+
+        // Dynamically align side ribbons wrapper to start exactly below filters (aligned with categories)
+        this.heightObserver = new ResizeObserver(() => {
+            const categoriesEl = this.element.querySelector('.grid-categories');
+            const liveInner = this.element.querySelector('.side-tabs-grid-inner');
+            if (categoriesEl && liveInner) {
+                // OffsetTop of categories gives exactly the height of groups + filters
+                const offset = categoriesEl.offsetTop;
+                liveInner.style.top = `${offset}px`;
+                
+                // Dynamically fit rows in available space
+                // Available height uses the new offset (categories offset) which means more space for tabs!
+                const availableHeight = this.element.clientHeight - offset - 10; // 10px safety bottom
+                let newMaxRows = Math.floor((availableHeight + 8) / 43); // 35px height + 8px gap
+                if (newMaxRows < 8) newMaxRows = 8; // min 8 to support the 7 required health slots + 1 for safety
+                
+                // Re-render if layout capacities changed!
+                if (this.state.maxRibbonRows !== newMaxRows) {
+                    this.state.maxRibbonRows = newMaxRows;
+                    this.update(this.props);
+                }
+            }
+        });
+        this.heightObserver.observe(this.element);
+    }
+
+    onUnmount() {
+        if (this.heightObserver) {
+            this.heightObserver.disconnect();
+        }
+        super.onUnmount && super.onUnmount();
     }
 }

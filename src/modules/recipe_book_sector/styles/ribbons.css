@@ -1,39 +1,25 @@
-.side-tabs--left-top {
-    position: absolute;
-    left: 21px;
-    /* The right edge of tabs rests 21px inside the page */
-    transform: translateX(-100%);
-    /* Pushes the entire container to the left safely */
-    width: max-content;
-    /* Ensure container tightly hugs its columns */
-    top: 130px;
-    bottom: 50px;
-    /* Explicitly span to bottom to allow deep columns */
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap-reverse;
-    /* Places new columns to the left */
-    align-content: flex-end;
-    row-gap: 4px;
-    column-gap: 15px;
-    padding: 0;
+.side-tabs-grid {
+    grid-area: side_ribbons;
+    position: relative;
+    /* Grid layout causes this to sit in the 0px column. 
+       We allow it to overflow to the LEFT by using RTL or negative margins. */
+    width: 0;
+    direction: rtl; /* This forces the overflow to expand towards the left! */
 }
 
-/* Dynamically generated full-height sheets that adapt to the number of columns! */
-.side-tabs--left-top::before {
-    content: '';
+.side-tabs-grid-inner {
+    display: grid;
+    direction: ltr;
+    gap: 8px 15px;
+    align-content: start;
+    justify-content: end;
+    width: max-content;
+    z-index: 5;
     position: absolute;
-    top: -130px;
-    /* Stretch to top of book */
-    bottom: -56px;
-    /* Stretch to bottom of book */
-    left: 48px;
-    /* Recess 20px so tabs stick out from the "paper" */
-    right: 0;
-    /* Merge exactly into the book */
+    right: 24px; /* Move perfectly into edge of page */
+}
 
-    /* Create a repeating paper edge effect every 70px (55px width + 15px gap) */
+.side-tabs-bg-sheet {
     background: repeating-linear-gradient(to right,
             rgba(0, 0, 0, 0.15) 0px,
             rgba(0, 0, 0, 0.05) 2px,
@@ -41,8 +27,10 @@
             var(--parchment) 70px);
     border-radius: 18px 0 0 18px;
     box-shadow: -4px 5px 15px rgba(0, 0, 0, 0.2);
-    /* Deep shadow under the sheets */
     z-index: -1;
+    position: relative;
+    width: 65px;
+    margin-right: -10px;
 }
 
 .side-tab--left {
@@ -77,7 +65,7 @@
 }
 
 /* Dim all other tabs when one is active */
-.side-tabs-container:has(.side-tab--left.active) .side-tab--left:not(.active):not(.tab-clear-active) {
+.side-tabs-grid:has(.side-tab--left.active) .side-tab--left:not(.active):not(.tab-clear-active):not(.side-tabs-bg-sheet) {
     background: #dbd3bb;
     color: rgba(90, 70, 60, 0.5);
     box-shadow: none;
@@ -104,16 +92,7 @@
     transform: translateX(10px);
 }
 
-/* LEFT BOTTOM RIBBON TABS */
-.side-tabs--left-bottom {
-    position: absolute;
-    left: -34px;
-    bottom: 50px;
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
+/* We removed .side-tabs--left-bottom since health tabs are now part of the uniform side-tabs-grid */
 
 /* WRAPPER FOR ALL RIGHT TABS to prevent overlap */
 .right-tabs-wrapper {
@@ -216,13 +195,11 @@
 
 /* BOTTOM RIBBONS */
 .bookmark-bottom-group {
-    position: absolute;
-    left: 30px;
-    bottom: -5px;
     display: flex;
     align-items: flex-end;
     gap: 16px;
     z-index: 100;
+    margin-bottom: -20px; /* Slight poke out from the bottom edge */
 }
 
 .bookmark-bottom {
