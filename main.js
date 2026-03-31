@@ -3,47 +3,21 @@ import { initCraftSpace } from './src/modules/craft_space/craft_space.js?v=2';
 import HeaderAuthModule from './src/modules/header_auth/HeaderAuthModule.js';
 import ProfileModule from './src/modules/profile/ProfileModule.js';
 import { RecipeService } from './src/api/RecipeService.js';
+import ClockModule from './src/modules/clock/ClockModule.js';
+import HeaderModule from './src/modules/header/HeaderModule.js';
+
 
 // --- ALL JS LOGIC FROM EatPan_SPA.html ---
 
 const body = document.body;
 const sectionBlocks = document.getElementById('sectionBlocks');
-const smallClock = document.getElementById('smallClock');
-const clockBlock = document.getElementById('clockBlock');
-const bigClockFace = document.getElementById('bigClockFace');
-const bigClockHand = document.getElementById('bigClockHand');
-const bigTimeDisplay = document.getElementById('bigTimeDisplay');
 const profileBlock = document.getElementById('profileBlock');
-const menuBtn = document.getElementById('menuBtn');
-const backBtn = document.getElementById('backBtn');
-let col3 = null;
-let col4 = null;
 
-function adaptMenuPosition() {
-    const isDesktop = window.innerWidth >= 1024;
-    const desktopCol3 = document.getElementById('col-3-desktop');
-    const desktopCol4 = document.getElementById('col-4-desktop');
-    const mobileCol3 = document.getElementById('col-3-mobile');
-    const mobileCol4 = document.getElementById('col-4-mobile');
-
-    col3 = isDesktop ? desktopCol3 : mobileCol3;
-    col4 = isDesktop ? desktopCol4 : mobileCol4;
-
-    const isActive = document.body.classList.contains('active-mode') || document.body.classList.contains('clock-mode');
-
-    if (isActive) {
-        if (col3 && menuBtn && !col3.contains(menuBtn)) col3.appendChild(menuBtn);
-        if (col4 && backBtn && !col4.contains(backBtn)) col4.appendChild(backBtn);
-    } else {
-        if (col4 && menuBtn && !col4.contains(menuBtn)) col4.appendChild(menuBtn);
-        if (col4 && backBtn && !col4.contains(backBtn)) col4.appendChild(backBtn);
-        if (col4 && menuBtn && backBtn && col4.contains(menuBtn) && col4.contains(backBtn)) {
-            col4.insertBefore(menuBtn, backBtn);
-        }
-    }
-}
-window.addEventListener('resize', adaptMenuPosition);
-adaptMenuPosition();
+const clockModule = new ClockModule({
+    headerTarget: '#col-4-desktop',
+    blockTarget: '#sectionBlocks'
+});
+clockModule.render();
 
 let savedBlockIndex = 0;
 const CLONES_COUNT = 2; 
@@ -169,84 +143,7 @@ sectionBlocks.addEventListener('scroll', () => {
 });
 
 // --- SEC: CLOCKS ---
-const DEG_PER_HOUR = 15;
-
-function hourToAngle(h, m) {
-    return (((h - 12 + 24) % 24) * DEG_PER_HOUR + (m || 0) * 0.25) % 360;
-}
-
-function angleToTime(deg) {
-    deg = ((deg % 360) + 360) % 360;
-    const totalMinutes = deg * 4;
-    let offsetHours = Math.floor(totalMinutes / 60);
-    let minutes = Math.round((totalMinutes % 60) / 5) * 5;
-    if (minutes >= 60) { minutes = 0; offsetHours++; }
-    const hour = (offsetHours + 12) % 24;
-    return { hour, minute: minutes };
-}
-
-function setClockTime(h, m) {
-    const angle = hourToAngle(h, m);
-    bigClockHand.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-    bigTimeDisplay.textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
-}
-
-function createClockFace() {
-    bigClockFace.querySelectorAll('.tick, .clock-label').forEach(el => el.remove());
-
-    for (let i = 0; i < 24; i++) {
-        const tick = document.createElement('div');
-        tick.className = 'tick';
-        if (i % 6 === 0) tick.classList.add('hour-tick');
-        tick.style.transform = `translateX(-50%) rotate(${i * DEG_PER_HOUR}deg)`;
-        bigClockFace.appendChild(tick);
-    }
-
-    const labels = [
-        { hour: 12, text: '12:00' },
-        { hour: 18, text: '18:00' },
-        { hour: 0,  text: '0:00' },
-        { hour: 6,  text: '6:00' },
-        { hour: 23, text: '23:00' }
-    ];
-    labels.forEach(({ hour, text }) => {
-        const angleDeg = hourToAngle(hour, 0);
-        const rad = (angleDeg - 90) * Math.PI / 180;
-        const r = 54;
-        const label = document.createElement('div');
-        label.className = 'clock-label';
-        label.style.left = (50 + r * Math.cos(rad)) + '%';
-        label.style.top  = (50 + r * Math.sin(rad)) + '%';
-        label.textContent = text;
-        bigClockFace.appendChild(label);
-    });
-
-    bigClockFace.addEventListener('click', (e) => {
-        const rect = bigClockFace.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = e.clientX - cx;
-        const dy = e.clientY - cy;
-        const dist = Math.sqrt(dx * dx + dy * dy) / (rect.width / 2);
-        if (dist < 0.15) return;
-        let angle = Math.atan2(dx, -dy) * 180 / Math.PI;
-        if (angle < 0) angle += 360;
-        const { hour, minute } = angleToTime(angle);
-        setClockTime(hour, minute);
-    });
-}
-
-function showCurrentTimeOnBigClock() {
-    const now = new Date();
-    setClockTime(now.getHours(), now.getMinutes());
-}
-
-function updateSmallClock() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    smallClock.textContent = `${hours}:${minutes}`;
-}
+// Clock logic has been moved to src/modules/clock/ClockModule.js
 
 // --- SEC: SCROLL & TOUCH ---
 function scrollToAdjacentBlock(direction) {
@@ -483,7 +380,7 @@ function performBlockActivation(element) {
     body.classList.add('active-mode');
     element.classList.add('active');
     element.scrollTop = 0;
-    moveElementWithAnimate(menuBtn, col3);
+    window.HeaderModuleInstance?.triggerAdapt();
 }
 
 function activateUtilityPage(type, element) {
@@ -519,7 +416,7 @@ window.openProfilePage = function() {
     activateUtilityPage('profile', profileBlock);
 };
 
-function activateClock() {
+window.activateClock = function() {
     if (body.classList.contains('clock-mode')) return;
     window.headerAuthModule?.closePanel();
     if (!body.classList.contains('active-mode')) {
@@ -527,50 +424,51 @@ function activateClock() {
     }
     history.pushState({ type: 'clock' }, null, "");
 
-    const smallRect = smallClock.getBoundingClientRect();
+    const smallRect = clockModule.smallClock.getBoundingClientRect();
     const currentActive = document.querySelector('.section_block.active');
     if (currentActive) currentActive.classList.remove('active');
 
     body.classList.add('active-mode'); 
     body.classList.add('clock-mode');
-    clockBlock.classList.add('active'); 
-    showCurrentTimeOnBigClock();
+    clockModule.clockBlock.classList.add('active'); 
+    clockModule.showCurrentTimeOnBigClock();
 
-    moveElementWithAnimate(menuBtn, col3);
+    window.HeaderModuleInstance?.triggerAdapt();
 
-    const bigRect = bigClockFace.getBoundingClientRect();
+    const bigRect = clockModule.bigClockFace.getBoundingClientRect();
     const scaleX = smallRect.width / bigRect.width;
     const scaleY = smallRect.height / bigRect.height;
     const transX = smallRect.left + (smallRect.width/2) - (bigRect.left + bigRect.width/2);
     const transY = smallRect.top + (smallRect.height/2) - (bigRect.top + bigRect.height/2);
 
-    bigClockFace.style.transition = 'none';
-    bigClockFace.style.transform = `translate(${transX}px, ${transY}px) scale(${scaleX}, ${scaleY})`;
+    clockModule.bigClockFace.style.transition = 'none';
+    clockModule.bigClockFace.style.transform = `translate(${transX}px, ${transY}px) scale(${scaleX}, ${scaleY})`;
 
     requestAnimationFrame(() => {
-        void bigClockFace.offsetWidth; 
-        bigClockFace.style.transition = 'transform 0.5s cubic-bezier(0.2, 0, 0.2, 1)';
-        bigClockFace.style.transform = ''; 
+        void clockModule.bigClockFace.offsetWidth; 
+        clockModule.bigClockFace.style.transition = 'transform 0.5s cubic-bezier(0.2, 0, 0.2, 1)';
+        clockModule.bigClockFace.style.transform = ''; 
     });
 }
 
 function deactivateClockWithAnimation(nextState) {
-    const smallRect = smallClock.getBoundingClientRect();
-    const bigRect = bigClockFace.getBoundingClientRect();
+    if (!clockModule || !clockModule.smallClock) return;
+    const smallRect = clockModule.smallClock.getBoundingClientRect();
+    const bigRect = clockModule.bigClockFace.getBoundingClientRect();
     const scaleX = smallRect.width / bigRect.width;
     const scaleY = smallRect.height / bigRect.height;
     const transX = smallRect.left + (smallRect.width/2) - (bigRect.left + bigRect.width/2);
     const transY = smallRect.top + (smallRect.height/2) - (bigRect.top + bigRect.height/2);
 
-    bigClockFace.style.transition = 'transform 0.4s ease-in';
-    bigClockFace.style.transform = `translate(${transX}px, ${transY}px) scale(${scaleX}, ${scaleY})`;
-    clockBlock.style.opacity = '0'; 
+    clockModule.bigClockFace.style.transition = 'transform 0.4s ease-in';
+    clockModule.bigClockFace.style.transform = `translate(${transX}px, ${transY}px) scale(${scaleX}, ${scaleY})`;
+    clockModule.clockBlock.style.opacity = '0'; 
 
     setTimeout(() => {
         body.classList.remove('clock-mode');
-        clockBlock.classList.remove('active');
-        clockBlock.style.opacity = ''; 
-        bigClockFace.style.transform = '';
+        clockModule.clockBlock.classList.remove('active');
+        clockModule.clockBlock.style.opacity = ''; 
+        clockModule.bigClockFace.style.transform = '';
 
         const nextTarget = resolveStateTarget(nextState);
 
@@ -588,7 +486,9 @@ function resetVisualState() {
     body.classList.remove('active-mode');
     body.classList.remove('clock-mode');
     document.querySelectorAll('.section_block.active').forEach(b => b.classList.remove('active'));
-    bigClockFace.style.transform = '';
+    if (clockModule && clockModule.bigClockFace) {
+        clockModule.bigClockFace.style.transform = '';
+    }
 }
 
 function restoreScroll() {
@@ -597,39 +497,6 @@ function restoreScroll() {
     requestAnimationFrame(() => {
         sectionBlocks.classList.add('snapping');
     });
-}
-
-function moveElementWithAnimate(element, newParent) {
-    if (!element || !newParent) return;
-
-    const first = element.getBoundingClientRect();
-    newParent.appendChild(element);
-    const last = element.getBoundingClientRect();
-    const deltaX = first.left - last.left;
-    const deltaY = first.top - last.top;
-
-    element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-    element.classList.remove('animating');
-
-    requestAnimationFrame(() => {
-        void element.offsetWidth; 
-        element.classList.add('animating');
-        element.style.transform = ''; 
-    });
-}
-
-function restoreHeaderControlsHome() {
-    if (!menuBtn || !col4) return;
-
-    moveElementWithAnimate(menuBtn, col4);
-
-    if (backBtn) {
-        setTimeout(() => {
-            if (col4.contains(backBtn)) {
-                col4.insertBefore(menuBtn, backBtn);
-            }
-        }, 400);
-    }
 }
 
 // Global scope helpers for HTML onclick
@@ -1232,20 +1099,13 @@ async function loadProjectStatus() {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Main SPA Router Started.');
     loadProjectStatus();
-    setInterval(updateSmallClock, 1000);
-    updateSmallClock();
-    smallClock.addEventListener('click', activateClock);
-    
-    const placeholder = document.querySelector('.clock-placeholder');
-    if (placeholder) {
-        placeholder.addEventListener('click', () => {
-            if (document.body.classList.contains('clock-mode')) {
-                window.history.back();
-            }
-        });
-    }
 
-    createClockFace();
+    const headerModuleMount = document.getElementById('headerModuleMount');
+    if (headerModuleMount) {
+        const headerModule = new HeaderModule();
+        const hmEl = await headerModule.render();
+        headerModuleMount.appendChild(hmEl);
+    }
 
     const headerAuthMount = document.getElementById('headerAuthMount');
     if (headerAuthMount) {

@@ -1,0 +1,113 @@
+<div>
+<template id="tpl-login">
+    <div class="header-auth-popover header-auth-popover--guest" data-auth-mode="login" role="dialog" aria-modal="false" aria-label="Форма авторизації">
+        <div class="header-auth-popover-head">
+            <div class="header-auth-heading">
+                <span class="header-auth-kicker">Kitchen Pass</span>
+                <h3 class="header-auth-title">Увійти в книгу</h3>
+            </div>
+            <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
+        </div>
+        <form class="header-auth-form-panel" data-auth-form="login">
+            <label class="header-auth-field">
+                <span class="header-auth-label">Email</span>
+                <input class="header-auth-input" type="email" name="email" placeholder="name@example.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" required />
+            </label>
+            <label class="header-auth-field">
+                <span class="header-auth-label">Пароль</span>
+                <input class="header-auth-input" type="password" name="password" placeholder="••••••••" autocomplete="current-password" required />
+            </label>
+            <button class="header-auth-switch header-auth-switch--subtle" type="button" data-auth-switch="forgot">
+                Забули пароль?
+            </button>
+            <div class="header-auth-actions-row">
+                <button class="header-auth-submit" type="submit">Увійти</button>
+            </div>
+            <button class="header-auth-switch" type="button" data-auth-switch="register">
+                Ще немає акаунта? Реєстрація
+            </button>
+            <p class="header-auth-note">Фронтенд-демо: після відправки форми бекенд поки не викликається.</p>
+        </form>
+    </div>
+</template>
+
+<template id="tpl-register">
+    <div class="header-auth-popover header-auth-popover--guest" data-auth-mode="register" role="dialog" aria-modal="false" aria-label="Форма реєстрації">
+        <div class="header-auth-popover-head">
+            <div class="header-auth-heading">
+                <span class="header-auth-kicker">Kitchen Pass</span>
+                <h3 class="header-auth-title">Створити акаунт</h3>
+            </div>
+            <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
+        </div>
+        <form class="header-auth-form-panel" data-auth-form="register">
+            <label class="header-auth-field">
+                <span class="header-auth-label">Ім'я</span>
+                <input class="header-auth-input" type="text" name="name" placeholder="Ваше ім'я" autocomplete="name" required />
+            </label>
+            <label class="header-auth-field">
+                <span class="header-auth-label">Email</span>
+                <input class="header-auth-input" type="email" name="email" placeholder="name@example.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" required />
+            </label>
+            <label class="header-auth-field">
+                <span class="header-auth-label">Пароль</span>
+                <input class="header-auth-input" type="password" name="password" placeholder="••••••••" autocomplete="new-password" required />
+            </label>
+            <label class="header-auth-field">
+                <span class="header-auth-label">Повторіть пароль</span>
+                <input class="header-auth-input" type="password" name="confirmPassword" placeholder="••••••••" autocomplete="new-password" required />
+            </label>
+            <div class="header-auth-actions-row">
+                <button class="header-auth-submit" type="submit">Створити профіль</button>
+            </div>
+            <button class="header-auth-switch" type="button" data-auth-switch="login">
+                Уже є акаунт? Увійти
+            </button>
+            <p class="header-auth-note">Фронтенд-демо: після відправки форми бекенд поки не викликається.</p>
+        </form>
+    </div>
+</template>
+
+<template id="tpl-forgot">
+    <div class="header-auth-popover header-auth-popover--guest" data-auth-mode="forgot" role="dialog" aria-modal="false" aria-label="Форма відновлення доступу">
+        <div class="header-auth-popover-head">
+            <div class="header-auth-heading">
+                <span class="header-auth-kicker">Kitchen Pass</span>
+                <h3 class="header-auth-title">Відновити доступ</h3>
+            </div>
+            <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
+        </div>
+        <form class="header-auth-form-panel" data-auth-form="forgot">
+            <label class="header-auth-field">
+                <span class="header-auth-label">Email</span>
+                <input class="header-auth-input" type="email" name="email" placeholder="name@example.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" required />
+            </label>
+            <div class="header-auth-actions-row">
+                <button class="header-auth-submit" type="submit">Відновити доступ</button>
+            </div>
+            <button class="header-auth-switch" type="button" data-auth-switch="login">
+                Назад до входу
+            </button>
+            <p class="header-auth-note">Фронтенд-демо: тут буде сценарій відновлення доступу без реальної відправки листа.</p>
+        </form>
+    </div>
+</template>
+
+<template id="tpl-forgot-sent">
+    <div class="header-auth-popover header-auth-popover--guest header-auth-popover--success" data-auth-mode="forgot-sent" role="dialog" aria-modal="false" aria-label="Підтвердження відновлення доступу">
+        <div class="header-auth-popover-head">
+            <div class="header-auth-heading">
+                <span class="header-auth-kicker">Kitchen Pass</span>
+                <h3 class="header-auth-title">Лист майже в дорозі</h3>
+            </div>
+            <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
+        </div>
+        <div class="header-auth-success-panel">
+            <p class="header-auth-note">Ми підготували інструкцію для <strong id="forgot-sent-email"></strong>. У демо-режимі лист не надсилається, але сценарій відновлення вже змодельовано.</p>
+            <div class="header-auth-actions-row">
+                <button class="header-auth-submit" type="button" data-auth-switch="login">Повернутися до входу</button>
+            </div>
+        </div>
+    </div>
+</template>
+</div>

@@ -47,7 +47,8 @@ export default class Component {
     async onMount() {}
 
     async render() {
-        this.element = this.createNode(this.template());
+        const templateString = await this.template();
+        this.element = this.createNode(templateString);
         this.attachEvents();
         await this.onMount();
         return this.element;

@@ -15,11 +15,14 @@
 
   <!-- Core & Module CSS -->
   <link rel="stylesheet" href="./src/styles/global.css" />
+  <link rel="stylesheet" href="./src/styles/global_media_queries.css" />
+  <link rel="stylesheet" href="./src/modules/clock/clock.css" />
   <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/book.css" />
   <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/ribbons.css" />
   <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/create-recipe.css" />
   <link rel="stylesheet" href="./src/modules/recipe_book_sector/styles/media_queries.css" />
   <link rel="stylesheet" href="./src/modules/craft_space/styles/kanban.css" />
+  <link rel="stylesheet" href="./src/modules/header/styles/header.css" />
   <link rel="stylesheet" href="./src/modules/header_auth/styles/header-auth.css" />
   <link rel="stylesheet" href="./src/modules/profile/styles/profile.css" />
 </head>
@@ -32,24 +35,13 @@
       <div></div>
       <div class="header-control-slot" id="col-3-desktop"></div>
       <div class="header-tools" id="col-4-desktop">
-        <button class="btn btn-menu" id="menuBtn" type="button">☰</button>
-        <button class="btn btn-back" id="backBtn" type="button" onclick="goBack()">⬅</button>
-        <div class="clock-container">
-          <div class="clock-placeholder">24:00</div>
-          <div class="clock" id="smallClock">00:00</div>
-        </div>
+        <!-- HeaderModule will inject menuBtn and backBtn here dynamically -->
       </div>
+      <div id="headerModuleMount" style="display:none;"></div>
     </div>
 
     <div class="content_sectionBlocks" id="sectionBlocks">
-      <!-- SPECIAL BLOCK: BIG CLOCK -->
-      <div class="section_block" id="clockBlock">
-        <div class="big-clock-face" id="bigClockFace">
-          <div class="clock-center-dot"></div>
-          <div class="clock-hand" id="bigClockHand"></div>
-        </div>
-        <div class="selected-time-display" id="bigTimeDisplay">12:00</div>
-      </div>
+
 
       <!-- ORIGINAL BLOCKS -->
       <div class="section_block original-block" data-index="0">
