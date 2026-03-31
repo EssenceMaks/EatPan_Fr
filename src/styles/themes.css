@@ -1,0 +1,181 @@
+/* Auto-generated themes */
+
+body.theme-royal {
+  --parchment: #0b0e14;
+  --parchment-rgb: 11, 14, 20;
+  
+  --surface-container: #161b22;
+  --surface-container-rgb: 22, 27, 34;
+  --surface-container-alt-rgb: 22, 27, 34; /* Use same for alt */
+  
+  --brand-red: #c5a059;
+  --brand-red-rgb: 197, 160, 89;
+  --accent: #c5a059;
+  --accent-rgb: 197, 160, 89;
+  
+  --ink: #e2e8f0;
+  --ink-rgb: 226, 232, 240;
+  
+  --paper-white: #1c2128;
+  --tab-bg: #1c2128;
+}
+
+body.theme-silver {
+  --parchment: #120d1a;
+  --parchment-rgb: 18, 13, 26;
+  
+  --surface-container: #1e1529;
+  --surface-container-rgb: 30, 21, 41;
+  --surface-container-alt-rgb: 30, 21, 41; /* Use same for alt */
+  
+  --brand-red: #a8b2c1;
+  --brand-red-rgb: 168, 178, 193;
+  --accent: #a8b2c1;
+  --accent-rgb: 168, 178, 193;
+  
+  --ink: #e2e8f0;
+  --ink-rgb: 226, 232, 240;
+  
+  --paper-white: #251c33;
+  --tab-bg: #251c33;
+}
+
+body.theme-bronze {
+  --parchment: #1a1614;
+  --parchment-rgb: 26, 22, 20;
+  
+  --surface-container: #27211d;
+  --surface-container-rgb: 39, 33, 29;
+  --surface-container-alt-rgb: 39, 33, 29; /* Use same for alt */
+  
+  --brand-red: #cd7f32;
+  --brand-red-rgb: 205, 127, 50;
+  --accent: #cd7f32;
+  --accent-rgb: 205, 127, 50;
+  
+  --ink: #f5deb3;
+  --ink-rgb: 245, 222, 179;
+  
+  --paper-white: #362d26;
+  --tab-bg: #362d26;
+}
+
+body.theme-tangerine {
+  --parchment: #1f1f1f;
+  --parchment-rgb: 31, 31, 31;
+  
+  --surface-container: #2d2d2d;
+  --surface-container-rgb: 45, 45, 45;
+  --surface-container-alt-rgb: 45, 45, 45; /* Use same for alt */
+  
+  --brand-red: #ff8c00;
+  --brand-red-rgb: 255, 140, 0;
+  --accent: #ff8c00;
+  --accent-rgb: 255, 140, 0;
+  
+  --ink: #ffffff;
+  --ink-rgb: 255, 255, 255;
+  
+  --paper-white: #3a3a3a;
+  --tab-bg: #3a3a3a;
+}
+
+body.theme-neon {
+  --parchment: #050510;
+  --parchment-rgb: 5, 5, 16;
+  
+  --surface-container: #0a0a20;
+  --surface-container-rgb: 10, 10, 32;
+  --surface-container-alt-rgb: 10, 10, 32; /* Use same for alt */
+  
+  --brand-red: #00ffff;
+  --brand-red-rgb: 0, 255, 255;
+  --accent: #00ffff;
+  --accent-rgb: 0, 255, 255;
+  
+  --ink: #ffffff;
+  --ink-rgb: 255, 255, 255;
+  
+  --paper-white: #101030;
+  --tab-bg: #101030;
+}
+
+body.theme-scroll {
+  --parchment: #d2b48c;
+  --parchment-rgb: 210, 180, 140;
+  
+  --surface-container: #e6ccab;
+  --surface-container-rgb: 230, 204, 171;
+  --surface-container-alt-rgb: 230, 204, 171; /* Use same for alt */
+  
+  --brand-red: #8b4513;
+  --brand-red-rgb: 139, 69, 19;
+  --accent: #8b4513;
+  --accent-rgb: 139, 69, 19;
+  
+  --ink: #3e2723;
+  --ink-rgb: 62, 39, 35;
+  
+  --paper-white: #f5deb3;
+  --tab-bg: #f5deb3;
+}
+
+body.theme-cartoon {
+  --parchment: #e0f7fa;
+  --parchment-rgb: 224, 247, 250;
+  
+  --surface-container: #b2ebf2;
+  --surface-container-rgb: 178, 235, 242;
+  --surface-container-alt-rgb: 178, 235, 242; /* Use same for alt */
+  
+  --brand-red: #ff6f00;
+  --brand-red-rgb: 255, 111, 0;
+  --accent: #ff6f00;
+  --accent-rgb: 255, 111, 0;
+  
+  --ink: #006064;
+  --ink-rgb: 0, 96, 100;
+  
+  --paper-white: #ffffff;
+  --tab-bg: #ffffff;
+}
+
+body.theme-cyber {
+  --parchment: #0d0d0d;
+  --parchment-rgb: 13, 13, 13;
+  
+  --surface-container: #1a1a1a;
+  --surface-container-rgb: 26, 26, 26;
+  --surface-container-alt-rgb: 26, 26, 26; /* Use same for alt */
+  
+  --brand-red: #39ff14;
+  --brand-red-rgb: 57, 255, 20;
+  --accent: #39ff14;
+  --accent-rgb: 57, 255, 20;
+  
+  --ink: #ffffff;
+  --ink-rgb: 255, 255, 255;
+  
+  --paper-white: #262626;
+  --tab-bg: #262626;
+}
+
+body.theme-ledger {
+  --parchment: #fdf5e6;
+  --parchment-rgb: 253, 245, 230;
+  
+  --surface-container: #faebd7;
+  --surface-container-rgb: 250, 235, 215;
+  --surface-container-alt-rgb: 250, 235, 215; /* Use same for alt */
+  
+  --brand-red: #dc143c;
+  --brand-red-rgb: 220, 20, 60;
+  --accent: #dc143c;
+  --accent-rgb: 220, 20, 60;
+  
+  --ink: #2f4f4f;
+  --ink-rgb: 47, 79, 79;
+  
+  --paper-white: #ffffff;
+  --tab-bg: #ffffff;
+}

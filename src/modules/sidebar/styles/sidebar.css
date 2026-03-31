@@ -1,0 +1,144 @@
+/* Sidebar Container - Covers the whole viewport initially hidden via pointer-events */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background-color: rgba(var(--ink-rgb), 0.5);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Sidebar Drawer - Sliding from Right */
+.sidebar-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 320px;
+  max-width: 85vw;
+  height: 100vh;
+  background-color: var(--surface-container);
+  box-shadow: -5px 0 20px rgba(var(--ink-rgb), 0.3);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-overlay.active .sidebar-drawer {
+  transform: translateX(0);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid rgba(var(--brand-red-rgb), 0.2);
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  color: var(--brand-red);
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.sidebar-close-btn {
+  background: none;
+  border: none;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, transform 0.2s;
+  border-radius: 50%;
+}
+
+.sidebar-close-btn:hover {
+  color: var(--brand-red);
+  transform: scale(1.1);
+  background: rgba(var(--brand-red-rgb), 0.1);
+}
+
+/* Sidebar Content */
+.sidebar-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.theme-selector h3 {
+  margin: 0 0 1rem 0;
+  font-family: var(--font-title);
+  color: var(--ink);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Theme List */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.theme-btn {
+  background-color: var(--paper-white);
+  border: 2px solid rgba(var(--ink-rgb), 0.1);
+  border-radius: 8px;
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.theme-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--brand-red-rgb), 0.2);
+  border-color: rgba(var(--brand-red-rgb), 0.5);
+}
+
+.theme-btn.active {
+  border-color: var(--brand-red);
+  background-color: rgba(var(--brand-red-rgb), 0.1);
+  box-shadow: 0 0 0 1px var(--brand-red) inset;
+}
+
+/* Make some colored circles to preview themes inside the button */
+.theme-preview-colors {
+  display: flex;
+  gap: 4px;
+}
+
+.theme-color-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--ink-rgb), 0.2);
+}

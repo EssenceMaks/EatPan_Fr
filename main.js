@@ -5,6 +5,7 @@ import ProfileModule from './src/modules/profile/ProfileModule.js';
 import { RecipeService } from './src/api/RecipeService.js';
 import ClockModule from './src/modules/clock/ClockModule.js?v=3';
 import HeaderModule from './src/modules/header/HeaderModule.js?v=3';
+import SidebarModule from './src/modules/sidebar/SidebarModule.js';
 
 
 // --- ALL JS LOGIC FROM EatPan_SPA.html ---
@@ -23,6 +24,14 @@ const headerModuleMount = document.getElementById('headerModuleMount');
 if (headerModuleMount) {
     const headerModule = new HeaderModule();
     headerModule.render();
+}
+
+const sidebarModuleMount = document.getElementById('sidebarModuleMount');
+if (sidebarModuleMount) {
+    const sidebarModule = new SidebarModule();
+    sidebarModule.render().then(el => {
+        sidebarModuleMount.replaceWith(el);
+    });
 }
 
 let savedBlockIndex = 0;

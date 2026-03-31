@@ -32,7 +32,7 @@
 @media (min-width: 1024px) and (max-width: 1199px) and (orientation: landscape)
 @media (min-width: 1200px) and (max-width: 1439px)
 @media (min-width: 1440px) and (max-width: 1919px)
-@media (min-width: 1024px) and (max-width: 1199px) and (max-height: 750px) and (orientation: landscape) {
+@media (min-width: 1024px) and (max-width: 1199px) and (max-height: 750px) and (orientation: landscape)
 @media (min-width: 1200px) and (max-width: 1439px) and (max-height: 750px)
 @media (min-width: 1440px) and (max-width: 1919px) and (max-height: 850px)
 @media (min-width: 1920px) and (max-height: 950px)
