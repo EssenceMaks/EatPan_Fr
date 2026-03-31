@@ -241,22 +241,31 @@ export default class PageLeft extends Component {
 
         // Ribbons Grid Calculation
         const healthTabsDef = [
-            { invisible: true },
             { id: 'fruct', title: 'Фрукти', icon: 'banana', color: '' },
             { id: 'bads', title: 'Бади', icon: 'pill', color: '' },
             { id: 'first-aid', title: 'Аптечка', icon: 'circle-plus', color: 'var(--brand-red)' },
             { id: 'allergens', title: 'Алергени', icon: 'alert-triangle', color: 'var(--brand-red)' },
-            { id: 'e-additives', title: 'Е-Добавки', icon: 'skull', color: 'var(--brand-red)', extra: 'E' },
-            { invisible: true }
+            { id: 'e-additives', title: 'Е-Добавки', icon: 'skull', color: 'var(--brand-red)', extra: 'E' }
         ];
 
         let maxRows = this.state.maxRibbonRows || 9;
 
+        // Dynamically add visual spacers only if we physically have room for them
+        if (maxRows >= 6) {
+            healthTabsDef.unshift({ invisible: true }); // top spacer
+        }
+        // User requested removing the bottom 7th spacer on resolutions < 700px height to prevent visual overflow
+        if (maxRows >= 7 && window.innerHeight >= 700) {
+            healthTabsDef.push({ invisible: true }); // bottom spacer
+        }
+
+        let healthTabsLen = healthTabsDef.length;
+
         let catCount = allCats.length + (cat !== 'all' ? 1 : 0);
         let requiredCols = 1;
         
-        // Health tabs column (rightmost) uses 7 slots at the bottom (1 empty, 5 tabs, 1 empty)
-        let rightmostCatSlots = maxRows - 7;
+        // Health tabs column (rightmost) uses healthTabsLen slots at the bottom
+        let rightmostCatSlots = maxRows - healthTabsLen;
         if (rightmostCatSlots < 0) rightmostCatSlots = 0;
         
         let cLeft = catCount;
@@ -305,7 +314,7 @@ export default class PageLeft extends Component {
         const healthTabsHTML = healthTabsDef.map((ht, idx) => {
             if (ht.invisible) return '';
             return `
-            <div class="side-tab--left" title="${ht.title}" style="grid-column: ${requiredCols}; grid-row: ${(maxRows - 6) + idx};">
+            <div class="side-tab--left" title="${ht.title}" style="grid-column: ${requiredCols}; grid-row: ${(maxRows - healthTabsLen + 1) + idx};">
                 <i data-lucide="${ht.icon}" style="width: 18px; ${ht.color ? `color: ${ht.color};` : ''}"></i>${ht.extra ? ht.extra : ''}
             </div>
             `;
@@ -518,15 +527,19 @@ export default class PageLeft extends Component {
 
         // Dynamically align side ribbons wrapper to start exactly below filters (aligned with categories)
         this.heightObserver = new ResizeObserver(() => {
+            const categoriesEl = this.element.querySelector('.grid-categories');
             const ribbonsContainer = this.element.querySelector('.side-tabs-grid');
             const liveInner = this.element.querySelector('.side-tabs-grid-inner');
-            if (ribbonsContainer && liveInner) {
-                liveInner.style.top = '0px';
+            if (categoriesEl && ribbonsContainer && liveInner) {
+                // OffsetTop of categories gives exactly the height of groups + filters
+                // This ensures ribbons start exactly below the top headers.
+                const offset = categoriesEl.offsetTop;
+                liveInner.style.top = `${offset}px`;
 
-                // Dynamically fit rows in the actual ribbon area
-                const availableHeight = ribbonsContainer.clientHeight - 10; // 10px safety bottom
+                // Calculate available height bypassing the top empty space
+                const availableHeight = ribbonsContainer.clientHeight - offset - 10; // 10px safety bottom
                 let newMaxRows = Math.floor((availableHeight + 8) / 43); // 35px height + 8px gap
-                if (newMaxRows < 8) newMaxRows = 8; // min 8 to support the 7 required health slots + 1 for safety
+                if (newMaxRows < 5) newMaxRows = 5; // absolute min to support the 5 active health slots
                 
                 // Re-render if layout capacities changed!
                 if (this.state.maxRibbonRows !== newMaxRows) {
