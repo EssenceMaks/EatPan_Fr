@@ -24,6 +24,20 @@ export default class HeaderAuthModule extends Component {
             await this.closePanel();
         };
         this.profileInitialized = false;
+        this.htmlCache = {};
+    }
+
+    async loadHtml(path) {
+        if (this.htmlCache[path]) return this.htmlCache[path];
+        try {
+            const res = await fetch(path);
+            const text = await res.text();
+            this.htmlCache[path] = text;
+            return text;
+        } catch (e) {
+            console.error('Failed to load HTML from ' + path, e);
+            return '';
+        }
     }
 
     readStoredUser() {
@@ -220,147 +234,65 @@ export default class HeaderAuthModule extends Component {
         await this.refresh();
     }
 
-    renderGuestPanel(mode) {
-        const isRegister = mode === 'register';
-        const isForgot = mode === 'forgot';
-        const title = isRegister
-            ? 'Створити акаунт'
-            : isForgot
-                ? 'Відновити доступ'
-                : 'Увійти в книгу';
-        const ariaLabel = isRegister
-            ? 'Форма реєстрації'
-            : isForgot
-                ? 'Форма відновлення доступу'
-                : 'Форма авторизації';
-        const submitLabel = isRegister
-            ? 'Створити профіль'
-            : isForgot
-                ? 'Відновити доступ'
-                : 'Увійти';
-        const note = isForgot
-            ? 'Фронтенд-демо: тут буде сценарій відновлення доступу без реальної відправки листа.'
-            : 'Фронтенд-демо: після відправки форми бекенд поки не викликається.';
-
-        return `
-            <div class="header-auth-popover header-auth-popover--guest" data-auth-mode="${mode}" role="dialog" aria-modal="false" aria-label="${ariaLabel}">
-                <div class="header-auth-popover-head">
-                    <div class="header-auth-heading">
-                        <span class="header-auth-kicker">Kitchen Pass</span>
-                        <h3 class="header-auth-title">${title}</h3>
-                    </div>
-                    <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
-                </div>
-                <form class="header-auth-form-panel" data-auth-form="${mode}">
-                    ${isRegister ? `
-                        <label class="header-auth-field">
-                            <span class="header-auth-label">Ім'я</span>
-                            <input class="header-auth-input" type="text" name="name" placeholder="Ваше ім'я" autocomplete="name" required />
-                        </label>
-                    ` : ''}
-                    <label class="header-auth-field">
-                        <span class="header-auth-label">Email</span>
-                        <input class="header-auth-input" type="email" name="email" placeholder="name@example.com" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" required />
-                    </label>
-                    ${isForgot ? '' : `
-                        <label class="header-auth-field">
-                            <span class="header-auth-label">Пароль</span>
-                            <input class="header-auth-input" type="password" name="password" placeholder="••••••••" autocomplete="${isRegister ? 'new-password' : 'current-password'}" required />
-                        </label>
-                    `}
-                    ${isRegister ? `
-                        <label class="header-auth-field">
-                            <span class="header-auth-label">Повторіть пароль</span>
-                            <input class="header-auth-input" type="password" name="confirmPassword" placeholder="••••••••" autocomplete="new-password" required />
-                        </label>
-                    ` : ''}
-                    ${mode === 'login' ? `
-                        <button class="header-auth-switch header-auth-switch--subtle" type="button" data-auth-switch="forgot">
-                            Забули пароль?
-                        </button>
-                    ` : ''}
-                    <div class="header-auth-actions-row">
-                        <button class="header-auth-submit" type="submit">${submitLabel}</button>
-                    </div>
-                    ${isForgot ? `
-                        <button class="header-auth-switch" type="button" data-auth-switch="login">
-                            Назад до входу
-                        </button>
-                    ` : `
-                        <button class="header-auth-switch" type="button" data-auth-switch="${isRegister ? 'login' : 'register'}">
-                            ${isRegister ? 'Уже є акаунт? Увійти' : 'Ще немає акаунта? Реєстрація'}
-                        </button>
-                    `}
-                    <p class="header-auth-note">${note}</p>
-                </form>
-            </div>
-        `;
+    async renderGuestPanel(mode) {
+        const fullHtml = await this.loadHtml('./src/modules/header_auth/auth_forms.html');
+        const div = document.createElement('div');
+        div.innerHTML = fullHtml;
+        const tpl = div.querySelector(`#tpl-${mode}`);
+        return tpl ? tpl.innerHTML : '';
     }
 
-    renderRecoverySuccessPanel() {
-        return `
-            <div class="header-auth-popover header-auth-popover--guest header-auth-popover--success" data-auth-mode="forgot-sent" role="dialog" aria-modal="false" aria-label="Підтвердження відновлення доступу">
-                <div class="header-auth-popover-head">
-                    <div class="header-auth-heading">
-                        <span class="header-auth-kicker">Kitchen Pass</span>
-                        <h3 class="header-auth-title">Лист майже в дорозі</h3>
-                    </div>
-                    <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
-                </div>
-                <div class="header-auth-success-panel">
-                    <p class="header-auth-note">Ми підготували інструкцію для <strong>${this.escapeHtml(this.state.recoveryEmail)}</strong>. У демо-режимі лист не надсилається, але сценарій відновлення вже змодельовано.</p>
-                    <div class="header-auth-actions-row">
-                        <button class="header-auth-submit" type="button" data-auth-switch="login">Повернутися до входу</button>
-                    </div>
-                </div>
-            </div>
-        `;
+    async renderRecoverySuccessPanel() {
+        const fullHtml = await this.loadHtml('./src/modules/header_auth/auth_forms.html');
+        const div = document.createElement('div');
+        div.innerHTML = fullHtml;
+        const tpl = div.querySelector('#tpl-forgot-sent');
+        if (!tpl) return '';
+        let html = tpl.innerHTML;
+        return html.replace('<strong id="forgot-sent-email"></strong>', `<strong>${this.escapeHtml(this.state.recoveryEmail)}</strong>`);
     }
 
-    renderProfileDrawer() {
+    async renderProfileDrawer() {
+        let html = await this.loadHtml('./src/modules/header_auth/profile_drawer.html');
         const profile = this.state.profile;
         const user = profile.user;
 
-        return `
-            <div class="header-profile-layer">
-                <div class="header-profile-backdrop" data-profile-drawer-close></div>
-                <aside class="header-profile-drawer" role="dialog" aria-modal="false" aria-label="Панель профілю користувача">
-                    <div class="header-profile-drawer-head">
-                        <div class="header-profile-drawer-avatar">${this.escapeHtml(user.initials)}</div>
-                        <div class="header-profile-drawer-copy">
-                            <span class="header-auth-kicker">Kitchen Profile</span>
-                            <strong class="header-auth-user-name">${this.escapeHtml(user.name)}</strong>
-                            <span class="header-profile-drawer-handle">${this.escapeHtml(user.handle)}</span>
-                            <span class="header-auth-user-email">${this.escapeHtml(user.email)}</span>
-                        </div>
-                        <button class="header-auth-close" type="button" data-profile-drawer-close aria-label="Закрити профіль">×</button>
-                    </div>
-                    <p class="header-profile-drawer-bio">${this.escapeHtml(user.bio)}</p>
-                    <div class="header-profile-stat-grid">
-                        ${profile.stats.map(stat => `
-                            <div class="header-profile-stat-card">
-                                <span class="header-profile-stat-value">${this.escapeHtml(stat.value)}</span>
-                                <span class="header-profile-stat-label">${this.escapeHtml(stat.label)}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="header-profile-drawer-highlights">
-                        ${profile.highlights.slice(0, 2).map(item => `
-                            <p>${this.escapeHtml(item)}</p>
-                        `).join('')}
-                    </div>
-                    <div class="header-profile-drawer-actions">
-                        <button class="header-auth-submit" type="button" data-profile-open-page>Відкрити профіль</button>
-                        <button class="header-auth-trigger" type="button" data-profile-drawer-close-button>Закрити</button>
-                        <button class="header-auth-trigger" type="button" data-auth-logout>Вийти</button>
-                    </div>
-                </aside>
+        html = html.replace('{{INITIALS}}', this.escapeHtml(user.initials));
+        html = html.replace('{{NAME}}', this.escapeHtml(user.name));
+        html = html.replace('{{HANDLE}}', this.escapeHtml(user.handle));
+        html = html.replace('{{EMAIL}}', this.escapeHtml(user.email));
+        html = html.replace('{{BIO}}', this.escapeHtml(user.bio));
+
+        const statsHtml = profile.stats.map(stat => `
+            <div class="header-profile-stat-card">
+                <span class="header-profile-stat-value">${this.escapeHtml(stat.value)}</span>
+                <span class="header-profile-stat-label">${this.escapeHtml(stat.label)}</span>
             </div>
-        `;
+        `).join('');
+
+        const highlightsHtml = profile.highlights.slice(0, 2).map(item => `
+            <p>${this.escapeHtml(item)}</p>
+        `).join('');
+
+        html = html.replace('<!-- STATS_PLACEHOLDER -->', statsHtml);
+        html = html.replace('<!-- HIGHLIGHTS_PLACEHOLDER -->', highlightsHtml);
+
+        return html;
     }
 
-    template() {
+    async template() {
         const profileUser = this.state.profile.user;
+
+        let panelHtml = '';
+        if (this.state.panel === 'login') panelHtml = await this.renderGuestPanel('login');
+        else if (this.state.panel === 'register') panelHtml = await this.renderGuestPanel('register');
+        else if (this.state.panel === 'forgot') panelHtml = await this.renderGuestPanel('forgot');
+        else if (this.state.panel === 'forgot-sent') panelHtml = await this.renderRecoverySuccessPanel();
+
+        let drawerHtml = '';
+        if (this.state.isDrawerOpen) {
+            drawerHtml = await this.renderProfileDrawer();
+        }
 
         return `
             <div class="header-auth-root">
@@ -371,12 +303,9 @@ export default class HeaderAuthModule extends Component {
                         </button>
                         <button class="header-auth-trigger header-auth-trigger--primary" type="button" data-auth-open="login">Вхід</button>
                     </div>
-                    ${this.state.panel === 'login' ? this.renderGuestPanel('login') : ''}
-                    ${this.state.panel === 'register' ? this.renderGuestPanel('register') : ''}
-                    ${this.state.panel === 'forgot' ? this.renderGuestPanel('forgot') : ''}
-                    ${this.state.panel === 'forgot-sent' ? this.renderRecoverySuccessPanel() : ''}
+                    ${panelHtml}
                 </div>
-                ${this.state.isDrawerOpen ? this.renderProfileDrawer() : ''}
+                ${drawerHtml}
             </div>
         `;
     }
@@ -486,5 +415,30 @@ export default class HeaderAuthModule extends Component {
                 email
             });
         });
+    }
+
+    escapeHtml(str) {
+        if (!str) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(str).replace(/[&<>"']/g, function (m) { return map[m]; });
+    }
+
+    normalizeEmail(email) {
+        return String(email || '').trim().toLowerCase();
+    }
+
+    buildDisplayName(email) {
+        const localPart = this.normalizeEmail(email).split('@')[0] || 'cook';
+        return localPart
+            .split(/[._-]+/)
+            .filter(Boolean)
+            .map(chunk => chunk.charAt(0).toUpperCase() + chunk.slice(1))
+            .join(' ') || 'Cook';
     }
 }

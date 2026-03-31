@@ -25,7 +25,7 @@
     background: var(--book-bg);
     border-radius: 12px;
     border: double 1px gold;
-    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 40px 100px -20px rgba(var(--black-rgb), 0.7);
     position: relative;
     display: grid;
     grid-template-columns: 1fr 32px 1fr;
@@ -37,32 +37,32 @@
 }
 
 .spine {
-    background: #221b03;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6);
+    background: var(--book-border);
+    box-shadow: inset 0 0 15px rgba(var(--black-rgb), 0.6);
     z-index: 40;
     border-radius: 2px;
 }
 
 .page {
-    background-color: var(--parchment);
+    background-color: var(--bg-book-page);
     position: relative;
     z-index: 10;
     min-height: min(850px, calc(100vh - 200px));
     height: 100%;
-    background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+    background-image: radial-gradient(circle at 50% 50%, rgba(var(--white-rgb), 0.2) 0%, transparent 100%);
 }
 
 .page--left {
     border-radius: 4px 0 0 4px;
     box-shadow:
-        inset -30px 0 40px rgba(0, 0, 0, 0.1),
-        -1px 2px 0 0 var(--parchment),
-        -2px 3px 0 0 rgba(0, 0, 0, 0.1),
-        -2px 4px 0 0 var(--parchment),
-        -3px 5px 0 0 rgba(0, 0, 0, 0.1),
-        -3px 6px 0 0 var(--parchment),
-        -4px 7px 0 0 rgba(0, 0, 0, 0.1),
-        -6px 10px 20px rgba(0, 0, 0, 0.3);
+        inset -30px 0 40px rgba(var(--black-rgb), 0.1),
+        -1px 2px 0 0 var(--bg-book-page),
+        -2px 3px 0 0 rgba(var(--black-rgb), 0.1),
+        -2px 4px 0 0 var(--bg-book-page),
+        -3px 5px 0 0 rgba(var(--black-rgb), 0.1),
+        -3px 6px 0 0 var(--bg-book-page),
+        -4px 7px 0 0 rgba(var(--black-rgb), 0.1),
+        -6px 10px 20px rgba(var(--black-rgb), 0.3);
     margin-left: 20px;
 }
 
@@ -130,14 +130,14 @@
 .page--right {
     border-radius: 0 4px 4px 0;
     box-shadow:
-        inset 30px 0 40px rgba(0, 0, 0, 0.1),
-        1px 2px 0 0 var(--parchment),
-        2px 3px 0 0 rgba(0, 0, 0, 0.1),
-        2px 4px 0 0 var(--parchment),
-        3px 5px 0 0 rgba(0, 0, 0, 0.1),
-        3px 6px 0 0 var(--parchment),
-        4px 7px 0 0 rgba(0, 0, 0, 0.1),
-        6px 10px 20px rgba(0, 0, 0, 0.3);
+        inset 30px 0 40px rgba(var(--black-rgb), 0.1),
+        1px 2px 0 0 var(--bg-book-page),
+        2px 3px 0 0 rgba(var(--black-rgb), 0.1),
+        2px 4px 0 0 var(--bg-book-page),
+        3px 5px 0 0 rgba(var(--black-rgb), 0.1),
+        3px 6px 0 0 var(--bg-book-page),
+        4px 7px 0 0 rgba(var(--black-rgb), 0.1),
+        6px 10px 20px rgba(var(--black-rgb), 0.3);
     display: grid;
     grid-template-rows: 1fr;
     margin-right: 20px;
@@ -217,7 +217,7 @@
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(var(--black-rgb), 0.1);
     transition: var(--transition-main);
     user-select: none;
     background-color: var(--page-bg);
@@ -227,16 +227,16 @@
 .category-card:hover {
     transform: scale(1.07);
     z-index: 10;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25), 0 0 0 2px var(--brand-red);
+    box-shadow: 0 10px 20px rgba(var(--black-rgb), 0.25), 0 0 0 2px var(--brand-red);
 }
 
 .category-card-badge {
     position: absolute;
     top: 0;
     right: 0;
-    background: linear-gradient(225deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(225deg, rgba(var(--black-rgb), 0.75) 0%, rgba(var(--black-rgb), 0.4) 100%);
+    border-bottom: 1px solid rgba(var(--white-rgb), 0.15);
+    border-left: 1px solid rgba(var(--white-rgb), 0.15);
     border-bottom-left-radius: 12px;
     color: white;
     padding: 0.6rem 1rem;
@@ -267,9 +267,9 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 100%);
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, rgba(var(--black-rgb), 0.75) 0%, rgba(var(--black-rgb), 0.4) 100%);
+    border-top: 1px solid rgba(var(--white-rgb), 0.15);
+    border-right: 1px solid rgba(var(--white-rgb), 0.15);
     border-top-right-radius: 12px;
     color: white;
     padding: 0.6rem 1rem;
@@ -308,7 +308,7 @@
 .recipe-image-wrap {
     background: white;
     padding: 10px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 15px 30px rgba(var(--black-rgb), 0.15);
     border-radius: 4px;
     width: 85%;
 }
@@ -318,7 +318,7 @@
     justify-content: flex-end;
     align-items: flex-end;
     margin-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(var(--black-rgb), 0.1);
     padding-top: 0.75rem;
 }
 
@@ -343,19 +343,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(0, 0, 0, 0.45);
+    color: rgba(var(--black-rgb), 0.45);
     position: relative;
 }
 
 .btn-recipe-action:hover,
 .btn-recipe-status:not(.active):hover {
     color: var(--ink);
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(var(--black-rgb), 0.03);
 }
 
 .btn-recipe-status.active,
 .btn-recipe-action.active {
-    background: rgba(128, 85, 51, 0.1);
+    background: rgba(var(--accent-rgb), 0.1);
     color: var(--ink);
 }
 
@@ -380,7 +380,7 @@
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(var(--black-rgb), 0.05);
     padding-top: 1rem;
 }
 
@@ -405,7 +405,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+    border-bottom: 1px dashed rgba(var(--black-rgb), 0.1);
     padding: 0.3rem 0;
     font-size: 0.85rem;
     font-family: var(--font-serif);
@@ -422,7 +422,7 @@
     height: 30px;
     border-radius: 15%;
     object-fit: cover;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(var(--black-rgb), 0.1);
 }
 
 .ingredient-amt {
@@ -435,7 +435,7 @@
     padding: 1.5rem;
     border-radius: 8px;
     margin-top: 2rem;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 2px 5px rgba(var(--black-rgb), 0.05);
 }
 
 .step-item {
@@ -463,7 +463,7 @@
 
 .step-desc {
     font-size: 0.8rem;
-    color: rgba(0, 0, 0, 0.7);
+    color: rgba(var(--black-rgb), 0.7);
     line-height: 1.6;
     font-family: var(--font-serif);
 }
@@ -474,7 +474,7 @@
     margin-top: 2rem;
     font-style: italic;
     font-size: 0.8rem;
-    background: rgba(0, 0, 0, 0.02);
+    background: rgba(var(--black-rgb), 0.02);
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 }
@@ -487,26 +487,26 @@
 }
 
 .btn-action--tactile {
-    background: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(var(--black-rgb), 0.05);
+    border: 1px solid rgba(var(--black-rgb), 0.08);
     width: 32px;
     height: 32px;
     border-radius: 6px;
     display: grid;
     place-items: center;
     color: var(--accent);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 0 rgba(var(--white-rgb), 0.4), 0 1px 2px rgba(var(--black-rgb), 0.1);
     transition: all 0.2s;
 }
 
 .btn-action--tactile:hover {
-    background: rgba(0, 0, 0, 0.08);
+    background: rgba(var(--black-rgb), 0.08);
     transform: translateY(-1px);
 }
 
 .btn-action--tactile:active {
     transform: translateY(0);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 1px 3px rgba(var(--black-rgb), 0.1);
 }
 
 .filter-menu {
@@ -515,9 +515,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    background: rgba(107, 13, 18, 0.03);
-    border-top: 0px solid rgba(0, 0, 0, 0.05);
-    border-bottom: 0px solid rgba(0, 0, 0, 0.05);
+    background: rgba(var(--brand-red-rgb), 0.03);
+    border-top: 0px solid rgba(var(--black-rgb), 0.05);
+    border-bottom: 0px solid rgba(var(--black-rgb), 0.05);
     margin-bottom: 0;
     font-size: 11px;
     font-family: var(--font-body);
@@ -546,7 +546,7 @@
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.7);
+    color: rgba(var(--black-rgb), 0.7);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -562,4 +562,115 @@
 
 .mobile-main-title {
     display: none;
+}
+
+/* --- RECIPE BOOK COVER PREVIEW --- */
+.book-cover-preview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.book-theme-icon {
+  position: absolute;
+  left: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--brand-red, var(--brand-red-light));
+  /* Red tint for the huge background icon */
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.book-theme-icon svg {
+  width: 250px;
+  height: 250px;
+  stroke-width: 1px;
+}
+
+.book-titles {
+  z-index: 2;
+  margin-top: 20px;
+}
+
+.book-titles h3 {
+  font-size: 2.2rem;
+  letter-spacing: 0.1em;
+  font-family: var(--font-primary, sans-serif);
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.book-titles h3 span {
+  font-weight: 300;
+}
+
+.book-sub-title {
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-white);
+  opacity: 0.8;
+  font-weight: 300;
+  margin-top: 10px;
+}
+
+.book-cover-footer {
+  position: absolute;
+  bottom: 100px;
+  right: 150px;
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--color-white);
+  opacity: 0.8;
+  max-width: 250px;
+  line-height: 1.5;
+  font-family: var(--font-primary, sans-serif);
+}
+
+.book-cover-footer strong {
+  display: block;
+  margin-top: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+/* --- MICRO-ANIMATIONS --- */
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.categories-list-view {
+  animation: slideFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  overflow-y: auto;
+  max-height: 60vh;
+  /* Prevents infinite book expansion causing tab overlapping */
+  scrollbar-width: none;
+  padding-right: 5px;
+}
+
+.categories-list-view::-webkit-scrollbar {
+  display: none;
+}
+
+.categories-grid-view {
+  animation: slideFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }

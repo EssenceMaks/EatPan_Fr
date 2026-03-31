@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EatPan Ultra Premium UI v1.8 (Pure CSS)</title>
+    <style>
+        /* --- ШРИФТЫ --- */
+        @import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@400;600&family=Philosopher:wght@400;700&display=swap');
+
+        /* --- ПЕРЕМЕННЫЕ И ТЕМЫ --- */
+        :root {
+            --bg-color: #0b0e14;
+            --panel-bg: #161b22;
+            --accent-gold: #c5a059;
+            --accent-glow: rgba(197, 160, 89, 0.3);
+            --border-style: linear-gradient(135deg, #f1d38a 0%, #c5a059 50%, #8b6d2d 100%);
+            --text-main: #e2e8f0;
+            --card-inner: #1c2128;
+            --font-display: 'Marcellus', serif;
+            --btn-shadow: #5c4a1d;
+        }
+
+        body.theme-silver {
+            --bg-color: #120d1a;
+            --panel-bg: #1e1529;
+            --accent-gold: #a8b2c1;
+            --accent-glow: rgba(168, 178, 193, 0.2);
+            --border-style: linear-gradient(135deg, #e2e8f0 0%, #a8b2c1 50%, #64748b 100%);
+            --card-inner: #251c33;
+            --btn-shadow: #475569;
+        }
+
+        body.theme-bronze {
+            --bg-color: #1a1612;
+            --panel-bg: #2a221b;
+            --accent-gold: #cd7f32;
+            --accent-glow: rgba(205, 127, 50, 0.2);
+            --border-style: linear-gradient(135deg, #eda45e 0%, #cd7f32 50%, #804a1a 100%);
+            --card-inner: #352a21;
+            --btn-shadow: #5a2e17;
+        }
+
+        body.theme-tangerine {
+            --bg-color: #1a1a1a;
+            --panel-bg: #363636;
+            --accent-gold: #f58f1f;
+            --accent-glow: rgba(245, 143, 31, 0.3);
+            --border-style: linear-gradient(135deg, #f58f1f 0%, #457534 100%);
+            --card-inner: #2a2a2a;
+            --text-main: #ffffff;
+            --btn-shadow: #9a5a12;
+        }
+
+        body.theme-neon {
+            --bg-color: #0a0a12;
+            --panel-bg: #151525;
+            --accent-gold: #00f5ff;
+            --accent-glow: rgba(0, 245, 255, 0.4);
+            --border-style: linear-gradient(90deg, #ff2ed1, #00f5ff);
+            --card-inner: #0f0f1a;
+            --text-main: #f0f0ff;
+            --btn-shadow: #008fa0;
+        }
+
+        body.theme-scroll {
+            --bg-color: #2d241e;
+            --panel-bg: #e6d5b8;
+            --accent-gold: #5d4037;
+            --accent-glow: rgba(93, 64, 55, 0.2);
+            --border-style: linear-gradient(180deg, #8d6e63, #5d4037);
+            --card-inner: #f3e5ab;
+            --text-main: #3e2723;
+            --font-display: 'Philosopher', sans-serif;
+            --btn-shadow: #2a1b16;
+        }
+
+        body.theme-cartoon {
+            --bg-color: #f0f4f8;
+            --panel-bg: #ffffff;
+            --accent-gold: #ff6b6b;
+            --accent-glow: rgba(255, 107, 107, 0.1);
+            --border-style: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            --card-inner: #f8f9fa;
+            --text-main: #2d3436;
+            --btn-shadow: #c0392b;
+        }
+
+        body.theme-cyber {
+            --bg-color: #000000;
+            --panel-bg: #121212;
+            --accent-gold: #adff2f;
+            --accent-glow: rgba(173, 255, 47, 0.5);
+            --border-style: linear-gradient(135deg, #adff2f, #32cd32);
+            --card-inner: #080808;
+            --text-main: #ffffff;
+            --btn-shadow: #1e8000;
+        }
+
+        body.theme-ledger {
+            --bg-color: #1a120b;
+            --panel-bg: #d4b996;
+            --accent-gold: #8b0000;
+            --accent-glow: rgba(139, 0, 0, 0.2);
+            --border-style: linear-gradient(135deg, #4a3728, #2a1b0e);
+            --card-inner: #c2a382;
+            --text-main: #2a1b0e;
+            --btn-shadow: #4d0000;
+        }
+
+        /* --- БАЗОВЫЙ СБРОС --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        h1,
+        h2,
+        .display-font {
+            font-family: var(--font-display);
+        }
+
+        /* --- СТРУКТУРА --- */
+        .layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-rows: clamp(60px, 12vh, 85px) 1fr clamp(60px, 12vh, 85px);
+        }
+
+        .premium-border {
+            position: relative;
+            border: 2px solid transparent;
+            background: linear-gradient(var(--panel-bg), var(--panel-bg)) padding-box, var(--border-style) border-box;
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.6),
+                inset 0 0 25px var(--accent-glow);
+        }
+
+        .content-header,
+        .content-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--accent-gold);
+            z-index: 50;
+        }
+
+        .content-footer {
+            border-bottom: none;
+            border-top: 1px solid var(--accent-gold);
+        }
+
+        /* --- БЕСКОНЕЧНЫЙ СКРОЛЛ --- */
+        .content_sectionBlocks {
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: flex;
+            align-items: center;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .content_sectionBlocks::-webkit-scrollbar {
+            display: none;
+        }
+
+        .content_sectionBlocks.snapping {
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .section_block {
+            min-width: 85%;
+            height: 85%;
+            margin: 0 15px;
+            border-radius: 18px;
+            scroll-snap-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.2, 0, 0.2, 1);
+            position: relative;
+            flex-shrink: 0;
+            overflow: visible;
+        }
+
+        .cloud-decor {
+            position: absolute;
+            top: -45px;
+            right: -10px;
+            width: 140px;
+            pointer-events: none;
+            z-index: 5;
+            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.4));
+            opacity: 0.95;
+        }
+
+        .section_block-inner-content {
+            display: none;
+            padding: 24px;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        /* --- СОСТОЯНИЯ --- */
+        body.active-mode .content_sectionBlocks {
+            overflow-x: hidden;
+        }
+
+        body.active-mode .section_block.active {
+            min-width: 100%;
+            height: 100%;
+            margin: 0;
+            border-radius: 0;
+            z-index: 100;
+        }
+
+        body.active-mode .section_block.active .section_block-inner-content {
+            display: block;
+        }
+
+        body.active-mode .section_block:not(.active) {
+            display: none;
+        }
+
+        /* --- МЕНЮ ТЕМ --- */
+        #themeMenu {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--panel-bg);
+            border: 2px solid var(--accent-gold);
+            padding: 24px;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            border-radius: 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+            width: 300px;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+        }
+
+        #themeMenu.show {
+            display: flex;
+            animation: themePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes themePop {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .theme-btn {
+            padding: 12px;
+            border: 1px solid var(--accent-gold);
+            cursor: pointer;
+            text-align: center;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .theme-btn:hover {
+            background: var(--accent-glow);
+            transform: scale(1.03);
+        }
+
+        /* --- КНОПКИ И УТИЛИТЫ --- */
+        .btn-premium {
+            background: var(--border-style);
+            color: #000;
+            font-weight: 800;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 6px 0 var(--btn-shadow), 0 8px 15px rgba(0, 0, 0, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn-premium:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 var(--btn-shadow);
+        }
+
+        .clock-frame {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-inner);
+            cursor: pointer;
+            box-shadow: inset 0 0 14px var(--accent-glow);
+            font-weight: 600;
+        }
+
+        .nav-btn {
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: none;
+            background: none;
+        }
+
+        .nav-btn:active {
+            transform: scale(0.8);
+        }
+
+        .inner-card {
+            background: var(--card-inner);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--accent-glow);
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .divider {
+            height: 2px;
+            width: 100%;
+            margin: 20px 0;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            opacity: 0.4;
+        }
+
+        /* --- ЧАСЫ (БОЛЬШИЕ) --- */
+        #clockBlock.active {
+            display: flex !important;
+            min-width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .big-clock-face {
+            width: 75vmin;
+            height: 75vmin;
+            border-radius: 50%;
+            border: 6px solid var(--accent-gold);
+            background: var(--card-inner);
+            position: relative;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .clock-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            background: #ff3b30;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .clock-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            width: 6px;
+            height: 42%;
+            background: #ff3b30;
+            border-radius: 4px;
+            origin-bottom;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(0deg);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* --- ВСПОМОГАТЕЛЬНЫЕ --- */
+        .hidden {
+            display: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .opacity-50 {
+            opacity: 0.5;
+        }
+
+        .italic {
+            font-style: italic;
+        }
+
+        .tracking-wider {
+            letter-spacing: 0.05em;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        .text-4xl {
+            font-size: 2.25rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- МЕНЮ ТЕМ -->
+    <div id="themeMenu" class="premium-border">
+        <div class="display-font text-center"
+            style="font-size: 1.5rem; color: var(--accent-gold); margin-bottom: 1.5rem;">Оберіть Дизайн</div>
+        <div class="theme-btn" onclick="setTheme('royal')">👑 Royal Gold</div>
+        <div class="theme-btn" onclick="setTheme('silver')">⚔️ Mystic Silver</div>
+        <div class="theme-btn" onclick="setTheme('bronze')">📜 Ancient Bronze</div>
+        <div class="theme-btn" onclick="setTheme('tangerine')">🍊 Jeju Tangerine</div>
+        <div class="theme-btn" onclick="setTheme('neon')">🌃 Neon Afterparty</div>
+        <div class="theme-btn" onclick="setTheme('scroll')">🧙 Fantasy Scroll</div>
+        <div class="theme-btn" onclick="setTheme('cartoon')">🎨 Flat Cartoon</div>
+        <div class="theme-btn" onclick="setTheme('cyber')">🔌 Cyber Glow</div>
+        <div class="theme-btn" onclick="setTheme('ledger')">📕 RPG Ledger</div>
+        <button class="mt-6 uppercase tracking-wider"
+            style="background: none; border: none; color: var(--text-main); opacity: 0.4; cursor: pointer;"
+            onclick="toggleThemeMenu()">Закрити</button>
+    </div>
+
+    <div id="content" class="layer">
+        <div class="content-header">
+            <div class="clock-frame">😎</div>
+            <div class="display-font uppercase tracking-wider"
+                style="font-size: 1.25rem; color: var(--accent-gold); letter-spacing: 0.3em;">EATPAN</div>
+            <div class="clock-frame" id="smallClock">00:00</div>
+        </div>
+
+        <div class="content_sectionBlocks" id="sectionBlocks">
+            <!-- Спеціальний блок годинника -->
+            <div class="section_block premium-border" id="clockBlock" style="display:none">
+                <div class="big-clock-face">
+                    <div class="clock-dot"></div>
+                    <div id="bigClockHand" class="clock-hand"></div>
+                </div>
+                <div id="bigTimeDisplay" class="display-font mt-6" style="font-size: 3rem; color: var(--accent-gold);">
+                    12:00</div>
+            </div>
+
+            <!-- Секції будуть додані через JS -->
+        </div>
+
+        <div class="content-footer">
+            <button class="nav-btn">🏰</button>
+            <button class="nav-btn">🏹</button>
+            <button class="nav-btn">🛡️</button>
+            <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+                <button id="menuBtn" class="nav-btn" style="font-size: 2.2rem;" onclick="toggleThemeMenu()">☰</button>
+                <button id="backBtn" class="nav-btn hidden" style="font-size: 2rem;" onclick="goBack()">⬅</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТЕМПЛЕЙТ СЕКЦІЇ -->
+    <template id="sectionTemplate">
+        <div class="section_block original-block premium-border">
+
+            <!-- Облако (показується тільки для певних індексів) -->
+            <svg class="cloud-decor hidden" viewBox="0 0 160 80">
+                <path fill="var(--panel-bg)" stroke="var(--accent-gold)" stroke-width="2"
+                    d="M20,60 Q10,35 40,30 Q55,5 95,20 Q125,5 145,35 Q165,55 140,75 Z" />
+            </svg>
+
+            <h2 class="text-4xl mb-4 tracking-wider" style="color: var(--accent-gold);">Title</h2>
+            <p class="opacity-50 italic tracking-wider uppercase" style="font-size: 0.8rem;">Відкрити сувій</p>
+
+            <div class="section_block-inner-content">
+                <div class="inner-card">
+                    <p class="display-font mb-4" style="font-size: 1.5rem; color: var(--accent-gold);">Інформаційна
+                        Скрижаль</p>
+                    <p style="font-size: 1rem; opacity: 0.8; line-height: 1.6; margin-bottom: 1rem;">
+                        Тут розкриваються таємниці вашої кухні. Кожен інгредієнт, кожен рецепт — це крок до кулінарної
+                        досконалості в екосистемі EatPan.
+                    </p>
+                    <div class="divider"></div>
+                    <p style="font-size: 0.9rem; opacity: 0.5; font-style: italic;">Система готова до ваших вказівок,
+                        майстре.</p>
+                </div>
+                <button class="btn-premium">Підтвердити Дію</button>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // --- ДАНІ ---
+        const SECTIONS_DATA = [
+            { title: "🍽️ EatPan", cloud: true },
+            { title: "🍳 Kitchen", cloud: false },
+            { title: "📖 Recipes", cloud: false },
+            { title: "🛒 Supplies", cloud: false },
+            { title: "📅 Calendar", cloud: true },
+            { title: "💰 Wallet", cloud: false },
+            { title: "⚙️ Settings", cloud: false }
+        ];
+
+        // --- ЕЛЕМЕНТИ ---
+        const body = document.body;
+        const container = document.getElementById('sectionBlocks');
+        const template = document.getElementById('sectionTemplate');
+        const themeMenu = document.getElementById('themeMenu');
+        const menuBtn = document.getElementById('menuBtn');
+        const backBtn = document.getElementById('backBtn');
+        const clockBlock = document.getElementById('clockBlock');
+        const smallClock = document.getElementById('smallClock');
+
+        // --- ІНІЦІАЛІЗАЦІЯ ---
+        function initApp() {
+            // Очищення та створення оригіналів
+            SECTIONS_DATA.forEach((data, i) => {
+                const el = template.content.cloneNode(true).querySelector('.section_block');
+                el.dataset.index = i;
+                el.querySelector('h2').textContent = data.title;
+                if (data.cloud) el.querySelector('.cloud-decor').classList.remove('hidden');
+                container.appendChild(el);
+            });
+
+            // Клонування для нескінченного скролу
+            const originals = Array.from(container.querySelectorAll('.original-block'));
+            const clonesPre = originals.slice(-2).map(el => {
+                const c = el.cloneNode(true);
+                c.classList.replace('original-block', 'clone-block');
+                return c;
+            });
+            const clonesApp = originals.slice(0, 2).map(el => {
+                const c = el.cloneNode(true);
+                c.classList.replace('original-block', 'clone-block');
+                return c;
+            });
+
+            clonesPre.reverse().forEach(c => container.prepend(c));
+            clonesApp.forEach(c => container.appendChild(c));
+
+            setTimeout(() => {
+                jumpToIndex(0, 'auto');
+                container.classList.add('snapping');
+            }, 100);
+        }
+
+        function jumpToIndex(idx, behavior = 'smooth') {
+            const target = container.querySelector(`.original-block[data-index="${idx}"]`);
+            if (target) {
+                const scrollLeft = target.offsetLeft - (container.clientWidth / 2) + (target.clientWidth / 2);
+                container.scrollTo({ left: scrollLeft, behavior: behavior });
+            }
+        }
+
+        // --- ЛОГІКА СКРОЛУ ---
+        function wrapScroll() {
+            if (body.classList.contains('active-mode')) return;
+            const scrollLeft = container.scrollLeft;
+            const maxScroll = container.scrollWidth - container.clientWidth;
+
+            if (scrollLeft <= 5) {
+                container.classList.remove('snapping');
+                jumpToIndex(SECTIONS_DATA.length - 1, 'auto');
+                setTimeout(() => container.classList.add('snapping'), 10);
+            } else if (scrollLeft >= maxScroll - 5) {
+                container.classList.remove('snapping');
+                jumpToIndex(0, 'auto');
+                setTimeout(() => container.classList.add('snapping'), 10);
+            }
+        }
+        container.addEventListener('scroll', wrapScroll);
+
+        // --- ТЕМИ ---
+        function setTheme(t) {
+            body.className = t === 'royal' ? '' : 'theme-' + t;
+            toggleThemeMenu();
+        }
+        function toggleThemeMenu() {
+            themeMenu.classList.toggle('show');
+        }
+
+        // --- НАВІГАЦІЯ ---
+        container.addEventListener('click', (e) => {
+            const block = e.target.closest('.section_block');
+            if (!block || body.classList.contains('active-mode')) return;
+
+            const center = container.scrollLeft + container.clientWidth / 2;
+            const bCenter = block.offsetLeft + block.clientWidth / 2;
+
+            if (Math.abs(center - bCenter) > 40) {
+                block.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            } else {
+                activateBlock(block);
+            }
+        });
+
+        function activateBlock(el) {
+            body.classList.add('active-mode');
+            el.classList.add('active');
+            menuBtn.classList.add('hidden');
+            backBtn.classList.remove('hidden');
+            history.pushState({ type: 'block' }, "");
+        }
+
+        function goBack() { history.back(); }
+
+        window.addEventListener('popstate', () => {
+            body.classList.remove('active-mode');
+            container.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+            clockBlock.style.display = 'none';
+            menuBtn.classList.remove('hidden');
+            backBtn.classList.add('hidden');
+        });
+
+        // --- ГОДИННИК ---
+        smallClock.addEventListener('click', () => {
+            body.classList.add('active-mode');
+            clockBlock.style.display = 'flex';
+            clockBlock.classList.add('active');
+            menuBtn.classList.add('hidden');
+            backBtn.classList.remove('hidden');
+            history.pushState({ type: 'clock' }, "");
+        });
+        function updateTime() {
+            const now = new Date();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+            smallClock.textContent = time;
+            document.getElementById('bigTimeDisplay').textContent = time;
+
+            // 24-годинний формат стрілки
+            const deg = ((h - 12 + 24) % 24) * 15 + m * 0.25;
+            document.getElementById('bigClockHand').style.transform = `translateX(-50%) rotate(${deg}deg)`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Старт
+        initApp();
+    </script>
+</body>
+
+</html>

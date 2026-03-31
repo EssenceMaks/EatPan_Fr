@@ -16,7 +16,7 @@
   display: block;
   /* lets inner flex bleed out horizontally */
   scrollbar-width: thin;
-  scrollbar-color: var(--brand-red) rgba(0, 0, 0, 0.05);
+  scrollbar-color: var(--brand-red) rgba(var(--black-rgb), 0.05);
   overscroll-behavior-x: contain;
   /* Prevents back-navigation when swiping sideways */
 }
@@ -26,7 +26,7 @@
 }
 
 .kanban-scroll-wrapper::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(var(--black-rgb), 0.05);
   border-radius: 4px;
 }
 
@@ -42,7 +42,7 @@
   padding: 20px;
   gap: 20px;
   box-sizing: border-box;
-  background-color: var(--texture-bg, #f4ecd8);
+  background-color: var(--texture-bg, var(--texture-bg));
   width: max-content;
   /* Force width to strictly wrap all children, ensuring scrollbar */
   min-width: 100%;
@@ -80,7 +80,7 @@
   font-size: 0.95rem;
   color: var(--ink);
   padding: 8px 4px;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+  border-bottom: 1px dashed rgba(var(--black-rgb), 0.1);
   line-height: 1.4;
   align-items: flex-start;
 }
@@ -103,7 +103,7 @@
   font-size: 10px;
   font-weight: bold;
   color: var(--brand-red);
-  background-color: #fff;
+  background-color: var(--color-white);
 }
 
 .raw-task-chapter {
@@ -158,7 +158,7 @@
   background: rgba(230, 218, 195, 0.4);
   /* darker column bg for contrast */
   border-radius: 12px;
-  border: 1px dashed rgba(0, 0, 0, 0.15);
+  border: 1px dashed rgba(var(--black-rgb), 0.15);
   padding: 10px;
   height: 100%;
 }
@@ -195,7 +195,7 @@
 .vintage-ticket.dragging {
   opacity: 0.6;
   transform: scale(0.95);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 2px 2px 0px rgba(var(--black-rgb), 0.5);
 }
 
 .kanban-column.drag-over {
@@ -204,11 +204,11 @@
 }
 
 .vintage-ticket {
-  background-color: #fcf9f2;
+  background-color: var(--paper-white);
   /* clearer paper white */
   border: 2px solid var(--ink);
   border-radius: 8px;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.85);
+  box-shadow: 4px 4px 0px rgba(var(--black-rgb), 0.85);
   /* Hard retro shadow */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -225,7 +225,7 @@
 }
 
 .vintage-ticket.hovered {
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 1);
+  box-shadow: 6px 6px 0px rgba(var(--black-rgb), 1);
   transform: translateY(-2px);
 }
 
@@ -254,7 +254,7 @@
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  background-color: #fff;
+  background-color: var(--color-white);
   border: 2px solid var(--brand-red);
   border-radius: 50%;
   /* Make it circular like a stamp */
@@ -286,7 +286,7 @@
 }
 
 .raw-task-item:hover {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(var(--black-rgb), 0.03);
 }
 
 .raw-task-item.archived {
@@ -322,7 +322,7 @@
 /* Base style for sidebar icon buttons */
 .sidebar-icon-btn {
   background: none;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(var(--black-rgb), 0.1);
   border-radius: 4px;
   cursor: pointer;
   padding: 4px;
@@ -334,7 +334,7 @@
 }
 
 .sidebar-icon-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(var(--black-rgb), 0.05);
   transform: scale(1.05);
 }
 
@@ -364,7 +364,7 @@
 
 .btn-sidebar-toggle.active {
   opacity: 1;
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(var(--black-rgb), 0.03);
   border-color: var(--brand-red);
   color: var(--brand-red);
 }
@@ -398,7 +398,7 @@
   height: 100%;
   border-radius: 99px;
   transition: background-color 0.3s;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(var(--black-rgb), 0.1);
 }
 
 .progress-dash.active {
@@ -462,7 +462,7 @@
   opacity: 1;
   margin-top: 15px;
   padding-top: 15px;
-  border-color: rgba(0, 0, 0, 0.15);
+  border-color: rgba(var(--black-rgb), 0.15);
 }
 
 .ticket-comment-dummy {
@@ -483,7 +483,7 @@
   padding: 6px 10px;
   border: 2px solid var(--ink);
   border-radius: 6px;
-  background: #fff;
+  background: var(--color-white);
   font-family: var(--font-serif);
   font-size: 0.8rem;
   color: var(--ink);
@@ -554,7 +554,7 @@
   font-family: var(--font-serif);
   background-color: var(--parchment);
   color: var(--ink);
-  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 1px 1px 0 rgba(var(--black-rgb), 0.5);
 }
 
 .ticket-id {
@@ -599,7 +599,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #fff;
+  background-color: var(--color-white);
   transition: all 0.2s;
 }
 
@@ -610,7 +610,7 @@
 
 .check-circle.filled::after {
   content: '✓';
-  color: #fff;
+  color: var(--color-white);
   font-size: 12px;
   line-height: 1;
   font-weight: bold;
@@ -628,28 +628,28 @@
   padding: 4px 10px;
   border-radius: 4px;
   border: 2px solid var(--ink);
-  background: #fff;
+  background: var(--color-white);
   font-size: 0.7rem;
   font-weight: bold;
   color: var(--ink);
   cursor: pointer;
   font-family: var(--font-serif);
   transition: all 0.2s;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 2px 2px 0 rgba(var(--black-rgb), 0.5);
   /* Retro pop button */
 }
 
 .btn-action:hover {
   background: var(--parchment);
   transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
+  box-shadow: 3px 3px 0 rgba(var(--black-rgb), 0.6);
 }
 
 .btn-action.active {
   border-color: var(--brand-red);
-  color: #fff;
+  color: var(--color-white);
   background: var(--brand-red);
-  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: inset 2px 2px 0 rgba(var(--black-rgb), 0.3);
   transform: translate(1px, 1px);
 }
 
@@ -703,7 +703,7 @@
 /* Expand Button (Divider) */
 .ticket-expand-btn {
   height: 28px;
-  border-top: 2px dashed rgba(0, 0, 0, 0.15);
+  border-top: 2px dashed rgba(var(--black-rgb), 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -713,7 +713,7 @@
 }
 
 .ticket-expand-btn:hover {
-  background-color: #ebe2cf;
+  background-color: var(--ticket-hover-bg);
 }
 
 .expand-icon-wrap {
@@ -721,7 +721,7 @@
   height: 20px;
   border-radius: 50%;
   border: 2px solid var(--ink);
-  background: #fff;
+  background: var(--color-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -729,4 +729,91 @@
   font-weight: bold;
   font-size: 14px;
   line-height: 1;
+}
+
+/* --- PROJECT STATUS PREVIEW (GLOBAL VISIBILITY) --- */
+.project-status-preview {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+  max-height: 50vh;
+  overflow-y: auto;
+  text-align: left;
+  width: 100%;
+  padding: 0 10px;
+  scrollbar-width: thin;
+  opacity: 1 !important;
+  /* Override section_block-text opacity */
+}
+
+.status-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-status-preview::-webkit-scrollbar {
+  width: 4px;
+}
+
+.project-status-preview::-webkit-scrollbar-thumb {
+  background-color: var(--accent);
+  border-radius: 4px;
+}
+
+.status-section-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: 12px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(var(--white-rgb), 0.15);
+  padding-bottom: 2px;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.status-section-title:first-child {
+  margin-top: 0;
+}
+
+.status-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.status-task.plain {
+  color: var(--color-white);
+  opacity: 1;
+}
+
+.status-task.done {
+  opacity: 0.5;
+  text-decoration: none;
+  /* No strikethrough as requested */
+}
+
+.status-task.pending {
+  opacity: 1;
+  color: var(--color-white);
+}
+
+.status-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.status-task.done .status-icon {
+  color: var(--status-done);
+}
+
+.status-task.pending .status-icon {
+  color: var(--status-pending);
+  /* pending orange */
 }

@@ -12,9 +12,9 @@
     z-index: 150;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+    scrollbar-color: rgba(var(--black-rgb), 0.12) transparent;
     padding: 2rem 2.5rem;
-    background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+    background-image: radial-gradient(circle at 50% 50%, rgba(var(--white-rgb), 0.2) 0%, transparent 100%);
 }
 
 .create-mode-content::-webkit-scrollbar {
@@ -26,12 +26,12 @@
 }
 
 .create-mode-content::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.12);
+    background: rgba(var(--black-rgb), 0.12);
     border-radius: 2px;
 }
 
 .create-mode-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(var(--black-rgb), 0.25);
 }
 
 .page--left .create-mode-content {
@@ -109,7 +109,7 @@
 }
 
 .create-check-item:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(var(--black-rgb), 0.03);
 }
 
 .create-check-item input[type="checkbox"] {
@@ -133,9 +133,9 @@
     align-items: center;
     gap: 4px;
     padding: 0.6rem 0.5rem;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(var(--black-rgb), 0.08);
     border-radius: 8px;
-    background: rgba(0, 0, 0, 0.02);
+    background: rgba(var(--black-rgb), 0.02);
     cursor: pointer;
     transition: all 0.2s;
     font-family: var(--font-body);
@@ -147,7 +147,7 @@
 }
 
 .create-cat-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(var(--black-rgb), 0.05);
     transform: translateY(-1px);
 }
 
@@ -155,7 +155,7 @@
     background: var(--brand-red);
     color: white;
     border-color: var(--brand-red);
-    box-shadow: 0 4px 12px rgba(107, 13, 18, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--brand-red-rgb), 0.3);
 }
 
 /* New category input */
@@ -168,7 +168,7 @@
 .create-new-category input {
     flex: 1;
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid rgba(var(--black-rgb), 0.15);
     background: none;
     padding: 0.5rem 0;
     font-family: var(--font-body);
@@ -177,12 +177,12 @@
 }
 
 .create-new-category input::placeholder {
-    color: rgba(0, 0, 0, 0.3);
+    color: rgba(var(--black-rgb), 0.3);
 }
 
 .create-new-cat-btn {
-    background: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(var(--black-rgb), 0.05);
+    border: 1px solid rgba(var(--black-rgb), 0.1);
     border-radius: 6px;
     width: 32px;
     height: 32px;
@@ -194,7 +194,7 @@
 }
 
 .create-new-cat-btn:hover {
-    background: rgba(0, 0, 0, 0.08);
+    background: rgba(var(--black-rgb), 0.08);
     transform: translateY(-1px);
 }
 
@@ -218,12 +218,12 @@
 }
 
 .create-input-title::placeholder {
-    color: rgba(0, 0, 0, 0.15);
+    color: rgba(var(--black-rgb), 0.15);
 }
 
 .create-input-subtitle {
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid rgba(var(--black-rgb), 0.08);
     background: none;
     font-family: var(--font-serif);
     font-size: 0.9rem;
@@ -235,12 +235,12 @@
 }
 
 .create-input-subtitle::placeholder {
-    color: rgba(0, 0, 0, 0.25);
+    color: rgba(var(--black-rgb), 0.25);
 }
 
 /* Image upload area */
 .create-image-upload {
-    border: 2px dashed rgba(0, 0, 0, 0.12);
+    border: 2px dashed rgba(var(--black-rgb), 0.12);
     border-radius: 8px;
     padding: 1.5rem;
     display: flex;
@@ -279,7 +279,7 @@
 
 .create-stat-input input {
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(var(--black-rgb), 0.1);
     background: none;
     padding: 0.25rem 0;
     font-family: var(--font-body);
@@ -292,7 +292,7 @@
 }
 
 .create-stat-input input::placeholder {
-    color: rgba(0, 0, 0, 0.3);
+    color: rgba(var(--black-rgb), 0.3);
     font-weight: 400;
 }
 
@@ -302,7 +302,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.35rem 0;
-    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+    border-bottom: 1px dashed rgba(var(--black-rgb), 0.08);
 }
 
 .create-ing-name {
@@ -316,13 +316,13 @@
 }
 
 .create-ing-name::placeholder {
-    color: rgba(0, 0, 0, 0.25);
+    color: rgba(var(--black-rgb), 0.25);
 }
 
 .create-ing-amount {
     width: 60px;
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(var(--black-rgb), 0.1);
     background: none;
     font-weight: 700;
     color: var(--accent);
@@ -332,7 +332,7 @@
 }
 
 .create-ing-amount::placeholder {
-    color: rgba(0, 0, 0, 0.2);
+    color: rgba(var(--black-rgb), 0.2);
     font-weight: 400;
 }
 
@@ -341,7 +341,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: rgba(0, 0, 0, 0.2);
+    color: rgba(var(--black-rgb), 0.2);
     padding: 4px;
     border-radius: 4px;
     display: grid;
@@ -351,7 +351,7 @@
 
 .create-remove-btn:hover {
     color: var(--brand-red);
-    background: rgba(107, 13, 18, 0.05);
+    background: rgba(var(--brand-red-rgb), 0.05);
 }
 
 /* Steps */
@@ -381,7 +381,7 @@
 
 .create-step-fields input {
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(var(--black-rgb), 0.1);
     background: none;
     font-weight: 700;
     text-transform: uppercase;
@@ -393,17 +393,17 @@
 }
 
 .create-step-fields input::placeholder {
-    color: rgba(0, 0, 0, 0.25);
+    color: rgba(var(--black-rgb), 0.25);
     font-weight: 400;
 }
 
 .create-step-fields textarea {
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(var(--black-rgb), 0.05);
     background: none;
     font-family: var(--font-serif);
     font-size: 0.8rem;
-    color: rgba(0, 0, 0, 0.7);
+    color: rgba(var(--black-rgb), 0.7);
     line-height: 1.6;
     resize: vertical;
     padding: 0.25rem 0;
@@ -411,13 +411,13 @@
 }
 
 .create-step-fields textarea::placeholder {
-    color: rgba(0, 0, 0, 0.2);
+    color: rgba(var(--black-rgb), 0.2);
 }
 
 /* Add row button */
 .create-add-row-btn {
     background: none;
-    border: 1px dashed rgba(0, 0, 0, 0.12);
+    border: 1px dashed rgba(var(--black-rgb), 0.12);
     border-radius: 6px;
     padding: 0.5rem 1rem;
     font-family: var(--font-body);
@@ -435,7 +435,7 @@
 }
 
 .create-add-row-btn:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(var(--black-rgb), 0.03);
     border-color: var(--accent);
 }
 
@@ -445,7 +445,7 @@
     width: 100%;
     border: none;
     border-left: 3px solid var(--brand-red);
-    background: rgba(0, 0, 0, 0.02);
+    background: rgba(var(--black-rgb), 0.02);
     padding: 0.75rem 1rem;
     font-family: var(--font-serif);
     font-style: italic;
@@ -458,7 +458,7 @@
 
 .create-secret-textarea::placeholder,
 .create-serving-textarea::placeholder {
-    color: rgba(0, 0, 0, 0.25);
+    color: rgba(var(--black-rgb), 0.25);
 }
 
 /* Form action buttons */
@@ -467,7 +467,7 @@
     gap: 0.75rem;
     margin-top: 0.5rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid rgba(var(--black-rgb), 0.08);
 }
 
 .create-save-btn {
@@ -486,19 +486,19 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    box-shadow: 0 8px 20px rgba(107, 13, 18, 0.3);
+    box-shadow: 0 8px 20px rgba(var(--brand-red-rgb), 0.3);
     transition: all 0.2s;
     font-family: var(--font-body);
 }
 
 .create-save-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(107, 13, 18, 0.4);
+    box-shadow: 0 12px 24px rgba(var(--brand-red-rgb), 0.4);
 }
 
 .create-cancel-btn {
     background: none;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(var(--black-rgb), 0.12);
     padding: 0.9rem 1.25rem;
     border-radius: 6px;
     font-weight: 600;
@@ -512,7 +512,7 @@
 }
 
 .create-cancel-btn:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(var(--black-rgb), 0.05);
 }
 
 /* ===== PAGE FLIP ANIMATION ===== */
@@ -542,9 +542,9 @@
 .create-icon-preview {
     width: 32px;
     height: 32px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(var(--black-rgb), 0.1);
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.02);
+    background: rgba(var(--black-rgb), 0.02);
     display: grid;
     place-items: center;
     cursor: pointer;
@@ -554,7 +554,7 @@
 }
 
 .create-icon-preview:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(var(--black-rgb), 0.05);
 }
 
 .create-icon-preview.has-icon {
@@ -568,13 +568,13 @@
     gap: 3px;
     padding: 0.5rem;
     margin-top: 0.5rem;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(var(--black-rgb), 0.08);
     border-radius: 8px;
-    background: rgba(0, 0, 0, 0.02);
+    background: rgba(var(--black-rgb), 0.02);
     max-height: 160px;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+    scrollbar-color: rgba(var(--black-rgb), 0.1) transparent;
 }
 
 .create-icon-picker.show {
@@ -596,12 +596,12 @@
 
 .icon-pick-btn:hover {
     opacity: 1;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(var(--black-rgb), 0.05);
 }
 
 .icon-pick-btn.selected {
     opacity: 1;
     border-color: var(--brand-red);
     color: var(--brand-red);
-    background: rgba(107, 13, 18, 0.05);
+    background: rgba(var(--brand-red-rgb), 0.05);
 }
