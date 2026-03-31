@@ -27,9 +27,15 @@
 
 .btn-back {
   background-color: #f44336;
-  display: none;
+  position: absolute;
+  right: 0;
   opacity: 0;
-  transition: opacity 0.3s;
+  color: white;
+  pointer-events: none;
+  transform: translateX(0) scale(0.9);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0);
+  z-index: 10;
 }
 
 /* Make sure header tools container in index.html align things correctly */

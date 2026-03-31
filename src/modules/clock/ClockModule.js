@@ -36,16 +36,22 @@ export default class ClockModule extends Component {
     this.bigClockHand = bigBlock.querySelector('#bigClockHand');
     this.bigTimeDisplay = bigBlock.querySelector('#bigTimeDisplay');
 
-    // Attach them to DOM where requested
-    if (this.props.headerTarget) {
-      const parent = document.querySelector(this.props.headerTarget);
-      if (parent) {
-        // give it the proper class
-        smallContainer.className = 'clock-container';
-        smallContainer.id = '';
-        parent.appendChild(smallContainer);
+    // Attach them to DOM where requested dynamically
+    smallContainer.className = 'clock-container';
+    smallContainer.id = '';
+    
+    this.adaptClockPosition = () => {
+      const isDesktop = window.innerWidth >= 1024;
+      const targetColId = isDesktop ? 'col-2-desktop' : 'col-4-desktop';
+      const targetCol = document.getElementById(targetColId);
+      
+      if (targetCol && !targetCol.contains(smallContainer)) {
+        targetCol.appendChild(smallContainer);
       }
-    }
+    };
+
+    window.addEventListener('resize', this.adaptClockPosition);
+    this.adaptClockPosition();
     
     if (this.props.blockTarget) {
       const parent = document.querySelector(this.props.blockTarget);

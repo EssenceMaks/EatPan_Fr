@@ -3,8 +3,8 @@ import { initCraftSpace } from './src/modules/craft_space/craft_space.js?v=2';
 import HeaderAuthModule from './src/modules/header_auth/HeaderAuthModule.js';
 import ProfileModule from './src/modules/profile/ProfileModule.js';
 import { RecipeService } from './src/api/RecipeService.js';
-import ClockModule from './src/modules/clock/ClockModule.js';
-import HeaderModule from './src/modules/header/HeaderModule.js';
+import ClockModule from './src/modules/clock/ClockModule.js?v=3';
+import HeaderModule from './src/modules/header/HeaderModule.js?v=3';
 
 
 // --- ALL JS LOGIC FROM EatPan_SPA.html ---
@@ -18,6 +18,12 @@ const clockModule = new ClockModule({
     blockTarget: '#sectionBlocks'
 });
 clockModule.render();
+
+const headerModuleMount = document.getElementById('headerModuleMount');
+if (headerModuleMount) {
+    const headerModule = new HeaderModule();
+    headerModule.render();
+}
 
 let savedBlockIndex = 0;
 const CLONES_COUNT = 2; 
@@ -1100,12 +1106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('Main SPA Router Started.');
     loadProjectStatus();
 
-    const headerModuleMount = document.getElementById('headerModuleMount');
-    if (headerModuleMount) {
-        const headerModule = new HeaderModule();
-        const hmEl = await headerModule.render();
-        headerModuleMount.appendChild(hmEl);
-    }
+
 
     const headerAuthMount = document.getElementById('headerAuthMount');
     if (headerAuthMount) {

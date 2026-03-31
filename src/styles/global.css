@@ -469,11 +469,11 @@ body.active-mode .section_block:not(.active) {
 }
 
 body.active-mode .btn-back {
-  display: flex;
   opacity: 1;
-  color: white;
+  pointer-events: auto;
+  transform: translateX(-60px) scale(1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
-
 
 /* Modal from my_recipes */
 .modal-overlay {
