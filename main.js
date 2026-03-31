@@ -16,34 +16,8 @@ const bigTimeDisplay = document.getElementById('bigTimeDisplay');
 const profileBlock = document.getElementById('profileBlock');
 const menuBtn = document.getElementById('menuBtn');
 const backBtn = document.getElementById('backBtn');
-let col3 = null;
-let col4 = null;
-
-function adaptMenuPosition() {
-    const isDesktop = window.innerWidth >= 1024;
-    const desktopCol3 = document.getElementById('col-3-desktop');
-    const desktopCol4 = document.getElementById('col-4-desktop');
-    const mobileCol3 = document.getElementById('col-3-mobile');
-    const mobileCol4 = document.getElementById('col-4-mobile');
-
-    col3 = isDesktop ? desktopCol3 : mobileCol3;
-    col4 = isDesktop ? desktopCol4 : mobileCol4;
-
-    const isActive = document.body.classList.contains('active-mode') || document.body.classList.contains('clock-mode');
-
-    if (isActive) {
-        if (col3 && menuBtn && !col3.contains(menuBtn)) col3.appendChild(menuBtn);
-        if (col4 && backBtn && !col4.contains(backBtn)) col4.appendChild(backBtn);
-    } else {
-        if (col4 && menuBtn && !col4.contains(menuBtn)) col4.appendChild(menuBtn);
-        if (col4 && backBtn && !col4.contains(backBtn)) col4.appendChild(backBtn);
-        if (col4 && menuBtn && backBtn && col4.contains(menuBtn) && col4.contains(backBtn)) {
-            col4.insertBefore(menuBtn, backBtn);
-        }
-    }
-}
-window.addEventListener('resize', adaptMenuPosition);
-adaptMenuPosition();
+const col3 = document.getElementById('col-3-container');
+const col4 = document.getElementById('col-4-container');
 
 let savedBlockIndex = 0;
 const CLONES_COUNT = 2; 

@@ -202,7 +202,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
-    padding: 0.7rem;
+    padding-bottom: 0.5rem;
 }
 
 .category-cards-grid::-webkit-scrollbar {
@@ -223,38 +223,8 @@
     background-color: var(--page-bg);
 }
 
-.category-card.pulse-active,
 .category-card:hover {
-    transform: scale(1.07);
-    z-index: 10;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25), 0 0 0 2px var(--brand-red);
-}
-
-.category-card-badge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: linear-gradient(225deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.4) 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    border-left: 1px solid rgba(255, 255, 255, 0.15);
-    border-bottom-left-radius: 12px;
-    color: white;
-    padding: 0.6rem 1rem;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    opacity: 0;
-    transform: scale(0.9);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    pointer-events: none;
-    z-index: 15;
-}
-
-.category-card.pulse-active .category-card-badge,
-.category-card:hover .category-card-badge {
-    opacity: 1;
-    transform: scale(1);
+    transform: scale(1.02);
 }
 
 .category-card-img {
