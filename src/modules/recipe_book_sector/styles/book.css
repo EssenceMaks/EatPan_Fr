@@ -202,7 +202,7 @@
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
-    padding-bottom: 0.5rem;
+    padding: 0.7rem;
 }
 
 .category-cards-grid::-webkit-scrollbar {
