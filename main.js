@@ -492,7 +492,7 @@ function deactivateClockWithAnimation(nextState) {
         } else {
             body.classList.remove('active-mode');
             restoreScroll();
-            restoreHeaderControlsHome();
+            window.HeaderModuleInstance?.triggerAdapt();
         }
     }, 350);
 }
@@ -1179,6 +1179,6 @@ window.addEventListener('popstate', (event) => {
         performBlockActivation(nextTarget);
     } else {
         restoreScroll();
-        restoreHeaderControlsHome();
+        window.HeaderModuleInstance?.triggerAdapt();
     }
 });

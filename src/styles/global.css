@@ -97,7 +97,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-  background-color: var(--parchment);
+  background-color: var(--bg-slider-container);
   color: var(--ink);
   height: 100vh;
   width: 100vw;
@@ -179,7 +179,7 @@ ul {
 
 #content {
   z-index: 1;
-  background-color: var(--parchment);
+  background-color: var(--bg-slider-container);
 }
 
 .content-header,
@@ -189,7 +189,7 @@ ul {
   align-items: center;
   justify-items: center;
   transition: background-color 0.3s ease;
-  background-color: var(--surface-container);
+  background-color: var(--bg-header);
   position: relative;
 }
 
@@ -204,7 +204,7 @@ ul {
 
 
 .content_sectionBlocks {
-  background-color: var(--parchment);
+  background-color: var(--bg-slider-container);
   overflow-x: auto;
   overflow-y: hidden;
   display: flex;
@@ -229,7 +229,7 @@ ul {
   /* Hard cap to prevent infinite child expansion causing scrollbar to vanish */
   height: 90%;
   margin: auto 10px;
-  background-color: var(--paper-white);
+  background-color: var(--bg-section-card);
   border-radius: 16px;
   scroll-snap-align: center;
   display: flex;
@@ -238,7 +238,7 @@ ul {
   align-items: center;
   transition: all 0.4s ease;
   position: relative;
-  border: 1px solid var(--surface-container);
+  border: 1px solid var(--border-section-card);
   flex-shrink: 0;
   color: var(--ink);
   pointer-events: auto;
@@ -297,7 +297,7 @@ ul {
 body.active-mode .content-header,
 body.active-mode .content-footer,
 body.active-mode .controls {
-  background-color: var(--surface-container) !important;
+  background-color: var(--bg-header) !important;
 }
 
 body.active-mode .content_sectionBlocks {
@@ -310,7 +310,7 @@ body.active-mode .content_sectionBlocks {
   margin: 0;
   height: 100%;
   border-radius: 0;
-  background-color: var(--parchment);
+  background-color: var(--bg-book-page);
   z-index: 100;
   justify-content: flex-start;
   overflow-y: auto;

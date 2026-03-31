@@ -1,181 +1,302 @@
-/* Auto-generated themes */
+/* Auto-generated highly granular themes */
+
+body.theme-vintage {
+  /* Core UI Fallbacks */
+  --parchment: #f1eacc;
+  --parchment-rgb: 241, 234, 204;
+  --brand-red: #6b0d12;
+  --brand-red-rgb: 107, 13, 18;
+  --surface-container: #e9dec0;
+  --surface-container-rgb: 233, 222, 192;
+  --ink: #2c1810;
+  --ink-rgb: 44, 24, 16;
+  --paper-white: #fcf9f2;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #f1eacc;
+  --bg-book-page-rgb: 241, 234, 204;
+  --bg-book-cover: #2c1810;
+  --bg-book-cover-rgb: 44, 24, 16;
+  --bg-slider-container: #eae2cc;
+  --bg-slider-container-rgb: 234, 226, 204;
+  --bg-section-card: #fcf9f2;
+  --bg-section-card-rgb: 252, 249, 242;
+  --border-section-card: #dec0bd;
+  --border-section-card-rgb: 222, 192, 189;
+  --bg-sidebar-menu: #281c15;
+  --bg-sidebar-menu-rgb: 40, 28, 21;
+  --bg-header: #e9dec0;
+  --bg-header-rgb: 233, 222, 192;
+  --book-bg: var(--bg-book-cover);
+}
 
 body.theme-royal {
-  --parchment: #0b0e14;
-  --parchment-rgb: 11, 14, 20;
-  
-  --surface-container: #161b22;
-  --surface-container-rgb: 22, 27, 34;
-  --surface-container-alt-rgb: 22, 27, 34; /* Use same for alt */
-  
+  /* Core UI Fallbacks */
+  --parchment: #0d1018;
+  --parchment-rgb: 13, 16, 24;
   --brand-red: #c5a059;
   --brand-red-rgb: 197, 160, 89;
-  --accent: #c5a059;
-  --accent-rgb: 197, 160, 89;
-  
-  --ink: #e2e8f0;
-  --ink-rgb: 226, 232, 240;
-  
+  --surface-container: #0c1017;
+  --surface-container-rgb: 12, 16, 23;
+  --ink: #e0e0e0;
+  --ink-rgb: 224, 224, 224;
   --paper-white: #1c2128;
-  --tab-bg: #1c2128;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #0d1018;
+  --bg-book-page-rgb: 13, 16, 24;
+  --bg-book-cover: #0b0e14;
+  --bg-book-cover-rgb: 11, 14, 20;
+  --bg-slider-container: #06080c;
+  --bg-slider-container-rgb: 6, 8, 12;
+  --bg-section-card: #1c2128;
+  --bg-section-card-rgb: 28, 33, 40;
+  --border-section-card: #242a34;
+  --border-section-card-rgb: 36, 42, 52;
+  --bg-sidebar-menu: #080b10;
+  --bg-sidebar-menu-rgb: 8, 11, 16;
+  --bg-header: #0c1017;
+  --bg-header-rgb: 12, 16, 23;
+  --book-bg: var(--bg-book-cover);
 }
 
 body.theme-silver {
-  --parchment: #120d1a;
-  --parchment-rgb: 18, 13, 26;
-  
-  --surface-container: #1e1529;
-  --surface-container-rgb: 30, 21, 41;
-  --surface-container-alt-rgb: 30, 21, 41; /* Use same for alt */
-  
+  /* Core UI Fallbacks */
+  --parchment: #150f1f;
+  --parchment-rgb: 21, 15, 31;
   --brand-red: #a8b2c1;
   --brand-red-rgb: 168, 178, 193;
-  --accent: #a8b2c1;
-  --accent-rgb: 168, 178, 193;
-  
-  --ink: #e2e8f0;
-  --ink-rgb: 226, 232, 240;
-  
+  --surface-container: #140e1d;
+  --surface-container-rgb: 20, 14, 29;
+  --ink: #e0e0e0;
+  --ink-rgb: 224, 224, 224;
   --paper-white: #251c33;
-  --tab-bg: #251c33;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #150f1f;
+  --bg-book-page-rgb: 21, 15, 31;
+  --bg-book-cover: #120d1a;
+  --bg-book-cover-rgb: 18, 13, 26;
+  --bg-slider-container: #0a070f;
+  --bg-slider-container-rgb: 10, 7, 15;
+  --bg-section-card: #251c33;
+  --bg-section-card-rgb: 37, 28, 51;
+  --border-section-card: #302442;
+  --border-section-card-rgb: 48, 36, 66;
+  --bg-sidebar-menu: #0e0a14;
+  --bg-sidebar-menu-rgb: 14, 10, 20;
+  --bg-header: #140e1d;
+  --bg-header-rgb: 20, 14, 29;
+  --book-bg: var(--bg-book-cover);
 }
 
 body.theme-bronze {
-  --parchment: #1a1614;
-  --parchment-rgb: 26, 22, 20;
-  
-  --surface-container: #27211d;
-  --surface-container-rgb: 39, 33, 29;
-  --surface-container-alt-rgb: 39, 33, 29; /* Use same for alt */
-  
+  /* Core UI Fallbacks */
+  --parchment: #1f1a18;
+  --parchment-rgb: 31, 26, 24;
   --brand-red: #cd7f32;
   --brand-red-rgb: 205, 127, 50;
-  --accent: #cd7f32;
-  --accent-rgb: 205, 127, 50;
-  
-  --ink: #f5deb3;
-  --ink-rgb: 245, 222, 179;
-  
+  --surface-container: #1d1917;
+  --surface-container-rgb: 29, 25, 23;
+  --ink: #e0e0e0;
+  --ink-rgb: 224, 224, 224;
   --paper-white: #362d26;
-  --tab-bg: #362d26;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #1f1a18;
+  --bg-book-page-rgb: 31, 26, 24;
+  --bg-book-cover: #1a1614;
+  --bg-book-cover-rgb: 26, 22, 20;
+  --bg-slider-container: #0f0d0c;
+  --bg-slider-container-rgb: 15, 13, 12;
+  --bg-section-card: #362d26;
+  --bg-section-card-rgb: 54, 45, 38;
+  --border-section-card: #463a31;
+  --border-section-card-rgb: 70, 58, 49;
+  --bg-sidebar-menu: #141110;
+  --bg-sidebar-menu-rgb: 20, 17, 16;
+  --bg-header: #1d1917;
+  --bg-header-rgb: 29, 25, 23;
+  --book-bg: var(--bg-book-cover);
 }
 
 body.theme-tangerine {
-  --parchment: #1f1f1f;
-  --parchment-rgb: 31, 31, 31;
-  
-  --surface-container: #2d2d2d;
-  --surface-container-rgb: 45, 45, 45;
-  --surface-container-alt-rgb: 45, 45, 45; /* Use same for alt */
-  
+  /* Core UI Fallbacks */
+  --parchment: #252525;
+  --parchment-rgb: 37, 37, 37;
   --brand-red: #ff8c00;
   --brand-red-rgb: 255, 140, 0;
-  --accent: #ff8c00;
-  --accent-rgb: 255, 140, 0;
-  
-  --ink: #ffffff;
-  --ink-rgb: 255, 255, 255;
-  
+  --surface-container: #232323;
+  --surface-container-rgb: 35, 35, 35;
+  --ink: #e0e0e0;
+  --ink-rgb: 224, 224, 224;
   --paper-white: #3a3a3a;
-  --tab-bg: #3a3a3a;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #252525;
+  --bg-book-page-rgb: 37, 37, 37;
+  --bg-book-cover: #1f1f1f;
+  --bg-book-cover-rgb: 31, 31, 31;
+  --bg-slider-container: #121212;
+  --bg-slider-container-rgb: 18, 18, 18;
+  --bg-section-card: #3a3a3a;
+  --bg-section-card-rgb: 58, 58, 58;
+  --border-section-card: #4b4b4b;
+  --border-section-card-rgb: 75, 75, 75;
+  --bg-sidebar-menu: #181818;
+  --bg-sidebar-menu-rgb: 24, 24, 24;
+  --bg-header: #232323;
+  --bg-header-rgb: 35, 35, 35;
+  --book-bg: var(--bg-book-cover);
 }
 
 body.theme-neon {
-  --parchment: #050510;
-  --parchment-rgb: 5, 5, 16;
-  
-  --surface-container: #0a0a20;
-  --surface-container-rgb: 10, 10, 32;
-  --surface-container-alt-rgb: 10, 10, 32; /* Use same for alt */
-  
+  /* Core UI Fallbacks */
+  --parchment: #060613;
+  --parchment-rgb: 6, 6, 19;
   --brand-red: #00ffff;
   --brand-red-rgb: 0, 255, 255;
-  --accent: #00ffff;
-  --accent-rgb: 0, 255, 255;
-  
-  --ink: #ffffff;
-  --ink-rgb: 255, 255, 255;
-  
+  --surface-container: #050512;
+  --surface-container-rgb: 5, 5, 18;
+  --ink: #e0e0e0;
+  --ink-rgb: 224, 224, 224;
   --paper-white: #101030;
-  --tab-bg: #101030;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #060613;
+  --bg-book-page-rgb: 6, 6, 19;
+  --bg-book-cover: #050510;
+  --bg-book-cover-rgb: 5, 5, 16;
+  --bg-slider-container: #030309;
+  --bg-slider-container-rgb: 3, 3, 9;
+  --bg-section-card: #101030;
+  --bg-section-card-rgb: 16, 16, 48;
+  --border-section-card: #14143e;
+  --border-section-card-rgb: 20, 20, 62;
+  --bg-sidebar-menu: #04040c;
+  --bg-sidebar-menu-rgb: 4, 4, 12;
+  --bg-header: #050512;
+  --bg-header-rgb: 5, 5, 18;
+  --book-bg: var(--bg-book-cover);
 }
 
 body.theme-scroll {
+  /* Core UI Fallbacks */
   --parchment: #d2b48c;
   --parchment-rgb: 210, 180, 140;
-  
-  --surface-container: #e6ccab;
-  --surface-container-rgb: 230, 204, 171;
-  --surface-container-alt-rgb: 230, 204, 171; /* Use same for alt */
-  
   --brand-red: #8b4513;
   --brand-red-rgb: 139, 69, 19;
-  --accent: #8b4513;
-  --accent-rgb: 139, 69, 19;
-  
-  --ink: #3e2723;
-  --ink-rgb: 62, 39, 35;
-  
+  --surface-container: #c7ab85;
+  --surface-container-rgb: 199, 171, 133;
+  --ink: #111;
+  --ink-rgb: 17, 17, 17;
   --paper-white: #f5deb3;
-  --tab-bg: #f5deb3;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #d2b48c;
+  --bg-book-page-rgb: 210, 180, 140;
+  --bg-book-cover: #544838;
+  --bg-book-cover-rgb: 84, 72, 56;
+  --bg-slider-container: #bda27e;
+  --bg-slider-container-rgb: 189, 162, 126;
+  --bg-section-card: #f5deb3;
+  --bg-section-card-rgb: 245, 222, 179;
+  --border-section-card: #d0bc98;
+  --border-section-card-rgb: 208, 188, 152;
+  --bg-sidebar-menu: #a89070;
+  --bg-sidebar-menu-rgb: 168, 144, 112;
+  --bg-header: #c7ab85;
+  --bg-header-rgb: 199, 171, 133;
+  --book-bg: var(--bg-book-cover);
 }
 
 body.theme-cartoon {
+  /* Core UI Fallbacks */
   --parchment: #e0f7fa;
   --parchment-rgb: 224, 247, 250;
-  
-  --surface-container: #b2ebf2;
-  --surface-container-rgb: 178, 235, 242;
-  --surface-container-alt-rgb: 178, 235, 242; /* Use same for alt */
-  
   --brand-red: #ff6f00;
   --brand-red-rgb: 255, 111, 0;
-  --accent: #ff6f00;
-  --accent-rgb: 255, 111, 0;
-  
-  --ink: #006064;
-  --ink-rgb: 0, 96, 100;
-  
+  --surface-container: #d4eaed;
+  --surface-container-rgb: 212, 234, 237;
+  --ink: #111;
+  --ink-rgb: 17, 17, 17;
   --paper-white: #ffffff;
-  --tab-bg: #ffffff;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #e0f7fa;
+  --bg-book-page-rgb: 224, 247, 250;
+  --bg-book-cover: #596264;
+  --bg-book-cover-rgb: 89, 98, 100;
+  --bg-slider-container: #c9dee1;
+  --bg-slider-container-rgb: 201, 222, 225;
+  --bg-section-card: #ffffff;
+  --bg-section-card-rgb: 255, 255, 255;
+  --border-section-card: #d8d8d8;
+  --border-section-card-rgb: 216, 216, 216;
+  --bg-sidebar-menu: #b3c5c8;
+  --bg-sidebar-menu-rgb: 179, 197, 200;
+  --bg-header: #d4eaed;
+  --bg-header-rgb: 212, 234, 237;
+  --book-bg: var(--bg-book-cover);
 }
 
 body.theme-cyber {
-  --parchment: #0d0d0d;
-  --parchment-rgb: 13, 13, 13;
-  
-  --surface-container: #1a1a1a;
-  --surface-container-rgb: 26, 26, 26;
-  --surface-container-alt-rgb: 26, 26, 26; /* Use same for alt */
-  
+  /* Core UI Fallbacks */
+  --parchment: #0f0f0f;
+  --parchment-rgb: 15, 15, 15;
   --brand-red: #39ff14;
   --brand-red-rgb: 57, 255, 20;
-  --accent: #39ff14;
-  --accent-rgb: 57, 255, 20;
-  
-  --ink: #ffffff;
-  --ink-rgb: 255, 255, 255;
-  
+  --surface-container: #0e0e0e;
+  --surface-container-rgb: 14, 14, 14;
+  --ink: #e0e0e0;
+  --ink-rgb: 224, 224, 224;
   --paper-white: #262626;
-  --tab-bg: #262626;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #0f0f0f;
+  --bg-book-page-rgb: 15, 15, 15;
+  --bg-book-cover: #0d0d0d;
+  --bg-book-cover-rgb: 13, 13, 13;
+  --bg-slider-container: #070707;
+  --bg-slider-container-rgb: 7, 7, 7;
+  --bg-section-card: #262626;
+  --bg-section-card-rgb: 38, 38, 38;
+  --border-section-card: #313131;
+  --border-section-card-rgb: 49, 49, 49;
+  --bg-sidebar-menu: #0a0a0a;
+  --bg-sidebar-menu-rgb: 10, 10, 10;
+  --bg-header: #0e0e0e;
+  --bg-header-rgb: 14, 14, 14;
+  --book-bg: var(--bg-book-cover);
 }
 
 body.theme-ledger {
+  /* Core UI Fallbacks */
   --parchment: #fdf5e6;
   --parchment-rgb: 253, 245, 230;
-  
-  --surface-container: #faebd7;
-  --surface-container-rgb: 250, 235, 215;
-  --surface-container-alt-rgb: 250, 235, 215; /* Use same for alt */
-  
   --brand-red: #dc143c;
   --brand-red-rgb: 220, 20, 60;
-  --accent: #dc143c;
-  --accent-rgb: 220, 20, 60;
-  
-  --ink: #2f4f4f;
-  --ink-rgb: 47, 79, 79;
-  
+  --surface-container: #f0e8da;
+  --surface-container-rgb: 240, 232, 218;
+  --ink: #111;
+  --ink-rgb: 17, 17, 17;
   --paper-white: #ffffff;
-  --tab-bg: #ffffff;
+
+  /* NEW SECESSIONAL VARIABLES */
+  --bg-book-page: #fdf5e6;
+  --bg-book-page-rgb: 253, 245, 230;
+  --bg-book-cover: #65625c;
+  --bg-book-cover-rgb: 101, 98, 92;
+  --bg-slider-container: #e3dccf;
+  --bg-slider-container-rgb: 227, 220, 207;
+  --bg-section-card: #ffffff;
+  --bg-section-card-rgb: 255, 255, 255;
+  --border-section-card: #d8d8d8;
+  --border-section-card-rgb: 216, 216, 216;
+  --bg-sidebar-menu: #cac4b8;
+  --bg-sidebar-menu-rgb: 202, 196, 184;
+  --bg-header: #f0e8da;
+  --bg-header-rgb: 240, 232, 218;
+  --book-bg: var(--bg-book-cover);
 }
+

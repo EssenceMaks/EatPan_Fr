@@ -1,6 +1,7 @@
 import Component from '../../core/Component.js';
 
 export const THEMES = [
+  { id: 'vintage', name: 'Vintage Book', colors: ['#f1eacc', '#6b0d12', '#fcf9f2'] },
   { id: 'royal', name: 'Royal', colors: ['#0b0e14', '#c5a059', '#1c2128'] },
   { id: 'silver', name: 'Silver', colors: ['#120d1a', '#a8b2c1', '#251c33'] },
   { id: 'bronze', name: 'Bronze', colors: ['#1a1614', '#cd7f32', '#362d26'] },
@@ -17,7 +18,7 @@ export default class SidebarModule extends Component {
     super(props);
     this.state = {
       isOpen: false,
-      currentTheme: localStorage.getItem('eatpan_theme') || 'royal'
+      currentTheme: localStorage.getItem('eatpan_theme') || 'vintage'
     };
   }
 
@@ -110,7 +111,7 @@ export default class SidebarModule extends Component {
     // Remove old theme classes
     document.body.classList.remove(...THEMES.map(t => `theme-${t.id}`));
     
-    // Default fallback to 'royal' which doesn't need a class, but we can add it to be consistent
+    // Apply new theme class
     document.body.classList.add(`theme-${themeId}`);
     
     // Save state
@@ -128,7 +129,7 @@ export default class SidebarModule extends Component {
       // Just apply class immediately on load
       document.body.classList.add(`theme-${savedTheme}`);
     } else {
-      document.body.classList.add(`theme-royal`); // Default
+      document.body.classList.add(`theme-vintage`); // Default
     }
     
     // Global bind to the burger menu button in Header
