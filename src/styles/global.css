@@ -1,18 +1,77 @@
 /* src/styles/global.css (Includes all EatPan_SPA.html structural styles) */
 :root {
-  /* Book Tokens */
-  --parchment: #f1eacc;
-  --ink: #2c1810;
-  --accent: #805533;
+  /* =========================================
+     EATPAN COLOR PALETTE
+     ========================================= */
+  
+  /* Brand & Core Colors */
   --brand-red: #6b0d12;
-  --ribbon-red: #6b0d12;
+  --brand-red-light: #b22222;
+  --accent: #805533;
+  --ink: #2c1810;
+  
+  /* RGB Base for Alpha Transparencies */
+  --brand-red-rgb: 107, 13, 18;
+  --accent-rgb: 128, 85, 51;
+  --ink-rgb: 44, 24, 16;
+  --black-rgb: 0, 0, 0;
+  --white-rgb: 255, 255, 255;
+  
+  /* Surfaces & Backgrounds */
+  --parchment: #f1eacc;
+  --parchment-rgb: 241, 234, 204;
   --surface-container: #e9dec0;
+  --surface-container-rgb: 220, 201, 158;
+  --surface-container-alt-rgb: 233, 222, 192;
   --outline-variant: #dec0bd;
+  --paper-white: #fcf9f2;
+  --texture-bg: #f4ecd8;
+  --off-white: #fffdf5;
 
-  --book-bg: #2c1810;
+  /* Recipe Book Specific */
+  --book-bg: var(--ink);
   --book-border: #221b03;
   --tab-bg: #dcc99e;
   --tab-text: #221b03;
+
+  /* Ribbons */
+  --ribbon-red: var(--brand-red);
+  --ribbon-base-bg: #dbd3bb;
+  --ribbon-base-rgb: 90, 70, 60;
+  --ribbon-green: #2e603a;
+  --ribbon-green-rgb: 46, 96, 58;
+  --ribbon-blue: #4a5f70;
+  --ribbon-blue-rgb: 90, 110, 130;
+  --ribbon-purple: #5d4068;
+  --ribbon-purple-rgb: 110, 80, 120;
+
+  /* Craft Space & Kanban */
+  --ticket-hover-bg: #ebe2cf;
+  
+  /* Status Colors */
+  --status-done: #4caf50;
+  --status-pending: #ff9800;
+  --status-error: #f44336;
+  --status-dev: #58c472;
+  --status-warning: #e5c07b;
+
+  /* Grayscale */
+  --color-black: #000;
+  --gray-900: #121212;
+  --gray-850: #171717;
+  --gray-800: #1a1a1a;
+  --gray-750: #1f1f1f;
+  --gray-700: #222;
+  --gray-650: #242424;
+  --gray-600: #2a2a2a;
+  --gray-500: #333;
+  --gray-400: #444;
+  --gray-300: #555;
+  --color-white: #fff;
+
+  /* =========================================
+     TYPOGRAPHY & LAYOUT TOKENS
+     ========================================= */
 
   --font-serif: "EB Garamond", serif;
   --font-title: "Noto Serif", serif;
@@ -25,7 +84,7 @@
   --header-height: clamp(25px, 8vh, 60px);
 
   --transition-main: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow-deep: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+  --shadow-deep: 0 40px 100px -20px rgba(var(--black-rgb), 0.7);
 }
 
 * {
@@ -38,8 +97,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-  background-color: #000;
-  /* color: #fff; */
+  background-color: var(--color-black);
+  /* color: var(--color-white); */
   height: 100vh;
   width: 100vw;
   overflow: hidden;
@@ -94,7 +153,7 @@ ul {
 .section-title {
   font-weight: 700;
   color: var(--accent);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(var(--black-rgb), 0.1);
   margin-bottom: 1rem;
   padding-bottom: 0.25rem;
   text-transform: uppercase;
@@ -120,7 +179,7 @@ ul {
 
 #content {
   z-index: 1;
-  background-color: #1a1a1a;
+  background-color: var(--gray-800);
 }
 
 .content-header,
@@ -130,7 +189,7 @@ ul {
   align-items: center;
   justify-items: center;
   transition: background-color 0.3s ease;
-  background-color: #2a2a2a;
+  background-color: var(--gray-600);
   position: relative;
 }
 
@@ -142,39 +201,10 @@ ul {
   z-index: 120;
 }
 
-.header-control-slot,
-#col-4-container {
-  width: 100%;
-  min-height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-}
-
-.header-control-slot {
-  justify-self: center;
-}
-
-#col-4-container {
-  justify-self: end;
-}
-
-.avatar {
-  width: 80%;
-  aspect-ratio: 1/1;
-  max-width: 50px;
-  background-color: #4caf50;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-}
 
 
 .content_sectionBlocks {
-  background-color: #121212;
+  background-color: var(--gray-900);
   overflow-x: auto;
   overflow-y: hidden;
   display: flex;
@@ -199,7 +229,7 @@ ul {
   /* Hard cap to prevent infinite child expansion causing scrollbar to vanish */
   height: 90%;
   margin: auto 10px;
-  background-color: #333;
+  background-color: var(--gray-500);
   border-radius: 16px;
   scroll-snap-align: center;
   display: flex;
@@ -208,13 +238,13 @@ ul {
   align-items: center;
   transition: all 0.4s ease;
   position: relative;
-  border: 1px solid #444;
+  border: 1px solid var(--gray-400);
   flex-shrink: 0;
   pointer-events: auto;
 }
 
 .section_block>*:not(.section_block-inner-content) {
-  color: #fff;
+  color: var(--color-white);
 }
 
 .section_block h2 {
@@ -225,174 +255,6 @@ ul {
   padding: 0 20px;
   text-align: center;
   opacity: 0.7;
-}
-
-/* Project Status Preview on Block Cover */
-.project-status-preview {
-  display: flex;
-  gap: 20px;
-  margin-top: 15px;
-  max-height: 50vh;
-  overflow-y: auto;
-  text-align: left;
-  width: 100%;
-  padding: 0 10px;
-  scrollbar-width: thin;
-  opacity: 1 !important;
-  /* Override section_block-text opacity */
-}
-
-.status-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.project-status-preview::-webkit-scrollbar {
-  width: 4px;
-}
-
-.project-status-preview::-webkit-scrollbar-thumb {
-  background-color: var(--accent);
-  border-radius: 4px;
-}
-
-.status-section-title {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-top: 12px;
-  margin-bottom: 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  padding-bottom: 2px;
-  letter-spacing: 0.05em;
-  font-weight: 700;
-}
-
-.status-section-title:first-child {
-  margin-top: 0;
-}
-
-.status-task {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 8px;
-  font-size: 0.8rem;
-  line-height: 1.3;
-}
-
-.status-task.plain {
-  color: #fff;
-  opacity: 1;
-}
-
-.status-task.done {
-  opacity: 0.5;
-  text-decoration: none;
-  /* No strikethrough as requested */
-}
-
-.status-task.pending {
-  opacity: 1;
-  color: #fff;
-}
-
-.status-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.status-task.done .status-icon {
-  color: #4caf50;
-}
-
-.status-task.pending .status-icon {
-  color: #ff9800;
-  /* pending orange */
-}
-
-/* Recipe Book Cover Preview */
-.book-cover-preview {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-}
-
-.book-theme-icon {
-  position: absolute;
-  left: -40px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--brand-red, #B22222);
-  /* Red tint for the huge background icon */
-  opacity: 0.15;
-  pointer-events: none;
-}
-
-.book-theme-icon svg {
-  width: 250px;
-  height: 250px;
-  stroke-width: 1px;
-}
-
-.book-titles {
-  z-index: 2;
-  margin-top: 20px;
-}
-
-.book-titles h3 {
-  font-size: 2.2rem;
-  letter-spacing: 0.1em;
-  font-family: var(--font-primary, sans-serif);
-  margin: 0;
-  text-transform: uppercase;
-  color: #fff;
-}
-
-.book-titles h3 span {
-  font-weight: 300;
-}
-
-.book-sub-title {
-  font-size: 0.9rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #fff;
-  opacity: 0.8;
-  font-weight: 300;
-  margin-top: 10px;
-}
-
-.book-cover-footer {
-  position: absolute;
-  bottom: 100px;
-  right: 150px;
-  text-align: right;
-  font-size: 0.85rem;
-  color: #fff;
-  opacity: 0.8;
-  max-width: 250px;
-  line-height: 1.5;
-  font-family: var(--font-primary, sans-serif);
-}
-
-.book-cover-footer strong {
-  display: block;
-  margin-top: 10px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  opacity: 1;
 }
 
 .section_block-inner-content {
@@ -425,7 +287,7 @@ ul {
   grid-template-columns: repeat(4, 1fr);
   align-items: center;
   justify-items: center;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(var(--black-rgb), 0.2);
   transition: background 0.3s;
 }
 
@@ -434,7 +296,7 @@ ul {
 body.active-mode .content-header,
 body.active-mode .content-footer,
 body.active-mode .controls {
-  background-color: #555 !important;
+  background-color: var(--gray-300) !important;
 }
 
 body.active-mode .content_sectionBlocks {
@@ -447,7 +309,7 @@ body.active-mode .content_sectionBlocks {
   margin: 0;
   height: 100%;
   border-radius: 0;
-  background-color: #222;
+  background-color: var(--gray-700);
   z-index: 100;
   justify-content: flex-start;
   overflow-y: auto;
@@ -472,14 +334,14 @@ body.active-mode .btn-back {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-60px) scale(1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 6px rgba(var(--black-rgb), 0.3);
 }
 
 /* Modal from my_recipes */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(var(--black-rgb), 0.85);
   backdrop-filter: blur(10px);
   display: grid;
   place-items: center;
@@ -497,37 +359,8 @@ body.active-mode .btn-back {
   max-width: 650px;
   padding: 4rem;
   border-radius: 8px;
-  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 40px 80px rgba(var(--black-rgb), 0.6);
   position: relative;
   color: var(--ink);
 }
-
-/* --- MICRO-ANIMATIONS --- */
-@keyframes slideFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.categories-list-view {
-  animation: slideFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  overflow-y: auto;
-  max-height: 60vh;
-  /* Prevents infinite book expansion causing tab overlapping */
-  scrollbar-width: none;
-  padding-right: 5px;
-}
-
-.categories-list-view::-webkit-scrollbar {
-  display: none;
-}
-
-.categories-grid-view {
-  animation: slideFadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
+
