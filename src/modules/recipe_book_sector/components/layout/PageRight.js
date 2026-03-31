@@ -3,7 +3,7 @@ import Component from '../../../../core/Component.js';
 export default class PageRight extends Component {
     template() {
         const recipeObj = this.props.recipe;
-        
+
         // EMPTY STATE
         if (!recipeObj) {
             return `
@@ -41,7 +41,7 @@ export default class PageRight extends Component {
         // BUILD STEPS HTML
         const stepsHTML = steps.map((st, i) => `
                                     <div class="step-item">
-                                        <div class="step-num">${String(st.num || i+1).padStart(2, '0')}</div>
+                                        <div class="step-num">${String(st.num || i + 1).padStart(2, '0')}</div>
                                         <div>
                                             <h5 class="step-title">${st.title || 'Крок'}</h5>
                                             <p class="step-desc">${st.text || ''}</p>
@@ -51,11 +51,7 @@ export default class PageRight extends Component {
 
         return `
             <section class="page page--right" id="recipe-page">
-                <!-- BOTTOM RIBBONS -->
-                <div class="bookmark-bottom-group">
-                    <button class="bookmark-bottom prepared active" onclick="this.classList.toggle('active')"><i data-lucide="soup" style="width: 25px; height: 25px;"></i></button>
-                    <button class="bookmark-bottom planned" onclick="this.classList.toggle('active')"><i data-lucide="timer" style="width: 25px; height: 25px;"></i></button>
-                </div>
+
                 <!-- RIGHT SIDE TABS WRAPPER -->
                 <aside class="right-tabs-wrapper">
                     <div class="side-tabs-container side-tabs--right">
@@ -201,13 +197,17 @@ export default class PageRight extends Component {
                         </div>
                     </div>
                 </div>
-
+                <!-- BOTTOM RIBBONS -->
+                <div class="bookmark-bottom-group">
+                    <button class="bookmark-bottom prepared active" onclick="this.classList.toggle('active')"><i data-lucide="soup" style="width: 25px; height: 25px;"></i></button>
+                    <button class="bookmark-bottom planned" onclick="this.classList.toggle('active')"><i data-lucide="timer" style="width: 25px; height: 25px;"></i></button>
+                </div>
             </section>
         `;
     }
 
     async onMount() {
-        if(window.lucide) {
+        if (window.lucide) {
             window.lucide.createIcons({
                 root: this.element
             });
