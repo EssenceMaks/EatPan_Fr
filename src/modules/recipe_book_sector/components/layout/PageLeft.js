@@ -139,12 +139,30 @@ export default class PageLeft extends Component {
                 "Супи": "https://images.unsplash.com/photo-1547592180-85f173990554",
             };
 
+            const catCounts = {};
+            (this.props.recipes || []).forEach(r => {
+                const c = r.data && r.data.category ? r.data.category : "Без категорії";
+                catCounts[c] = (catCounts[c] || 0) + 1;
+            });
+
+            const getRecipeWord = (num) => {
+                const lastDigit = num % 10;
+                const lastTwoDigits = num % 100;
+                if (lastTwoDigits >= 11 && lastTwoDigits <= 19) return 'рецептів';
+                if (lastDigit === 1) return 'рецепт';
+                if (lastDigit >= 2 && lastDigit <= 4) return 'рецепти';
+                return 'рецептів';
+            };
+
             const existingCats = new Set(recipes.map(r => r.data && r.data.category ? r.data.category : "Без категорії"));
 
             const cards = Array.from(existingCats).map(cat => {
                 const img = catImgs[cat] || catImgs["Супи"]; // fallback
+                const count = catCounts[cat] || 0;
+                const countText = `${count} ${getRecipeWord(count)}`;
                 return `
                     <div class="category-card" onclick="window.setPageLeftState({ activeCategory: '${cat.replace(/'/g, "\\'")}', viewMode: 'list' })">
+                        <div class="category-card-badge">${countText}</div>
                         <img alt="${cat}" class="category-card-img" src="${img}" />
                         <div class="category-card-pill" style="text-transform:uppercase;">${cat}</div>
                     </div>
@@ -152,7 +170,7 @@ export default class PageLeft extends Component {
             });
 
             return `
-                <div class="category-cards-grid">
+                <div class="category-cards-grid" style="padding: 0.7rem;">
                     ${cards.join('')}
                     <div class="category-card category-card--all" onclick="window.setPageLeftState({ activeCategory: 'all', viewMode: 'list' })">
                         <span>ALL CATEGORIES</span>
@@ -167,6 +185,7 @@ export default class PageLeft extends Component {
 
             const recCards = recipes.map(r => `
                 <div class="category-card" onclick="window.onRecipeSelectCall(${r.id})" style="border: 2px solid #5a4f45; border-radius: 8px; overflow: hidden; position: relative;">
+                    <div class="category-card-badge"><i data-lucide="heart" style="width: 10px; margin-right: 3px; display:inline-block; vertical-align:middle;"></i> <span style="vertical-align:middle;">${r.likes || Math.floor(Math.random() * 15 + 1)}</span></div>
                     <div style="background: var(--brand-red); width: 100%; height: 100px; display:flex; align-items:center; justify-content:center;">
                         <i data-lucide="chef-hat" style="color:#fff; width:32px; height:32px;"></i>
                     </div>
@@ -263,11 +282,11 @@ export default class PageLeft extends Component {
 
         let catCount = allCats.length + (cat !== 'all' ? 1 : 0);
         let requiredCols = 1;
-        
+
         // Health tabs column (rightmost) uses healthTabsLen slots at the bottom
         let rightmostCatSlots = maxRows - healthTabsLen;
         if (rightmostCatSlots < 0) rightmostCatSlots = 0;
-        
+
         let cLeft = catCount;
         cLeft -= rightmostCatSlots; // Health tabs column supports rightmostCatSlots cats on top
         while (cLeft > 0) {
@@ -278,7 +297,7 @@ export default class PageLeft extends Component {
         let targetCol = requiredCols;
         let targetRow = 1;
         let renderedRibbons = [];
-        let activeCols = new Set([requiredCols]); 
+        let activeCols = new Set([requiredCols]);
 
         if (cat !== 'all') {
             renderedRibbons.push({ type: 'reset', col: targetCol, row: targetRow++ });
@@ -346,8 +365,8 @@ export default class PageLeft extends Component {
                         <div class="inner-tabs-group" style="display:flex; flex-wrap:wrap; gap: 4px; align-items:center;">
                             <button class="tab-btn--top ${book === 'all' ? 'active' : ''}" onclick="window.setPageLeftState({ activeBook: 'all' })">Всі рецепти</button>
                             ${dynamicGroups.map(g => {
-                const customStyle = !['Особисті', 'Гості', 'Заклади'].includes(g) ? 'font-style: italic; color: var(--accent);' : '';
-                return `
+            const customStyle = !['Особисті', 'Гості', 'Заклади'].includes(g) ? 'font-style: italic; color: var(--accent);' : '';
+            return `
                                     <div class="group-tab-wrap" style="position:relative; display:inline-flex; align-items:center;" onmouseover="this.querySelector('.grp-actions').style.display='flex'" onmouseout="this.querySelector('.grp-actions').style.display='none'">
                                         <button class="tab-btn--top ${book === g ? 'active' : ''}" style="${customStyle}" onclick="window.setPageLeftState({ activeBook: '${g.replace(/'/g, "\\'")}' })">${g}</button>
                                         <div class="grp-actions" style="display:none; position:absolute; top:-12px; right:-10px; gap:2px; background:var(--parchment); border-radius:4px; border:1px solid rgba(0,0,0,0.1); padding:2px;">
@@ -356,7 +375,7 @@ export default class PageLeft extends Component {
                                         </div>
                                     </div>
                                 `;
-            }).join('')}
+        }).join('')}
                         </div>
                         <div>
                             <button class="tab-btn--top" onclick="window.toggleCreateRecipe()"><i data-lucide="plus" style="width: 14px; height: 14px;"></i></button>
@@ -417,7 +436,7 @@ export default class PageLeft extends Component {
 
                 <!-- Scrollable Content -->
                 <div class="scrollable-area page-content-wrapper grid-content" style="${view === 'grid' ? 'overflow-y: hidden;' : ''}">
-                    <div class="categories-grid-view" style="padding: 0 2.5rem 2.5rem; ${view === 'grid' ? 'position: absolute; inset: 0;' : 'flex: none; height: auto;'}">
+                    <div class="categories-grid-view" style="padding: 0.7rem; ${view === 'grid' ? 'position: absolute; inset: 0;' : 'flex: none; height: auto;'}">
                         <!-- MAIN CONTENT LIST OR GRID -->
                         ${viewContentHTML}
                     </div>
@@ -514,6 +533,8 @@ export default class PageLeft extends Component {
             });
         }
 
+        this.setupGridPulse();
+
         // Enable horizontal scrolling via vertical mouse wheel in grid containers
         const grids = this.element.querySelectorAll('.category-cards-grid');
         grids.forEach(grid => {
@@ -523,6 +544,13 @@ export default class PageLeft extends Component {
                     grid.scrollLeft += e.deltaY;
                 }
             }, { passive: false });
+
+            grid.addEventListener('mouseenter', () => { this.isHoveringGrid = true; });
+            grid.addEventListener('mouseleave', () => {
+                this.isHoveringGrid = false;
+                const activeCards = this.element.querySelectorAll('.category-card.pulse-active');
+                activeCards.forEach(c => c.classList.remove('pulse-active'));
+            });
         });
 
         // Dynamically align side ribbons wrapper to start exactly below filters (aligned with categories)
@@ -540,7 +568,7 @@ export default class PageLeft extends Component {
                 const availableHeight = ribbonsContainer.clientHeight - offset - 10; // 10px safety bottom
                 let newMaxRows = Math.floor((availableHeight + 8) / 43); // 35px height + 8px gap
                 if (newMaxRows < 5) newMaxRows = 5; // absolute min to support the 5 active health slots
-                
+
                 // Re-render if layout capacities changed!
                 if (this.state.maxRibbonRows !== newMaxRows) {
                     this.state.maxRibbonRows = newMaxRows;
@@ -551,10 +579,60 @@ export default class PageLeft extends Component {
         this.heightObserver.observe(this.element);
     }
 
+    setupGridPulse() {
+        if (this.pulseInterval) clearInterval(this.pulseInterval);
+        if (this.pulseObserver) this.pulseObserver.disconnect();
+
+        let visibleCards = [];
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const target = entry.target;
+                if (entry.isIntersecting) {
+                    if (!visibleCards.includes(target)) {
+                        visibleCards.push(target);
+                    }
+                } else {
+                    visibleCards = visibleCards.filter(c => c !== target);
+                    target.classList.remove('pulse-active');
+                }
+            });
+        }, { threshold: 0.6 });
+
+        const cards = Array.from(this.element.querySelectorAll('.category-card:not(.category-card--all)'));
+        if (cards.length === 0) return;
+
+        cards.forEach(c => observer.observe(c));
+        this.pulseObserver = observer;
+
+        let currentPulseIdx = 0;
+
+        this.pulseInterval = setInterval(() => {
+            if (this.isHoveringGrid) return;
+            if (visibleCards.length === 0) return;
+
+            // Note: we let animations run independently so we don't clear the old one manually,
+            // but to be safe we just clean all visible cards that shouldn't be active right now.
+            // Since our timeout removes active class, we just proceed.
+
+            if (currentPulseIdx >= visibleCards.length) {
+                currentPulseIdx = 0;
+            }
+
+            const targetCard = visibleCards[currentPulseIdx];
+            if (targetCard) {
+                targetCard.classList.add('pulse-active');
+                setTimeout(() => {
+                    if (targetCard) targetCard.classList.remove('pulse-active');
+                }, 2000); // 2 second pulse duration
+            }
+            currentPulseIdx++;
+        }, 3500); // Trigger every 3.5 seconds
+    }
+
     onUnmount() {
-        if (this.heightObserver) {
-            this.heightObserver.disconnect();
-        }
+        if (this.heightObserver) this.heightObserver.disconnect();
+        if (this.pulseObserver) this.pulseObserver.disconnect();
+        if (this.pulseInterval) clearInterval(this.pulseInterval);
         super.onUnmount && super.onUnmount();
     }
 }
