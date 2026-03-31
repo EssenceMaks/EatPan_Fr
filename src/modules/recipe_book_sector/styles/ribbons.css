@@ -1,6 +1,8 @@
 .side-tabs-grid {
     grid-area: side_ribbons;
     position: relative;
+    align-self: stretch;
+    height: 100%;
     /* Grid layout causes this to sit in the 0px column. 
        We allow it to overflow to the LEFT by using RTL or negative margins. */
     width: 0;
@@ -16,6 +18,7 @@
     width: max-content;
     z-index: 5;
     position: absolute;
+    top: 0;
     right: 24px; /* Move perfectly into edge of page */
 }
 

@@ -29,10 +29,13 @@
 - **Profile drawer bounds + close UX** — drawer профілю тепер обмежений лише content-area між header/footer, має окрему кнопку `Закрити` і закривається по `Esc`.
 - **Left-side header auth layout** — інтерактивний аватар профілю перенесено в лівий avatar-slot хедера, кнопку `Вхід` поставлено праворуч від нього, а сам avatar у хедері тепер має квадратніший `border-radius: 4px`.
 - **Left-opening auth surfaces** — popup-форми `Вхід` / `Реєстрація` / `Забули пароль?` та drawer профілю тепер відкриваються і позиціонуються з лівого боку інтерфейсу.
+- **Safe component content rendering** — у базовий `Component` додано helper для очищення й підрендеру дочірнього контенту в root або у вказаний target-container без ручного `innerHTML` у модулях.
+- **BookModule mount fix** — cookbook-модуль більше не рендерить власний wrapper усередину самого себе; замість цього `Book` монтується у внутрішній `data-book-mount` контейнер.
+- **Header control migration** — legacy `menu/back` controls, які раніше жили в окремому `control_panel`, перенесено в `content-header`, а логіку їх повернення в home-slot у `main.js` зроблено безпечнішою для відсутніх DOM-вузлів.
 
 ### Documentation
 
-- Оновлено `docs/tasks.md` — додано виконані пункти про smoother auth transitions, dev profile drawer, окремий profile module/page, recipe-book polish для profile UX і нове лівостороннє розміщення header auth/profile controls.
+- Оновлено `docs/tasks.md` — додано виконані пункти про safer cookbook rendering, перенесення legacy controls у header, smoother auth transitions, dev profile drawer, окремий profile module/page, recipe-book polish для profile UX і нове лівостороннє розміщення header auth/profile controls.
 
 **Назва коміту:**
 `refactor: extract header auth into dedicated module`

@@ -553,8 +553,7 @@ function deactivateClockWithAnimation(nextState) {
         } else {
             body.classList.remove('active-mode');
             restoreScroll();
-            moveElementWithAnimate(menuBtn, col4);
-            setTimeout(() => { col4.insertBefore(menuBtn, backBtn); }, 400);
+            restoreHeaderControlsHome();
         }
     }, 350);
 }
@@ -575,6 +574,8 @@ function restoreScroll() {
 }
 
 function moveElementWithAnimate(element, newParent) {
+    if (!element || !newParent) return;
+
     const first = element.getBoundingClientRect();
     newParent.appendChild(element);
     const last = element.getBoundingClientRect();
@@ -589,6 +590,20 @@ function moveElementWithAnimate(element, newParent) {
         element.classList.add('animating');
         element.style.transform = ''; 
     });
+}
+
+function restoreHeaderControlsHome() {
+    if (!menuBtn || !col4) return;
+
+    moveElementWithAnimate(menuBtn, col4);
+
+    if (backBtn) {
+        setTimeout(() => {
+            if (col4.contains(backBtn)) {
+                col4.insertBefore(menuBtn, backBtn);
+            }
+        }, 400);
+    }
 }
 
 // Global scope helpers for HTML onclick
@@ -1268,7 +1283,6 @@ window.addEventListener('popstate', (event) => {
         performBlockActivation(nextTarget);
     } else {
         restoreScroll();
-        moveElementWithAnimate(menuBtn, col4);
-        setTimeout(() => { col4.insertBefore(menuBtn, backBtn); }, 400);
+        restoreHeaderControlsHome();
     }
 });

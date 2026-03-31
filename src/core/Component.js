@@ -10,6 +10,34 @@ export default class Component {
         return div.firstElementChild || div.firstChild;
     }
 
+    getRenderTarget(selector = null) {
+        if (!this.element) return null;
+        return selector ? this.element.querySelector(selector) : this.element;
+    }
+
+    async replaceContent(content, selector = null) {
+        const target = this.getRenderTarget(selector);
+        if (!target) return null;
+
+        let node = null;
+
+        if (content && typeof content.render === 'function') {
+            node = await content.render();
+        } else if (typeof content === 'string') {
+            node = this.createNode(content);
+        } else if (typeof Node !== 'undefined' && content instanceof Node) {
+            node = content;
+        }
+
+        target.replaceChildren();
+
+        if (node) {
+            target.appendChild(node);
+        }
+
+        return node;
+    }
+
     template() {
         return `<div></div>`;
     }

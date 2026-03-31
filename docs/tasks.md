@@ -56,6 +56,7 @@
 - [x] Make auth form switching smoother and add a dev avatar drawer next to login
 - [x] Move the profile avatar into the left header avatar slot and place the login trigger to its right
 - [x] Open auth forms and the profile drawer from the left side of the screen
+- [x] Move legacy menu/back control-panel behavior into the content header
 
 #### Frontend (Profile)
 
@@ -66,6 +67,7 @@
 #### Frontend (Recipe Book)
 
 - [x] Reduce left side tabs and bottom ribbons on low-height desktops
+- [x] Fix BookModule nested wrapper rendering and switch cookbook injection to a safe inner mount target
 
 #### Project Maintenance
 
