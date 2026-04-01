@@ -68,6 +68,9 @@
 
 - [x] Reduce left side tabs and bottom ribbons on low-height desktops
 - [x] Fix BookModule nested wrapper rendering and switch cookbook injection to a safe inner mount target
+- [x] Document PageLeft ribbon grid and responsive side-tab layout rules
+- [x] Cap left ribbon columns to max 2, toggle category on repeat click
+- [x] Add "show all categories" tab + modal for overflow; hidden active category swaps with list tab
 
 #### Project Maintenance
 

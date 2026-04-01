@@ -12,14 +12,16 @@
 .side-tabs-grid-inner {
     display: grid;
     direction: ltr;
-    gap: 8px 15px;
+    gap: 6px 15px;
     align-content: start;
     justify-content: end;
     width: max-content;
     z-index: 5;
     position: absolute;
     top: 0;
-    right: 24px; /* Move perfectly into edge of page */
+    /* Move perfectly into edge of page */
+    /* right: 24px; */
+    right: 4px; /* Good for mac */
 }
 
 .side-tabs-bg-sheet {
@@ -93,6 +95,121 @@
 .tab-clear-active:hover {
     filter: brightness(1.2);
     transform: translateX(10px);
+}
+
+/* "Show all categories" list tab — distinct accent color */
+.side-tab--list-all {
+    background: var(--accent, #5b7a5e);
+    color: white;
+    filter: brightness(1);
+    box-shadow: -3px 3px 10px rgba(var(--black-rgb), 0.35);
+}
+
+.side-tab--list-all:hover {
+    filter: brightness(1.15);
+    transform: translateX(6px);
+}
+
+/* Dim rule: keep list-all tab bright when a category is active */
+.side-tabs-grid:has(.side-tab--left.active) .side-tab--list-all {
+    filter: brightness(0.95);
+    box-shadow: -2px 2px 8px rgba(var(--black-rgb), 0.25);
+}
+
+/* ── Category Modal ── */
+.cat-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: catModalFadeIn 0.2s ease;
+}
+
+@keyframes catModalFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.cat-modal {
+    background: var(--parchment, #f5f0e1);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    width: 340px;
+    max-width: 90vw;
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: catModalSlideUp 0.25s ease;
+}
+
+@keyframes catModalSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.cat-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid rgba(var(--black-rgb), 0.1);
+}
+
+.cat-modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink);
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.cat-modal-close:hover {
+    background: rgba(var(--black-rgb), 0.08);
+}
+
+.cat-modal-list {
+    list-style: none;
+    margin: 0;
+    padding: 8px 12px 12px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.cat-modal-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    color: var(--ink);
+    transition: background 0.15s, color 0.15s;
+}
+
+.cat-modal-item:hover {
+    background: rgba(var(--black-rgb), 0.06);
+}
+
+.cat-modal-item--active {
+    background: var(--brand-red);
+    color: white;
+    font-weight: 600;
+}
+
+.cat-modal-item--active:hover {
+    background: var(--brand-red);
+    filter: brightness(1.1);
 }
 
 /* We removed .side-tabs--left-bottom since health tabs are now part of the uniform side-tabs-grid */

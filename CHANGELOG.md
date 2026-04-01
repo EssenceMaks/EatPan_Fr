@@ -5,6 +5,28 @@
 
 ---
 
+## [0.5.4] - 2026-04-02
+
+### Changed
+
+- **Ribbon columns capped to 2** — `MAX_RIBBON_COLS = 2` у `PageLeft.js`: кількість `side-tabs-bg-sheet` і колонок `side-tab--left` ніколи не перевищує двох.
+- **Overflow hiding with "show all" tab** — якщо категорій більше ніж вміщується в 2 колонки, зайві приховуються; з'являється вкладка-список (зелена, іконка `list`), яка відкриває модальне вікно з усіма категоріями (іконка + текстова назва). Якщо обрана прихована категорія — її вкладка показується замість вкладки-списку.
+- **Toggle category** — повторний клік на активну вкладку категорії деактивує її (повертає до `'all'`). Окрему reset-вкладку «X» зверху прибрано.
+- **Removed excessive ribbon top offset** — `ResizeObserver` використовує фіксований `topMargin = 12px` замість `categoriesEl.offsetTop` (100–150px).
+- **Background sheets aligned to book edges** — `side-tabs-bg-wrapper` має `top: 0; bottom: 0` замість `top: -1.5rem; bottom: -2.5rem`.
+- **ResizeObserver** тепер зберігає `ribbonAvailableHeight` у стейт для розрахунку слотів у `template()`.
+- **Category modal** — нове модальне вікно `.cat-modal` зі списком усіх категорій; стилі додано в `ribbons.css`.
+
+### Documentation
+
+- Додано файл `docs/features/page-left-ribbons.md` з описом логіки лівих вкладок `PageLeft`.
+- Оновлено `docs/tasks.md`.
+
+**Назва коміту:**
+`fix: side-tabs ribbon layout`
+
+---
+
 ## [0.5.3] - 2026-03-28
 
 ### Added
