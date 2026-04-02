@@ -26,17 +26,26 @@
 
 .side-tabs-bg-sheet {
     background: repeating-linear-gradient(to right,
-            rgba(var(--black-rgb), 0.15) 0px,
-            rgba(var(--black-rgb), 0.05) 2px,
+            /* rgba(var(--black-rgb), 0.15) 0px, */
+            /* rgba(var(--black-rgb), 0.05) 2px, */
             var(--parchment) 5px,
             var(--parchment) 70px);
-    border-radius: 18px 0 0 18px;
-    box-shadow: -4px 5px 15px rgba(var(--black-rgb), 0.2);
+    border-radius: 4px 0 0 4px;
+    box-shadow:
+        inset -30px 0 40px rgba(var(--black-rgb), 0.1),
+        -1px 2px 0 0 var(--bg-book-page, var(--parchment)),
+        -2px 3px 0 0 rgba(var(--black-rgb), 0.1),
+        -2px 4px 0 0 var(--bg-book-page, var(--parchment)),
+        -3px 5px 0 0 rgba(var(--black-rgb), 0.1),
+        -3px 6px 0 0 var(--bg-book-page, var(--parchment)),
+        -4px 7px 0 0 rgba(var(--black-rgb), 0.1),
+        -6px 10px 20px rgba(var(--black-rgb), 0.3);
     z-index: -1;
     position: relative;
     width: 65px;
     margin-right: -10px;
 }
+
 
 .side-tab--left {
     position: relative;
@@ -45,7 +54,11 @@
     background: var(--tab-bg);
     color: var(--ink);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 0.3s ease,
+                background 0.3s ease,
+                color 0.3s ease,
+                box-shadow 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -54,6 +67,43 @@
     transform-origin: right center;
     box-shadow: -2px 2px 5px rgba(var(--black-rgb), 0.3);
     filter: brightness(0.9);
+}
+
+.side-tab-text-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    font-family: 'Nunito', 'Rounded Mplus 1c', system-ui, sans-serif;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    padding-right: 3px;
+}
+
+@keyframes ribbonFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes ribbonActiveSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(8px);
+    }
+}
+
+.side-tabs-grid-inner .side-tab--left {
+    animation: ribbonFadeIn 0.25s ease both;
+}
+
+.side-tabs-grid-inner .side-tab--left.active {
+    animation: ribbonActiveSlideIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .side-tab--left:hover {
@@ -67,6 +117,10 @@
     transform: translateX(8px);
     filter: brightness(1.1);
     box-shadow: -5px 5px 15px rgba(var(--black-rgb), 0.4);
+}
+
+.side-tab--left.active .side-tab-text-label {
+    color: white;
 }
 
 /* Dim all other tabs when one is active */
@@ -121,7 +175,7 @@
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.45);
-    z-index: 9999;
+    z-index: 100000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -136,7 +190,15 @@
 .cat-modal {
     background: var(--parchment, #f5f0e1);
     border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    box-shadow:
+        inset -30px 0 40px rgba(var(--black-rgb), 0.1),
+        -1px 2px 0 0 var(--bg-book-page),
+        -2px 3px 0 0 rgba(var(--black-rgb), 0.1),
+        -2px 4px 0 0 var(--bg-book-page),
+        -3px 5px 0 0 rgba(var(--black-rgb), 0.1),
+        -3px 6px 0 0 var(--bg-book-page),
+        -4px 7px 0 0 rgba(var(--black-rgb), 0.1),
+        -6px 10px 20px rgba(var(--black-rgb), 0.3);
     width: 340px;
     max-width: 90vw;
     max-height: 70vh;
@@ -182,6 +244,25 @@
     padding: 8px 12px 12px;
     overflow-y: auto;
     flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(var(--black-rgb), 0.25) transparent;
+}
+
+.cat-modal-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cat-modal-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cat-modal-list::-webkit-scrollbar-thumb {
+    background: rgba(var(--black-rgb), 0.25);
+    border-radius: 3px;
+}
+
+.cat-modal-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--black-rgb), 0.4);
 }
 
 .cat-modal-item {
@@ -210,6 +291,28 @@
 .cat-modal-item--active:hover {
     background: var(--brand-red);
     filter: brightness(1.1);
+}
+
+.cat-modal-subheading {
+    padding: 14px 12px 6px;
+    font-family: var(--font-serif);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(var(--black-rgb), 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-top: 1px solid rgba(var(--black-rgb), 0.08);
+    margin-top: 6px;
+    list-style: none;
+}
+
+.cat-modal-item--health {
+    cursor: default;
+    opacity: 0.85;
+}
+
+.cat-modal-item--health:hover {
+    background: rgba(var(--black-rgb), 0.03);
 }
 
 /* We removed .side-tabs--left-bottom since health tabs are now part of the uniform side-tabs-grid */
@@ -365,13 +468,15 @@
 
 /* LEFT BOTTOM RIBBONS */
 .bookmark-bottom-group-left {
-    position: absolute;
-    right: 40px;
-    bottom: -5px;
     display: flex;
     gap: 16px;
     z-index: 100;
     align-items: flex-end;
+    justify-content: flex-end;
+    align-self: end;
+    padding-right: 40px;
+    margin-bottom: -2.5rem;
+    padding-bottom: 0;
 }
 
 .bookmark-bottom-left {
@@ -448,6 +553,49 @@
 .bookmark-bottom-left.shopping.active {
     background: var(--accent);
     color: white;
+}
+
+/* Shrink bottom ribbons on short screens */
+@media (max-height: 750px) {
+    .bookmark-bottom-group-left {
+        gap: 10px;
+    }
+    .bookmark-bottom-left {
+        width: 30px;
+        height: 70px;
+        padding-top: 14px;
+    }
+    .bookmark-bottom-left:hover {
+        height: 78px;
+    }
+    .bookmark-bottom-left.active {
+        height: 88px;
+    }
+    .bookmark-bottom-left [data-lucide] {
+        width: 20px !important;
+        height: 20px !important;
+    }
+}
+
+@media (max-height: 600px) {
+    .bookmark-bottom-group-left {
+        gap: 6px;
+    }
+    .bookmark-bottom-left {
+        width: 26px;
+        height: 50px;
+        padding-top: 10px;
+    }
+    .bookmark-bottom-left:hover {
+        height: 56px;
+    }
+    .bookmark-bottom-left.active {
+        height: 64px;
+    }
+    .bookmark-bottom-left [data-lucide] {
+        width: 16px !important;
+        height: 16px !important;
+    }
 }
 
 /* TOP TABS */

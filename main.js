@@ -322,6 +322,15 @@ function getCurrentOriginalBlock() {
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+        // Close any open modal overlay first (category modal, future modals, etc.)
+        const openModal = document.querySelector('.cat-modal-overlay[style*="display: flex"], .cat-modal-overlay[style*="display:flex"]');
+        if (openModal) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (window.closeCategoryModal) window.closeCategoryModal();
+            return;
+        }
+
         const createModeBook = document.querySelector('.book-cover.book--create-mode');
         if (createModeBook) {
             event.preventDefault();

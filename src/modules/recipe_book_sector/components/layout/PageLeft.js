@@ -18,10 +18,18 @@ export default class PageLeft extends Component {
         };
 
         window.openCategoryModal = () => {
-            const overlay = document.getElementById('catModalOverlay');
-            if (overlay) {
-                overlay.style.display = 'flex';
-                if (window.lucide) window.lucide.createIcons({ root: overlay });
+            const bodyModal = document.body.querySelector(':scope > #catModalOverlay');
+            const componentModal = document.querySelector('.page--left #catModalOverlay');
+
+            if (componentModal) {
+                // Fresh modal from re-render — remove stale body one, use fresh
+                if (bodyModal) bodyModal.remove();
+                document.body.appendChild(componentModal);
+                componentModal.style.display = 'flex';
+                if (window.lucide) window.lucide.createIcons({ root: componentModal });
+            } else if (bodyModal) {
+                // No re-render happened — reuse hidden body modal
+                bodyModal.style.display = 'flex';
             }
         };
         window.closeCategoryModal = () => {
@@ -277,12 +285,14 @@ export default class PageLeft extends Component {
             { id: 'bads', title: 'Бади', icon: 'pill', color: '' },
             { id: 'first-aid', title: 'Аптечка', icon: 'circle-plus', color: 'var(--brand-red)' },
             { id: 'allergens', title: 'Алергени', icon: 'alert-triangle', color: 'var(--brand-red)' },
-            { id: 'e-additives', title: 'Е-Добавки', icon: 'skull', color: 'var(--brand-red)', extra: 'E' }
+            { id: 'e-additives', title: 'Е-Добавки', icon: '', color: 'var(--brand-red)', textLabel: 'E' }
         ];
 
         const MAX_RIBBON_COLS = 2;
-        const ROW_H = 35;
-        const ROW_GAP = 6;
+        const BASE_ROW_H = 35;
+        const BASE_ROW_GAP = 6;
+        const MIN_ROW_H = 24;
+        const MIN_ROW_GAP = 4;
 
         // Dynamically add visual spacers only if we have room
         if ((this.state.maxRibbonRows || 9) >= 6) {
@@ -296,39 +306,53 @@ export default class PageLeft extends Component {
 
         // Available pixel height for the ribbons grid
         const ribbonAvailH = this.state.ribbonAvailableHeight || 420;
-        let maxRows = Math.floor((ribbonAvailH + ROW_GAP) / (ROW_H + ROW_GAP));
+
+        // Start with base sizes
+        let rowH = BASE_ROW_H;
+        let rowGap = BASE_ROW_GAP;
+        let maxRows = Math.floor((ribbonAvailH + rowGap) / (rowH + rowGap));
         if (maxRows < 5) maxRows = 5;
 
-        // Slots available for category tabs
+        // Slots available for category tabs (rightmost col shares with health tabs)
         let rightmostCatSlots = maxRows - healthTabsLen;
         if (rightmostCatSlots < 0) rightmostCatSlots = 0;
 
+        // Always reserve 1 slot for the "show all" list tab
         let requiredCols = 1;
-        let cLeft = allCats.length - rightmostCatSlots;
+        let catCountWithListTab = allCats.length + 1; // +1 for list tab
+        let cLeft = catCountWithListTab - rightmostCatSlots;
         while (cLeft > 0 && requiredCols < MAX_RIBBON_COLS) {
             requiredCols++;
             cLeft -= maxRows;
         }
 
-        // Total category slots available at base size across capped columns
-        const totalCatSlots = rightmostCatSlots + (requiredCols - 1) * maxRows;
+        // Total slots available across capped columns
+        let totalSlots = rightmostCatSlots + (requiredCols - 1) * maxRows;
 
-        // Determine if we need a "show all" tab (overflow case)
-        const hasOverflow = allCats.length > totalCatSlots;
-        // Reserve 1 slot for the "show all" tab when overflowing
-        const visibleCatLimit = hasOverflow ? totalCatSlots - 1 : totalCatSlots;
+        // If categories + list tab don't fit at base size, shrink row height & gap
+        if (catCountWithListTab > totalSlots) {
+            const neededRows = Math.max(healthTabsLen, Math.ceil(catCountWithListTab / MAX_RIBBON_COLS) + healthTabsLen);
+            rowGap = MIN_ROW_GAP;
+            rowH = Math.floor((ribbonAvailH - (neededRows - 1) * rowGap) / neededRows);
+            if (rowH < MIN_ROW_H) rowH = MIN_ROW_H;
+            maxRows = Math.floor((ribbonAvailH + rowGap) / (rowH + rowGap));
+            if (maxRows < neededRows) maxRows = neededRows;
+            rightmostCatSlots = maxRows - healthTabsLen;
+            if (rightmostCatSlots < 0) rightmostCatSlots = 0;
+            totalSlots = rightmostCatSlots + (requiredCols - 1) * maxRows;
+        }
 
-        // Determine which categories are visible as ribbon tabs
+        // Visible cats: reserve 1 slot for list tab; hide overflow
+        const visibleCatLimit = totalSlots - 1; // -1 for list tab
         let visibleCats = allCats.slice(0, visibleCatLimit);
         const hiddenCats = allCats.slice(visibleCatLimit);
 
-        // If active category is hidden, show it instead of the "show all" tab
+        // If active category is hidden, swap it in (replaces last visible cat)
         const activeIsHidden = cat !== 'all' && hiddenCats.includes(cat);
-        let showListTab = hasOverflow && !activeIsHidden;
-
-        // If active category was hidden, add it to visible list (it replaces the list tab slot)
-        if (activeIsHidden) {
-            visibleCats = [...visibleCats, cat];
+        if (activeIsHidden && visibleCats.length > 0) {
+            visibleCats[visibleCats.length - 1] = cat;
+        } else if (activeIsHidden) {
+            visibleCats = [cat];
         }
 
         // Place visible category ribbons into grid positions
@@ -353,25 +377,22 @@ export default class PageLeft extends Component {
             activeCols.add(targetCol);
         });
 
-        // Place "show all" list tab in the next available slot (after visible cats)
-        let listTabHTML = '';
-        if (showListTab) {
-            if (targetCol === requiredCols && targetRow > rightmostCatSlots) {
-                targetCol--;
-                targetRow = 1;
-                activeCols.add(targetCol);
-            } else if (targetCol < requiredCols && targetRow > maxRows) {
-                targetCol--;
-                targetRow = 1;
-                activeCols.add(targetCol);
-            }
-            if (targetCol < 1) targetCol = 1;
-            listTabHTML = `
-                <div class="side-tab--left side-tab--list-all" style="grid-column: ${targetCol}; grid-row: ${targetRow}; z-index:999; height: ${ROW_H}px;" title="Усі категорії" onclick="window.openCategoryModal()">
-                    <i data-lucide="list" style="width: 18px;"></i>
-                </div>`;
+        // Always place "show all" list tab after visible cats
+        if (targetCol === requiredCols && targetRow > rightmostCatSlots) {
+            targetCol--;
+            targetRow = 1;
+            activeCols.add(targetCol);
+        } else if (targetCol < requiredCols && targetRow > maxRows) {
+            targetCol--;
+            targetRow = 1;
             activeCols.add(targetCol);
         }
+        if (targetCol < 1) targetCol = 1;
+        const listTabHTML = `
+            <div class="side-tab--left side-tab--list-all" style="grid-column: ${targetCol}; grid-row: ${targetRow}; z-index:999; height: ${rowH}px;" title="Усі категорії" onclick="window.openCategoryModal()">
+                <i data-lucide="list" style="width: ${rowH <= 26 ? 14 : 18}px;"></i>
+            </div>`;
+        activeCols.add(targetCol);
 
         const coverPadding = requiredCols * 55 + (requiredCols - 1) * 15 + 40;
         const bookCover = document.querySelector('.book-cover');
@@ -384,11 +405,16 @@ export default class PageLeft extends Component {
             <div class="side-tabs-bg-sheet" style="grid-column: ${col}; grid-row: 1 / -1;"></div>
         `).join('');
 
+        const iconSize = rowH <= 26 ? 14 : 18;
+
         const healthTabsHTML = healthTabsDef.map((ht, idx) => {
             if (ht.invisible) return '';
+            const content = ht.textLabel
+                ? `<span class="side-tab-text-label" style="width: ${iconSize}px; height: ${iconSize}px; font-size: ${iconSize}px; ${ht.color ? `color: ${ht.color};` : ''}">${ht.textLabel}</span>`
+                : `<i data-lucide="${ht.icon}" style="width: ${iconSize}px; ${ht.color ? `color: ${ht.color};` : ''}"></i>`;
             return `
-            <div class="side-tab--left" title="${ht.title}" style="grid-column: ${requiredCols}; grid-row: ${(maxRows - healthTabsLen + 1) + idx}; height: ${ROW_H}px;">
-                <i data-lucide="${ht.icon}" style="width: 18px; ${ht.color ? `color: ${ht.color};` : ''}"></i>${ht.extra ? ht.extra : ''}
+            <div class="side-tab--left" title="${ht.title}" style="grid-column: ${requiredCols}; grid-row: ${(maxRows - healthTabsLen + 1) + idx}; height: ${rowH}px;">
+                ${content}
             </div>
             `;
         }).join('');
@@ -399,13 +425,14 @@ export default class PageLeft extends Component {
                 ? "window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })"
                 : `window.setPageLeftState({ activeCategory: '${rib.name.replace(/'/g, "\\\'")}', viewMode: 'list' })`;
             return `
-                <div class="side-tab--left ${isActive ? 'active' : ''}" style="grid-column: ${rib.col}; grid-row: ${rib.row}; z-index:${100 - i}; height: ${ROW_H}px;" title="${rib.name}" onclick="${clickAction}">
-                    <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(rib.name) : 'utensils'}" style="width: 18px;"></i>
+                <div class="side-tab--left ${isActive ? 'active' : ''}" style="grid-column: ${rib.col}; grid-row: ${rib.row}; z-index:${100 - i}; height: ${rowH}px;" title="${rib.name}" onclick="${clickAction}">
+                    <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(rib.name) : 'utensils'}" style="width: ${iconSize}px;"></i>
                 </div>`;
         }).join('');
 
-        // Modal with all categories (icon + text name)
+        // Modal with all categories + health tabs (icon + text name)
         const getIcon = (name) => window.getMainGroupIconDef ? window.getMainGroupIconDef(name) : 'utensils';
+        const visibleHealthTabs = healthTabsDef.filter(h => !h.invisible);
         const categoryModalHTML = `
             <div class="cat-modal-overlay" id="catModalOverlay" style="display:none;" onclick="window.closeCategoryModal()">
                 <div class="cat-modal" onclick="event.stopPropagation()">
@@ -420,6 +447,15 @@ export default class PageLeft extends Component {
                             <li class="cat-modal-item ${cat === c ? 'cat-modal-item--active' : ''}" onclick="window.closeCategoryModal(); window.setPageLeftState({ activeCategory: '${c.replace(/'/g, "\\'")}', viewMode: 'list' })">
                                 <i data-lucide="${getIcon(c)}" style="width:20px; height:20px; flex-shrink:0;"></i>
                                 <span>${c}</span>
+                            </li>
+                        `).join('')}
+                        <li class="cat-modal-subheading">Здоров'я</li>
+                        ${visibleHealthTabs.map(ht => `
+                            <li class="cat-modal-item cat-modal-item--health">
+                                ${ht.textLabel
+                                    ? `<span style="width:20px; height:20px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; ${ht.color ? `color: ${ht.color};` : ''}">${ht.textLabel}</span>`
+                                    : `<i data-lucide="${ht.icon}" style="width:20px; height:20px; flex-shrink:0; ${ht.color ? `color: ${ht.color};` : ''}"></i>`}
+                                <span>${ht.title}</span>
                             </li>
                         `).join('')}
                     </ul>
@@ -462,10 +498,10 @@ export default class PageLeft extends Component {
 
                 <!-- LEFT SIDE RIBBONS GRID -->
                 <aside class="side-tabs-grid grid-side_ribbons">
-                    <div class="side-tabs-bg-wrapper" style="position: absolute; right: 24px; top: 0; bottom: 0; display: grid; grid-template-columns: repeat(${requiredCols}, 55px); column-gap: 15px; direction: ltr; justify-content: end; z-index: -1;">
+                    <div class="side-tabs-bg-wrapper" style="position: absolute; right: 24px; top: -1.5rem; bottom: -2.5rem; display: grid; grid-template-columns: repeat(${requiredCols}, 55px); column-gap: 15px; direction: ltr; justify-content: end; z-index: -1;">
                         ${bgSheetsHTML}
                     </div>
-                    <div class="side-tabs-grid-inner" style="grid-template-columns: repeat(${requiredCols}, 55px); grid-template-rows: repeat(${maxRows}, ${ROW_H}px); gap: ${ROW_GAP}px 15px;">
+                    <div class="side-tabs-grid-inner" style="grid-template-columns: repeat(${requiredCols}, 55px); grid-template-rows: repeat(${maxRows}, ${rowH}px); gap: ${rowGap}px 15px;">
                         ${ribbonsHTML}
                         ${listTabHTML}
                         ${healthTabsHTML}
@@ -633,7 +669,7 @@ export default class PageLeft extends Component {
             const ribbonsContainer = this.element.querySelector('.side-tabs-grid');
             const liveInner = this.element.querySelector('.side-tabs-grid-inner');
             if (ribbonsContainer && liveInner) {
-                const topMargin = 12;
+                const topMargin = 0;
                 liveInner.style.top = `${topMargin}px`;
 
                 const availableHeight = ribbonsContainer.clientHeight - topMargin - 10;

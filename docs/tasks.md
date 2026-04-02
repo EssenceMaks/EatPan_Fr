@@ -71,6 +71,7 @@
 - [x] Document PageLeft ribbon grid and responsive side-tab layout rules
 - [x] Cap left ribbon columns to max 2, toggle category on repeat click
 - [x] Add "show all categories" tab + modal for overflow; hidden active category swaps with list tab
+- [x] Fullscreen category modal, smoother tab transitions, E-text-label, responsive bottom ribbons
 
 #### Project Maintenance
 
