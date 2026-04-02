@@ -72,6 +72,8 @@
 - [x] Cap left ribbon columns to max 2, toggle category on repeat click
 - [x] Add "show all categories" tab + modal for overflow; hidden active category swaps with list tab
 - [x] Fullscreen category modal, smoother tab transitions, E-text-label, responsive bottom ribbons
+- [x] Columns tuck under page (book-like depth), remove gray dimming on active tab, .side-tab--no-content for empty tabs
+- [x] Fix z-index stacking (bg-sheets under page edge), remove animation jump on re-render, add list tab active state
 
 #### Project Maintenance
 

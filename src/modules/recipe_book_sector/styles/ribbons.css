@@ -25,14 +25,10 @@
 }
 
 .side-tabs-bg-sheet {
-    background: repeating-linear-gradient(to right,
-            /* rgba(var(--black-rgb), 0.15) 0px, */
-            /* rgba(var(--black-rgb), 0.05) 2px, */
-            var(--parchment) 5px,
-            var(--parchment) 70px);
+    background: var(--parchment);
     border-radius: 4px 0 0 4px;
     box-shadow:
-        inset -30px 0 40px rgba(var(--black-rgb), 0.1),
+        inset -20px 0 30px rgba(var(--black-rgb), 0.08),
         -1px 2px 0 0 var(--bg-book-page, var(--parchment)),
         -2px 3px 0 0 rgba(var(--black-rgb), 0.1),
         -2px 4px 0 0 var(--bg-book-page, var(--parchment)),
@@ -40,12 +36,15 @@
         -3px 6px 0 0 var(--bg-book-page, var(--parchment)),
         -4px 7px 0 0 rgba(var(--black-rgb), 0.1),
         -6px 10px 20px rgba(var(--black-rgb), 0.3);
-    z-index: -1;
     position: relative;
     width: 65px;
     margin-right: -10px;
 }
 
+/* Wrapper is inside .page--left. Sits behind tabs (z-index: 5) but above page background */
+.side-tabs-bg-wrapper {
+    z-index: 0;
+}
 
 .side-tab--left {
     position: relative;
@@ -82,11 +81,6 @@
     padding-right: 3px;
 }
 
-@keyframes ribbonFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
 @keyframes ribbonActiveSlideIn {
     from {
         opacity: 0;
@@ -96,10 +90,6 @@
         opacity: 1;
         transform: translateX(8px);
     }
-}
-
-.side-tabs-grid-inner .side-tab--left {
-    animation: ribbonFadeIn 0.25s ease both;
 }
 
 .side-tabs-grid-inner .side-tab--left.active {
@@ -123,12 +113,26 @@
     color: white;
 }
 
-/* Dim all other tabs when one is active */
-.side-tabs-grid:has(.side-tab--left.active) .side-tab--left:not(.active):not(.tab-clear-active):not(.side-tabs-bg-sheet) {
-    background: var(--ribbon-base-bg);
-    color: rgba(var(--ribbon-base-rgb), 0.5);
+/* List tab active state when viewing "all" categories */
+.side-tab--list-all.active {
+    background: #4a4a4a;
+    color: white;
+    transform: translateX(8px);
+    filter: brightness(1.1);
+    box-shadow: -5px 5px 15px rgba(var(--black-rgb), 0.4);
+}
+
+.side-tab--list-all.active i {
+    color: white !important;
+}
+
+/* Tabs without content — always look dimmed/disabled */
+.side-tab--no-content {
+    background: var(--ribbon-base-bg, rgba(var(--black-rgb), 0.08));
+    color: rgba(var(--black-rgb), 0.35);
     box-shadow: none;
-    filter: grayscale(0.6) brightness(0.9);
+    filter: grayscale(0.5) brightness(0.92);
+    cursor: default;
 }
 
 /* Clear Tab stands out in its own way (acting like the main active component but for Reset) */

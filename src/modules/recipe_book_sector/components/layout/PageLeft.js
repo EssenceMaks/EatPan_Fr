@@ -31,10 +31,16 @@ export default class PageLeft extends Component {
                 // No re-render happened — reuse hidden body modal
                 bodyModal.style.display = 'flex';
             }
+            // Activate list tab when modal is open
+            const listTab = document.querySelector('.side-tab--list-all');
+            if (listTab) listTab.classList.add('active');
         };
         window.closeCategoryModal = () => {
             const overlay = document.getElementById('catModalOverlay');
             if (overlay) overlay.style.display = 'none';
+            // Deactivate list tab when modal closes
+            const listTab = document.querySelector('.side-tab--list-all');
+            if (listTab) listTab.classList.remove('active');
         };
 
         window.onRecipeSelectCall = (recipeId) => {
@@ -389,21 +395,21 @@ export default class PageLeft extends Component {
         }
         if (targetCol < 1) targetCol = 1;
         const listTabHTML = `
-            <div class="side-tab--left side-tab--list-all" style="grid-column: ${targetCol}; grid-row: ${targetRow}; z-index:999; height: ${rowH}px;" title="Усі категорії" onclick="window.openCategoryModal()">
+            <div class="side-tab--left side-tab--list-all" style="grid-column: ${targetCol}; grid-row: ${targetRow}; height: ${rowH}px;" title="Усі категорії" onclick="window.openCategoryModal()">
                 <i data-lucide="list" style="width: ${rowH <= 26 ? 14 : 18}px;"></i>
             </div>`;
         activeCols.add(targetCol);
+
+        // Generate background sheets for each active column
+        const bgSheetsHTML = Array.from(activeCols).map(col => `
+            <div class="side-tabs-bg-sheet" style="grid-column: ${col}; grid-row: 1 / -1;"></div>
+        `).join('');
 
         const coverPadding = requiredCols * 55 + (requiredCols - 1) * 15 + 40;
         const bookCover = document.querySelector('.book-cover');
         if (bookCover) {
             bookCover.style.paddingLeft = `${coverPadding}px`;
         }
-
-        // Generate background sheets
-        const bgSheetsHTML = Array.from(activeCols).map(col => `
-            <div class="side-tabs-bg-sheet" style="grid-column: ${col}; grid-row: 1 / -1;"></div>
-        `).join('');
 
         const iconSize = rowH <= 26 ? 14 : 18;
 
@@ -413,7 +419,7 @@ export default class PageLeft extends Component {
                 ? `<span class="side-tab-text-label" style="width: ${iconSize}px; height: ${iconSize}px; font-size: ${iconSize}px; ${ht.color ? `color: ${ht.color};` : ''}">${ht.textLabel}</span>`
                 : `<i data-lucide="${ht.icon}" style="width: ${iconSize}px; ${ht.color ? `color: ${ht.color};` : ''}"></i>`;
             return `
-            <div class="side-tab--left" title="${ht.title}" style="grid-column: ${requiredCols}; grid-row: ${(maxRows - healthTabsLen + 1) + idx}; height: ${rowH}px;">
+            <div class="side-tab--left side-tab--no-content" title="${ht.title}" style="grid-column: ${requiredCols}; grid-row: ${(maxRows - healthTabsLen + 1) + idx}; height: ${rowH}px;">
                 ${content}
             </div>
             `;
@@ -425,7 +431,7 @@ export default class PageLeft extends Component {
                 ? "window.setPageLeftState({ activeCategory: 'all', viewMode: 'grid' })"
                 : `window.setPageLeftState({ activeCategory: '${rib.name.replace(/'/g, "\\\'")}', viewMode: 'list' })`;
             return `
-                <div class="side-tab--left ${isActive ? 'active' : ''}" style="grid-column: ${rib.col}; grid-row: ${rib.row}; z-index:${100 - i}; height: ${rowH}px;" title="${rib.name}" onclick="${clickAction}">
+                <div class="side-tab--left ${isActive ? 'active' : ''}" style="grid-column: ${rib.col}; grid-row: ${rib.row}; height: ${rowH}px;" title="${rib.name}" onclick="${clickAction}">
                     <i data-lucide="${window.getMainGroupIconDef ? window.getMainGroupIconDef(rib.name) : 'utensils'}" style="width: ${iconSize}px;"></i>
                 </div>`;
         }).join('');
@@ -498,7 +504,7 @@ export default class PageLeft extends Component {
 
                 <!-- LEFT SIDE RIBBONS GRID -->
                 <aside class="side-tabs-grid grid-side_ribbons">
-                    <div class="side-tabs-bg-wrapper" style="position: absolute; right: 24px; top: -1.5rem; bottom: -2.5rem; display: grid; grid-template-columns: repeat(${requiredCols}, 55px); column-gap: 15px; direction: ltr; justify-content: end; z-index: -1;">
+                    <div class="side-tabs-bg-wrapper" style="position: absolute; right: -8px; top: -1.5rem; bottom: -2.5rem; display: grid; grid-template-columns: repeat(${requiredCols}, 55px); column-gap: 5px; direction: rtl; justify-content: end;">
                         ${bgSheetsHTML}
                     </div>
                     <div class="side-tabs-grid-inner" style="grid-template-columns: repeat(${requiredCols}, 55px); grid-template-rows: repeat(${maxRows}, ${rowH}px); gap: ${rowGap}px 15px;">
