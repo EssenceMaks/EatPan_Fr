@@ -5,6 +5,32 @@
 
 ---
 
+## [0.5.4] - 2026-04-02
+
+### Changed
+
+- **Ribbon columns capped to 2** — `MAX_RIBBON_COLS = 2` у `PageLeft.js`: кількість `side-tabs-bg-sheet` і колонок `side-tab--left` ніколи не перевищує двох.
+- **Always-visible "show all" tab** — вкладка-список (зелена, іконка `list`) відображається завжди, навіть якщо усі категорії вміщуються. При переповненні зайві категорії приховуються; якщо обрана прихована категорія — її прапорець показується замість останньої видимої.
+- **Dynamic row sizing** — на невисоких екранах висота вкладок і gap автоматично зменшуються (мін. 24px/2px), щоб вмістити більше рядків.
+- **Toggle category** — повторний клік на активну вкладку категорії деактивує її (повертає до `'all'`). Окрему reset-вкладку «X» зверху прибрано.
+- **Removed excessive ribbon top offset** — `ResizeObserver` використовує фіксований `topMargin = 12px` замість `categoriesEl.offsetTop` (100–150px).
+- **Background sheets match page height** — `side-tabs-bg-wrapper` має `top: -1.5rem; bottom: -2.5rem`, щоб компенсувати padding сторінки і колонки були однакової висоти з нею.
+- **ResizeObserver** тепер зберігає `ribbonAvailableHeight` у стейт для розрахунку слотів у `template()`.
+- **Category modal** — модальне вікно `.cat-modal` зі списком усіх категорій + секція «Здоров'я» з healthTab; box-shadow як у `.page--left`, `z-index: 100000`, скролбар для списку. Модалка переноситься в `document.body` і відкривається на весь екран.
+- **Smoother tab transitions** — `transition` на `.side-tab--left` розбито на окремі властивості з `cubic-bezier(0.4,0,0.2,1)` для плавнішого переходу між активним/неактивним станом.
+- **E-additives tab** — прибрано іконку `skull`, залишено лише букву «E» вирівняну як іконка (`.side-tab-text-label`).
+- **Responsive bottom ribbons** — `@media (max-height: 750px)` і `(max-height: 600px)` зменшують висоту, gap і іконки `.bookmark-bottom-left`.
+
+### Documentation
+
+- Додано файл `docs/features/page-left-ribbons.md` з описом логіки лівих вкладок `PageLeft`.
+- Оновлено `docs/tasks.md`.
+
+**Назва коміту:**
+`fix: side-tabs ribbon layout`
+
+---
+
 ## [0.5.3] - 2026-03-28
 
 ### Added
