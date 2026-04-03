@@ -457,7 +457,8 @@ export default class HeaderAuthModule extends Component {
                 }
 
                 try {
-                    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+                    const currentUrl = window.location.origin + window.location.pathname;
+                    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup?redirect_to=${encodeURIComponent(currentUrl)}`, {
                         method: 'POST',
                         headers: {
                             'apikey': SUPABASE_ANON_KEY,
