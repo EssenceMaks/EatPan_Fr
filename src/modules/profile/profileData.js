@@ -70,9 +70,24 @@ function normalizeRecipe(recipe, index) {
     };
 }
 
+function getCurrentUserId() {
+    try {
+        const raw = window.localStorage.getItem('eatpan_header_auth_user');
+        if (raw) {
+            const user = JSON.parse(raw);
+            return user?.id || 'guest';
+        }
+    } catch {}
+    return 'guest';
+}
+
+function getLikesKey() {
+    return `eatpan_liked_recipes_${getCurrentUserId()}`;
+}
+
 export function getLikedRecipeIds() {
     try {
-        const raw = window.localStorage.getItem('eatpan_liked_recipes');
+        const raw = window.localStorage.getItem(getLikesKey());
         return raw ? JSON.parse(raw) : [];
     } catch {
         return [];
@@ -87,7 +102,7 @@ export function toggleLikeRecipe(id) {
     } else {
         likes.push(id);
     }
-    window.localStorage.setItem('eatpan_liked_recipes', JSON.stringify(likes));
+    window.localStorage.setItem(getLikesKey(), JSON.stringify(likes));
     
     // Auto-update profile page if it's open
     if (window.profileModule && window.profileModule.element) {
