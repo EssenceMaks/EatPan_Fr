@@ -1004,6 +1004,9 @@ window.saveRecipe = async function() {
                     window.globalActiveRecipe = { id: result.id, data: result.data }; // Update locally
                     await window.activeBookModule.loadData();
                 }
+                if (window.profileModule && typeof window.profileModule.refresh === 'function') {
+                    await window.profileModule.refresh();
+                }
             } else {
                 alert('Помилка при оновленні рецепту. Сервер не повернув 200.');
             }
@@ -1020,6 +1023,10 @@ window.saveRecipe = async function() {
                     await window.activeBookModule.loadData();
                 } else {
                     window.location.reload();
+                }
+                
+                if (window.profileModule && typeof window.profileModule.refresh === 'function') {
+                    await window.profileModule.refresh();
                 }
             } else {
                 console.error('Failed response:', result);

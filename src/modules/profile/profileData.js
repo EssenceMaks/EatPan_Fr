@@ -64,22 +64,61 @@ function normalizeRecipe(recipe, index) {
         category: String(data.category || '').trim() || 'Без категорії',
         time: String(data.time_str || '').trim() || '25 хв',
         books: Array.isArray(data.books) ? data.books.filter(Boolean) : [],
-        cover: `linear-gradient(135deg, rgba(107, 13, 18, ${0.78 - (index % 3) * 0.08}), rgba(128, 85, 51, 0.94))`
+        cover: `linear-gradient(135deg, rgba(107, 13, 18, ${0.78 - (index % 3) * 0.08}), rgba(128, 85, 51, 0.94))`,
+        author_username: recipe?.author_username,
+        is_public: recipe?.is_public
     };
+}
+
+export function getLikedRecipeIds() {
+    try {
+        const raw = window.localStorage.getItem('eatpan_liked_recipes');
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+}
+
+export function toggleLikeRecipe(id) {
+    const likes = getLikedRecipeIds();
+    const index = likes.indexOf(id);
+    if (index > -1) {
+        likes.splice(index, 1);
+    } else {
+        likes.push(id);
+    }
+    window.localStorage.setItem('eatpan_liked_recipes', JSON.stringify(likes));
+    
+    // Auto-update profile page if it's open
+    if (window.profileModule && window.profileModule.element) {
+        window.profileModule.loadProfile();
+    }
 }
 
 export function buildProfilePayload(user, recipes = []) {
     const email = normalizeEmail(user?.email || DEFAULT_PROFILE.email);
     const name = String(user?.name || '').trim() || buildDisplayName(email) || DEFAULT_PROFILE.name;
     const normalizedRecipes = recipes.map(normalizeRecipe);
-    const ownRecipes = normalizedRecipes.slice(0, 6);
-    const fallbackFavoritesSource = normalizedRecipes.length > 6
-        ? normalizedRecipes.slice(2)
-        : normalizedRecipes;
-    const favoriteRecipes = fallbackFavoritesSource.slice(0, 6);
-    const followers = 120 + normalizedRecipes.length * 3;
-    const following = 32 + normalizedRecipes.length;
-    const collections = new Set(normalizedRecipes.flatMap(recipe => recipe.books)).size || 3;
+    
+    // User ID is available from Supabase payload (user.id). 
+    // This perfectly matches the Django username.
+    const userId = user?.id || null;
+    const ownRecipes = normalizedRecipes.filter(r => r.author_username === userId);
+    
+    const likedIds = getLikedRecipeIds();
+    const favoriteRecipes = normalizedRecipes.filter(r => likedIds.includes(String(r.id)));
+
+    const followers = 0;
+    const following = 0;
+
+    const myGroups = new Set();
+    ownRecipes.forEach(r => {
+        if (r.books && Array.isArray(r.books)) {
+            r.books.forEach(b => myGroups.add(b));
+        }
+    });
+    if (myGroups.size === 0) myGroups.add('Особисто');
+    const groupsCount = myGroups.size;
 
     return {
         user: {
@@ -92,10 +131,10 @@ export function buildProfilePayload(user, recipes = []) {
             initials: getInitials(name)
         },
         stats: [
-            { label: 'Рецептів', value: ownRecipes.length || normalizedRecipes.length || 6, icon: 'book-open-text' },
+            { label: 'Рецептів', value: ownRecipes.length || 0, icon: 'book-open-text' },
             { label: 'Фоловерів', value: followers, icon: 'users' },
             { label: 'Підписок', value: following, icon: 'user-plus' },
-            { label: 'Колекцій', value: collections, icon: 'folders' }
+            { label: 'Групи', value: groupsCount, icon: 'folders' }
         ],
         highlights: [
             'Сезонні добірки та особисті нотатки до страв.',
@@ -103,55 +142,17 @@ export function buildProfilePayload(user, recipes = []) {
             'Швидкий доступ до власних колекцій і соціальної статистики.'
         ],
         achievements: [
-            { label: 'Улюблені рецепти', value: favoriteRecipes.length || 4 },
-            { label: 'Створені добірки', value: collections },
-            { label: 'Середній час страв', value: ownRecipes[0]?.time || '35 хв' }
+            { label: 'Улюблені рецепти', value: favoriteRecipes.length },
+            { label: 'Створені добірки', value: groupsCount },
+            { label: 'Середній час страв', value: '0 хв' }
         ],
-        ownRecipes: ownRecipes.length ? ownRecipes : [
-            {
-                id: 'demo-own-1',
-                title: 'Лимонний ризото',
-                subtitle: 'Кремова текстура з цитрусовою свіжістю.',
-                category: 'Паста',
-                time: '30 хв',
-                books: ['Особисті'],
-                cover: 'linear-gradient(135deg, rgba(107, 13, 18, 0.8), rgba(128, 85, 51, 0.95))'
-            },
-            {
-                id: 'demo-own-2',
-                title: 'Курка з травами',
-                subtitle: 'Запечене філе з ароматним маслом.',
-                category: 'Птиця',
-                time: '45 хв',
-                books: ['Особисті'],
-                cover: 'linear-gradient(135deg, rgba(44, 24, 16, 0.86), rgba(107, 13, 18, 0.9))'
-            }
-        ],
-        favoriteRecipes: favoriteRecipes.length ? favoriteRecipes : [
-            {
-                id: 'demo-favorite-1',
-                title: 'Суп дня',
-                subtitle: 'Теплий сезонний суп із насиченим смаком.',
-                category: 'Супи',
-                time: '20 хв',
-                books: ['Гості'],
-                cover: 'linear-gradient(135deg, rgba(128, 85, 51, 0.88), rgba(220, 201, 158, 0.95))'
-            },
-            {
-                id: 'demo-favorite-2',
-                title: 'Шоколадний тарт',
-                subtitle: 'Ніжний десерт для святкових вечорів.',
-                category: 'Десерти',
-                time: '55 хв',
-                books: ['Закладки'],
-                cover: 'linear-gradient(135deg, rgba(44, 24, 16, 0.9), rgba(107, 13, 18, 0.92))'
-            }
-        ]
+        ownRecipes: ownRecipes,
+        favoriteRecipes: favoriteRecipes
     };
 }
 
-export async function getProfilePayload(user) {
-    if (!recipesCachePromise) {
+export async function getProfilePayload(user, forceRefresh = false) {
+    if (!recipesCachePromise || forceRefresh) {
         recipesCachePromise = RecipeService.fetchAll();
     }
 

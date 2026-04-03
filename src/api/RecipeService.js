@@ -1,5 +1,23 @@
-const API_BASE = 'https://eatpan-back.onrender.com/api/v1';
-// const API_BASE = 'http://localhost:8000/api/v1'; for local development
+// --- ENVIRONMENT TOGGLE ---
+export const IS_LOCAL = true; // Змініть на false, щоб стукатися на Render
+
+const API_BASE = IS_LOCAL 
+    ? 'http://localhost:6600/api/v1' 
+    : 'https://eatpan-back.onrender.com/api/v1';
+
+function getAuthHeaders(extraHeaders = {}) {
+    const headers = { ...extraHeaders };
+    try {
+        const raw = window.localStorage.getItem('eatpan_header_auth_user');
+        if (raw) {
+            const user = JSON.parse(raw);
+            if (user && user.access_token) {
+                headers['Authorization'] = `Bearer ${user.access_token}`;
+            }
+        }
+    } catch(e) {}
+    return headers;
+}
 
 export const RecipeService = {
     // --- RECIPES ---
@@ -8,7 +26,10 @@ export const RecipeService = {
             const params = new URLSearchParams(filters);
             params.append('_t', new Date().getTime()); // Вбиваємо кеш браузера
             const url = `${API_BASE}/recipes/?${params.toString()}`;
-            const response = await fetch(url, { cache: 'no-store' });
+            const response = await fetch(url, { 
+                cache: 'no-store',
+                headers: getAuthHeaders() 
+            });
             return await response.json();
         } catch (error) {
             console.error('API Error fetchAll:', error);
@@ -18,7 +39,10 @@ export const RecipeService = {
 
     async fetchDetail(id) {
         try {
-            const response = await fetch(`${API_BASE}/recipes/${id}/?_t=${new Date().getTime()}`, { cache: 'no-store' });
+            const response = await fetch(`${API_BASE}/recipes/${id}/?_t=${new Date().getTime()}`, { 
+                cache: 'no-store',
+                headers: getAuthHeaders() 
+            });
             return await response.json();
         } catch (error) {
             console.error('API Error fetchDetail:', error);
@@ -30,7 +54,7 @@ export const RecipeService = {
         try {
             const response = await fetch(`${API_BASE}/recipes/`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 // Бекенд чекає поле `data` типу JSONB
                 body: JSON.stringify({ data: data })
             });
@@ -45,7 +69,7 @@ export const RecipeService = {
         try {
             const response = await fetch(`${API_BASE}/recipes/${id}/`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ data: data, is_active: true })
             });
             return await response.json();
@@ -58,7 +82,8 @@ export const RecipeService = {
     async deleteRecipe(id) {
         try {
             const response = await fetch(`${API_BASE}/recipes/${id}/`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: getAuthHeaders()
             });
             if (response.status === 204) return true;
             return false;
@@ -71,7 +96,9 @@ export const RecipeService = {
     // --- RECIPE BOOKS & TAXONOMY ---
     async fetchBooks() {
         try {
-            const response = await fetch(`${API_BASE}/recipe-books/`);
+            const response = await fetch(`${API_BASE}/recipe-books/`, {
+                headers: getAuthHeaders()
+            });
             return await response.json();
         } catch (error) {
             console.error('API Error fetchBooks:', error);
@@ -83,7 +110,7 @@ export const RecipeService = {
         try {
             const response = await fetch(`${API_BASE}/recipe-books/`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({ name: name, data: data })
             });
             return await response.json();
@@ -101,7 +128,7 @@ export const RecipeService = {
 
             const response = await fetch(`${API_BASE}/recipe-books/${id}/`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(payload)
             });
             return await response.json();

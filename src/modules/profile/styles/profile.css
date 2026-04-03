@@ -187,7 +187,7 @@
 }
 
 .profile-page-btn:hover::after,
-.profile-page-btn--ghost::after {
+.profile-page-btn:not(.profile-page-btn--ghost)::after {
   background: var(--brand-red);
 }
 

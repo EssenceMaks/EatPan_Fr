@@ -1,5 +1,15 @@
 import Component from '../../core/Component.js';
 import { buildProfilePayload, getProfilePayload } from '../profile/profileData.js';
+import { IS_LOCAL } from '../../api/RecipeService.js';
+
+const SUPABASE_URL = IS_LOCAL
+    ? 'http://localhost:6500'
+    : 'https://pkdnyonrejptotlpzclq.supabase.co'; // Cloud Supabase
+
+// Default Anon Key for local instances (update if necessary for Prod)
+const SUPABASE_ANON_KEY = IS_LOCAL 
+    ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE' 
+    : 'sb_publishable_84gbx1XeHzOHwsM9oJEeYg_bDtU_7Zh'; // Publishable Key for Cloud Supabase
 
 const SESSION_KEY = 'eatpan_header_auth_user';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -52,13 +62,13 @@ export default class HeaderAuthModule extends Component {
     storeUser(user) {
         try {
             window.localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-        } catch {}
+        } catch { }
     }
 
     clearStoredUser() {
         try {
             window.localStorage.removeItem(SESSION_KEY);
-        } catch {}
+        } catch { }
     }
 
     escapeHtml(value) {
@@ -139,6 +149,27 @@ export default class HeaderAuthModule extends Component {
     }
 
     async loadProfileData(shouldRefresh = true) {
+        if (!window.supabase) {
+            this.state.profile = await getProfilePayload(this.getProfileIdentity());
+            if (shouldRefresh) await this.refresh();
+            return;
+        }
+
+        const { data: { session }, error } = await window.supabase.auth.getSession();
+        if (session && session.user) {
+            const userWithToken = {
+                ...session.user,
+                name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || '',
+                access_token: session.access_token,
+                refresh_token: session.refresh_token
+            };
+            this.state.user = userWithToken;
+            this.storeUser(userWithToken);
+        } else {
+            this.state.user = null;
+            this.clearStoredUser();
+        }
+
         this.state.profile = await getProfilePayload(this.getProfileIdentity());
 
         if (window.profileModule?.setUser) {
@@ -151,7 +182,7 @@ export default class HeaderAuthModule extends Component {
     }
 
     isGuestPanel(panel) {
-        return ['login', 'register', 'forgot', 'forgot-sent'].includes(panel);
+        return ['login', 'register', 'forgot', 'forgot-sent', 'welcome'].includes(panel);
     }
 
     async animateGuestPanelOut() {
@@ -164,6 +195,9 @@ export default class HeaderAuthModule extends Component {
 
     async refresh() {
         await this.update({});
+        if (window.lucide) {
+            window.lucide.createIcons({ root: this.element });
+        }
     }
 
     async openPanel(panel) {
@@ -282,26 +316,45 @@ export default class HeaderAuthModule extends Component {
 
     async template() {
         const profileUser = this.state.profile.user;
+        const isAuthenticated = !!this.state.user;
 
         let panelHtml = '';
         if (this.state.panel === 'login') panelHtml = await this.renderGuestPanel('login');
         else if (this.state.panel === 'register') panelHtml = await this.renderGuestPanel('register');
         else if (this.state.panel === 'forgot') panelHtml = await this.renderGuestPanel('forgot');
         else if (this.state.panel === 'forgot-sent') panelHtml = await this.renderRecoverySuccessPanel();
+        else if (this.state.panel === 'welcome') panelHtml = await this.renderGuestPanel('welcome');
 
         let drawerHtml = '';
         if (this.state.isDrawerOpen) {
             drawerHtml = await this.renderProfileDrawer();
         }
 
+        const avatarBorder = isAuthenticated ? 'border: 2px solid #578c54;' : '';
+        const activeDotHtml = isAuthenticated 
+            ? '<span style="position: absolute; bottom: 0px; right: -2px; width: 10px; height: 10px; background-color: #578c54; border-radius: 50%; border: 2px solid #f4f3ed; z-index: 2;"></span>' 
+            : '';
+            
+        const loginBtnStyle = isAuthenticated 
+            ? 'background-color: #d1cfc7; color: #aba79d; border-color: #d1cfc7;' 
+            : '';
+
         return `
             <div class="header-auth-root">
                 <div class="header-auth-shell">
                     <div class="header-auth-buttons">
-                        <button class="header-auth-avatar header-auth-avatar--dev" type="button" data-profile-drawer-toggle aria-label="Відкрити профіль користувача">
-                            ${this.escapeHtml(profileUser.initials)}
-                        </button>
-                        <button class="header-auth-trigger header-auth-trigger--primary" type="button" data-auth-open="login">Вхід</button>
+                        ${isAuthenticated ? `
+                            <div style="position: relative; display: inline-flex;">
+                                <button class="header-auth-avatar header-auth-avatar--dev" type="button" style="${avatarBorder}" data-profile-drawer-toggle aria-label="Відкрити профіль користувача">
+                                    ${this.escapeHtml(profileUser.initials)}
+                                </button>
+                                ${activeDotHtml}
+                            </div>
+                        ` : `
+                            <button class="header-auth-avatar header-auth-avatar--dev" type="button" data-auth-open="login" aria-label="Увійти">
+                                <i data-lucide="log-in" style="width: 20px; height: 20px;"></i>
+                            </button>
+                        `}
                     </div>
                     ${panelHtml}
                 </div>
@@ -403,17 +456,76 @@ export default class HeaderAuthModule extends Component {
                     return;
                 }
 
-                await this.completeAuth({
-                    name: name || this.buildDisplayName(email),
-                    email
-                });
+                try {
+                    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password, data: { name } })
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        window.alert('Помилка реєстрації: ' + (data.msg || data.error_description || 'Невідома помилка'));
+                        return;
+                    }
+
+                    if (data.session) {
+                        await this.completeAuth({
+                            name: name || this.buildDisplayName(email),
+                            email: email,
+                            access_token: data.session.access_token,
+                            refresh_token: data.session.refresh_token,
+                            id: data.user.id
+                        });
+                    } else if (data.access_token) {
+                        await this.completeAuth({
+                            name: name || this.buildDisplayName(email),
+                            email: email,
+                            access_token: data.access_token,
+                            refresh_token: data.refresh_token,
+                            id: data.user?.id
+                        });
+                    } else {
+                        window.alert('Реєстрація успішна! Якщо потрібно, перевірте пошту для підтвердження.');
+                        await this.openPanel('login');
+                    }
+                } catch (e) {
+                    window.alert('Помилка з\'єднання з сервером реєстрації.');
+                }
                 return;
             }
 
-            await this.completeAuth({
-                name: this.buildDisplayName(email),
-                email
-            });
+            try {
+                const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    window.alert('Помилка входу: ' + (data.error_description || data.msg || 'Невірні дані'));
+                    return;
+                }
+
+                await this.completeAuth({
+                    name: data.user.user_metadata?.name || this.buildDisplayName(email),
+                    email: email,
+                    access_token: data.access_token,
+                    refresh_token: data.refresh_token,
+                    id: data.user.id
+                });
+            } catch (e) {
+                window.alert('Помилка з\'єднання з сервером авторизації.');
+            }
         });
     }
 

@@ -1,4 +1,5 @@
 import Component from '../../../../core/Component.js';
+import { toggleLikeRecipe, getLikedRecipeIds } from '../../../profile/profileData.js';
 
 export default class PageRight extends Component {
     template() {
@@ -25,6 +26,9 @@ export default class PageRight extends Component {
         const portionsStr = data.portions_str || "0 порцій";
         const ingredients = data.ingredients || [];
         const steps = data.steps || [];
+
+        const likedIds = getLikedRecipeIds();
+        const isLiked = likedIds.includes(String(recipeObj.id));
 
         // BUILD INGREDIENTS HTML
         const ingredientsHTML = ingredients.map(ing => `
@@ -59,8 +63,8 @@ export default class PageRight extends Component {
                 <!-- RIGHT SIDE TABS WRAPPER -->
                 <aside class="right-tabs-wrapper">
                     <div class="side-tabs-container side-tabs--right">
-                        <div class="side-tab--right">
-                            <i data-lucide="heart" style="width: 16px;"></i><span class="side-tab-count">124</span>
+                        <div class="side-tab--right ${isLiked ? 'active' : ''}" style="cursor: pointer; ${isLiked ? 'color: #d9534f;' : ''}" data-like-btn="${recipeObj.id}">
+                            <i data-lucide="heart" style="width: 16px; ${isLiked ? 'fill: #d9534f;' : ''}"></i><span class="side-tab-count">${isLiked ? '1' : '0'}</span>
                         </div>
                         <div class="side-tab--right"><i data-lucide="send" style="width: 16px;"></i></div>
                         <div class="side-tab--right">
@@ -210,6 +214,17 @@ export default class PageRight extends Component {
         if(window.lucide) {
             window.lucide.createIcons({
                 root: this.element
+            });
+        }
+
+        const likeBtn = this.element.querySelector('[data-like-btn]');
+        if (likeBtn) {
+            likeBtn.addEventListener('click', async () => {
+                const id = likeBtn.dataset.likeBtn;
+                if (id) {
+                    toggleLikeRecipe(id);
+                    await this.update();
+                }
             });
         }
     }

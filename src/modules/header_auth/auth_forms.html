@@ -4,7 +4,7 @@
         <div class="header-auth-popover-head">
             <div class="header-auth-heading">
                 <span class="header-auth-kicker">Kitchen Pass</span>
-                <h3 class="header-auth-title">Увійти в книгу</h3>
+                <h3 class="header-auth-title">Увійти на EatPan</h3>
             </div>
             <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
         </div>
@@ -106,6 +106,27 @@
             <p class="header-auth-note">Ми підготували інструкцію для <strong id="forgot-sent-email"></strong>. У демо-режимі лист не надсилається, але сценарій відновлення вже змодельовано.</p>
             <div class="header-auth-actions-row">
                 <button class="header-auth-submit" type="button" data-auth-switch="login">Повернутися до входу</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="tpl-welcome">
+    <div class="header-auth-popover header-auth-popover--guest header-auth-popover--success" data-auth-mode="welcome" role="dialog" aria-modal="false" aria-label="Вітання">
+        <div class="header-auth-popover-head">
+            <div class="header-auth-heading">
+                <span class="header-auth-kicker">Kitchen Pass</span>
+                <h3 class="header-auth-title">Увійти на EatPan</h3>
+            </div>
+            <button class="header-auth-close" type="button" data-auth-close aria-label="Закрити форму">×</button>
+        </div>
+        <div class="header-auth-form-panel">
+            <div style="text-align: center; margin-bottom: 24px; color: #3d3b36; font-size: 15px;">
+                <p><strong>Вітаємо вас на EatPan!</strong></p>
+                <p style="margin-top: 8px;">Ви вже успішно увійшли в систему.</p>
+            </div>
+            <div class="header-auth-actions-row">
+                <button class="header-auth-submit" type="button" disabled style="background-color: #d1cfc7; color: #aba79d; cursor: not-allowed;">Увійти</button>
             </div>
         </div>
     </div>

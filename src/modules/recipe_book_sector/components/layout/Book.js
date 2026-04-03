@@ -40,6 +40,15 @@ export default class Book extends Component {
         const prEl = this.element?.querySelector('.page--right');
         if (prEl) prEl.classList.remove('is-open');
     };
+
+    window.openRecipe = (recipeId) => {
+        const recipe = this.props.recipes?.find(r => String(r.id) === String(recipeId));
+        if (recipe && this.pageLeft && this.pageLeft.props.onRecipeSelect) {
+            this.pageLeft.props.onRecipeSelect(recipe);
+        } else {
+            console.warn('Recipe not found or onRecipeSelect not available for id:', recipeId);
+        }
+    };
     
     this.pageRight = new PageRight({ recipe: this.activeRecipe });
 
