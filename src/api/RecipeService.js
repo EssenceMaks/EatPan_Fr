@@ -1,5 +1,5 @@
 // --- ENVIRONMENT TOGGLE ---
-export const IS_LOCAL = true; // Змініть на false, щоб стукатися на Render
+export const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 const API_BASE = IS_LOCAL 
     ? 'http://localhost:6600/api/v1' 
