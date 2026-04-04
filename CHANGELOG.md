@@ -20,6 +20,11 @@
 - **Smoother tab transitions** — `transition` на `.side-tab--left` розбито на окремі властивості з `cubic-bezier(0.4,0,0.2,1)` для плавнішого переходу між активним/неактивним станом.
 - **E-additives tab** — прибрано іконку `skull`, залишено лише букву «E» вирівняну як іконка (`.side-tab-text-label`).
 - **Responsive bottom ribbons** — `@media (max-height: 750px)` і `(max-height: 600px)` зменшують висоту, gap і іконки `.bookmark-bottom-left`.
+- **Columns tuck under page** — bg-sheet колонки заходять під сторінку книги (`right: -8px`, `column-gap: 5px`), права колонка над лівою (z-index layering).
+- **Прибрано сірий dimming** — при активній вкладці інші зберігають свій колір. Новий клас `.side-tab--no-content` для вкладок без контенту (health tabs).
+- **Fixed bg-sheets z-index** — `.side-tabs-bg-wrapper` повернуто всередину `.page--left` для збереження цілісності компонента. Проблему stacking context вирішено шляхом видалення `z-index: 10` з `.page` та `.page--left`. Тепер wrapper з `z-index: -1` успішно ховається під фон сторінки, а самі вкладки залишаються зверху.
+- **Removed animation jump** — прибрано `ribbonFadeIn` анімацію з усіх вкладок при ре-рендері, залишено лише `ribbonActiveSlideIn` для активної вкладки.
+- **List tab active state** — вкладка зі списком отримує темно-сірий активний стан (`#4a4a4a`) лише коли модалка відкрита (toggle через `openCategoryModal`/`closeCategoryModal`).
 
 ### Documentation
 
