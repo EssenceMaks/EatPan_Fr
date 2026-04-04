@@ -1,9 +1,9 @@
 // --- ENVIRONMENT TOGGLE ---
 export const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-const API_BASE = IS_LOCAL 
-    ? 'http://localhost:6600/api/v1' 
-    : 'https://eatpan-back.onrender.com/api/v1';
+const API_BASE = IS_LOCAL
+    ? 'http://localhost:6600/api/v1'
+    : 'https://api.eatpan.com/api/v1'; // Наш Cloudflare Worker балансувальник
 
 function getAuthHeaders(extraHeaders = {}) {
     const headers = { ...extraHeaders };
@@ -15,7 +15,7 @@ function getAuthHeaders(extraHeaders = {}) {
                 headers['Authorization'] = `Bearer ${user.access_token}`;
             }
         }
-    } catch(e) {}
+    } catch (e) { }
     return headers;
 }
 
@@ -26,9 +26,9 @@ export const RecipeService = {
             const params = new URLSearchParams(filters);
             params.append('_t', new Date().getTime()); // Вбиваємо кеш браузера
             const url = `${API_BASE}/recipes/?${params.toString()}`;
-            const response = await fetch(url, { 
+            const response = await fetch(url, {
                 cache: 'no-store',
-                headers: getAuthHeaders() 
+                headers: getAuthHeaders()
             });
             return await response.json();
         } catch (error) {
@@ -39,9 +39,9 @@ export const RecipeService = {
 
     async fetchDetail(id) {
         try {
-            const response = await fetch(`${API_BASE}/recipes/${id}/?_t=${new Date().getTime()}`, { 
+            const response = await fetch(`${API_BASE}/recipes/${id}/?_t=${new Date().getTime()}`, {
                 cache: 'no-store',
-                headers: getAuthHeaders() 
+                headers: getAuthHeaders()
             });
             return await response.json();
         } catch (error) {
