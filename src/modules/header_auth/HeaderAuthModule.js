@@ -2,14 +2,22 @@ import Component from '../../core/Component.js';
 import { buildProfilePayload, getProfilePayload } from '../profile/profileData.js';
 import { IS_LOCAL } from '../../api/RecipeService.js';
 
-const SUPABASE_URL = IS_LOCAL
-    ? 'http://localhost:6500'
-    : 'https://pkdnyonrejptotlpzclq.supabase.co'; // Cloud Supabase
-
+//const SUPABASE_URL = IS_LOCAL
+//    ? 'http://localhost:6500'
+//    : 'https://pkdnyonrejptotlpzclq.supabase.co'; // Cloud Supabase
 // Default Anon Key for local instances (update if necessary for Prod)
-const SUPABASE_ANON_KEY = IS_LOCAL 
-    ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE' 
-    : 'sb_publishable_84gbx1XeHzOHwsM9oJEeYg_bDtU_7Zh'; // Publishable Key for Cloud Supabase
+//const SUPABASE_ANON_KEY = IS_LOCAL 
+//    ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE' 
+//    : 'sb_publishable_84gbx1XeHzOHwsM9oJEeYg_bDtU_7Zh'; // Publishable Key for Cloud Supabase
+
+
+const SUPABASE_URL = 'https://pkdnyonrejptotlpzclq.supabase.co'; // Завжди Cloud Supabase для централізованої автентифікації
+
+// Publishable Key for Cloud Supabase
+const SUPABASE_ANON_KEY = 'sb_publishable_84gbx1XeHzOHwsM9oJEeYg_bDtU_7Zh';
+
+
+
 
 const SESSION_KEY = 'eatpan_header_auth_user';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -331,12 +339,12 @@ export default class HeaderAuthModule extends Component {
         }
 
         const avatarBorder = isAuthenticated ? 'border: 2px solid #578c54;' : '';
-        const activeDotHtml = isAuthenticated 
-            ? '<span style="position: absolute; bottom: 0px; right: -2px; width: 10px; height: 10px; background-color: #578c54; border-radius: 50%; border: 2px solid #f4f3ed; z-index: 2;"></span>' 
+        const activeDotHtml = isAuthenticated
+            ? '<span style="position: absolute; bottom: 0px; right: -2px; width: 10px; height: 10px; background-color: #578c54; border-radius: 50%; border: 2px solid #f4f3ed; z-index: 2;"></span>'
             : '';
-            
-        const loginBtnStyle = isAuthenticated 
-            ? 'background-color: #d1cfc7; color: #aba79d; border-color: #d1cfc7;' 
+
+        const loginBtnStyle = isAuthenticated
+            ? 'background-color: #d1cfc7; color: #aba79d; border-color: #d1cfc7;'
             : '';
 
         return `
