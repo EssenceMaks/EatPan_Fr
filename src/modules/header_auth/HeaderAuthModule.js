@@ -13,8 +13,10 @@ import { IS_LOCAL } from '../../api/RecipeService.js';
 
 const SUPABASE_URL = 'https://pkdnyonrejptotlpzclq.supabase.co'; // Завжди Cloud Supabase для централізованої автентифікації
 
-// Publishable Key for Cloud Supabase
-const SUPABASE_ANON_KEY = 'sb_publishable_84gbx1XeHzOHwsM9oJEeYg_bDtU_7Zh';
+// Legacy Anon Key for Cloud Supabase (HS256) — обов'язково HS256, 
+// бо бекенд перевіряє JWT через SUPABASE_JWT_SECRET (симетричний HMAC).
+// Publishable Key (sb_publishable_) генерує ES256 токени, які бекенд не може перевірити.
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrZG55b25yZWpwdG90bHB6Y2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MDI1MDksImV4cCI6MjA5MDI3ODUwOX0.4wffStFMBVmHiWQrrB9qu2ptGIu9ok3CWV79sp0M8s8';
 
 
 
