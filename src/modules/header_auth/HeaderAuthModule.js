@@ -12,14 +12,12 @@ import { IS_LOCAL } from '../../api/RecipeService.js';
 
 
 const SUPABASE_URL = 'https://pkdnyonrejptotlpzclq.supabase.co'; // Завжди Cloud Supabase для централізованої автентифікації
-
-// Legacy Anon Key for Cloud Supabase (HS256) — обов'язково HS256, 
-// бо бекенд перевіряє JWT через SUPABASE_JWT_SECRET (симетричний HMAC).
-// Publishable Key (sb_publishable_) генерує ES256 токени, які бекенд не може перевірити.
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrZG55b25yZWpwdG90bHB6Y2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MDI1MDksImV4cCI6MjA5MDI3ODUwOX0.4wffStFMBVmHiWQrrB9qu2ptGIu9ok3CWV79sp0M8s8';
 
-
-
+// Ініціалізація офіційного JS-клієнта Supabase, якщо його підтягнуло через CDN (в index.html)
+if (window.supabase && typeof window.supabase.createClient === 'function') {
+    window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
 
 const SESSION_KEY = 'eatpan_header_auth_user';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -269,6 +267,13 @@ export default class HeaderAuthModule extends Component {
     }
 
     async logout() {
+        if (window.supabase) {
+            try {
+                await window.supabase.auth.signOut();
+            } catch (e) {
+                console.warn('Logout error:', e);
+            }
+        }
         this.state.user = null;
         this.state.isDrawerOpen = false;
         this.state.panel = null;
@@ -301,7 +306,11 @@ export default class HeaderAuthModule extends Component {
         const profile = this.state.profile;
         const user = profile.user;
 
-        html = html.replace('{{INITIALS}}', this.escapeHtml(user.initials));
+        const avatarHtml = user.avatar
+            ? `<img src="${this.escapeHtml(user.avatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" alt="User Avatar">`
+            : this.escapeHtml(user.initials);
+
+        html = html.replace('{{INITIALS}}', avatarHtml);
         html = html.replace('{{NAME}}', this.escapeHtml(user.name));
         html = html.replace('{{HANDLE}}', this.escapeHtml(user.handle));
         html = html.replace('{{EMAIL}}', this.escapeHtml(user.email));
@@ -340,7 +349,7 @@ export default class HeaderAuthModule extends Component {
             drawerHtml = await this.renderProfileDrawer();
         }
 
-        const avatarBorder = isAuthenticated ? 'border: 2px solid #578c54;' : '';
+        const avatarBorder = isAuthenticated && !profileUser.avatar ? 'border: 2px solid #578c54;' : 'border: 2px solid transparent; padding: 0;';
         const activeDotHtml = isAuthenticated
             ? '<span style="position: absolute; bottom: 0px; right: -2px; width: 10px; height: 10px; background-color: #578c54; border-radius: 50%; border: 2px solid #f4f3ed; z-index: 2;"></span>'
             : '';
@@ -349,6 +358,10 @@ export default class HeaderAuthModule extends Component {
             ? 'background-color: #d1cfc7; color: #aba79d; border-color: #d1cfc7;'
             : '';
 
+        const navAvatarHtml = profileUser.avatar
+            ? `<img src="${this.escapeHtml(profileUser.avatar)}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" alt="User Avatar">`
+            : this.escapeHtml(profileUser.initials);
+
         return `
             <div class="header-auth-root">
                 <div class="header-auth-shell">
@@ -356,7 +369,7 @@ export default class HeaderAuthModule extends Component {
                         ${isAuthenticated ? `
                             <div style="position: relative; display: inline-flex;">
                                 <button class="header-auth-avatar header-auth-avatar--dev" type="button" style="${avatarBorder}" data-profile-drawer-toggle aria-label="Відкрити профіль користувача">
-                                    ${this.escapeHtml(profileUser.initials)}
+                                    ${navAvatarHtml}
                                 </button>
                                 ${activeDotHtml}
                             </div>

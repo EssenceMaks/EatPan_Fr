@@ -78,7 +78,11 @@ export default class ProfileModule extends Component {
                             <div class="profile-page-hero-card">
                                 <div class="profile-page-hero-ribbon">Profile</div>
                                 <div class="profile-page-identity">
-                                    <div class="profile-page-avatar">${user.initials}</div>
+                                    <div class="profile-page-avatar">
+                                        ${user.avatar 
+                                            ? `<img src="${user.avatar}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` 
+                                            : user.initials}
+                                    </div>
                                     <div class="profile-page-copy">
                                         <p class="profile-page-handle">${user.handle}</p>
                                         <p class="profile-page-bio">${user.bio}</p>

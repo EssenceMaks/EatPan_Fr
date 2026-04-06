@@ -143,7 +143,8 @@ export function buildProfilePayload(user, recipes = []) {
             location: String(user?.location || DEFAULT_PROFILE.location).trim(),
             bio: String(user?.bio || DEFAULT_PROFILE.bio).trim(),
             joinedLabel: String(user?.joinedLabel || DEFAULT_PROFILE.joinedLabel).trim(),
-            initials: getInitials(name)
+            initials: getInitials(name),
+            avatar: user?.avatar_url || user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''
         },
         stats: [
             { label: 'Рецептів', value: ownRecipes.length || 0, icon: 'book-open-text' },
