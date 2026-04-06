@@ -416,6 +416,27 @@ export default class HeaderAuthModule extends Component {
 
             if (event.target.closest('[data-auth-logout]')) {
                 await this.logout();
+                return;
+            }
+
+            const googleBtn = event.target.closest('[data-auth-google]');
+            if (googleBtn) {
+                if (!window.supabase) {
+                    window.alert('Клієнт Supabase не ініціалізовано. Перезавантажте сторінку.');
+                    return;
+                }
+                const currentUrl = window.location.origin + window.location.pathname;
+                const { data, error } = await window.supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: currentUrl
+                    }
+                });
+                if (error) {
+                    console.error('Google Auth Error:', error.message);
+                    window.alert('Помилка авторизації: ' + error.message);
+                }
+                return;
             }
         });
 
