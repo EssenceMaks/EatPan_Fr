@@ -1,0 +1,294 @@
+/* =============================================
+   EATPAN FRONTEND v2 — DESIGN TOKENS
+   RPG/Fantasy Style — Gold, Parchment, Embossed
+   ============================================= */
+
+:root {
+  /* ---- BRAND COLORS ---- */
+  --gold:           #c5a044;
+  --gold-light:     #e8cc6e;
+  --gold-dark:      #8b6914;
+  --gold-rgb:       197, 160, 68;
+
+  --bronze:         #cd7f32;
+  --bronze-rgb:     205, 127, 50;
+
+  --crimson:        #8b1a1a;
+  --crimson-light:  #b22222;
+  --crimson-rgb:    139, 26, 26;
+
+  /* ---- SURFACES ---- */
+  --parchment:      #e8dcc0;
+  --parchment-rgb:  232, 220, 192;
+  --parchment-dark: #c4b48e;
+  --parchment-light:#f5edd6;
+
+  --wood-dark:      #1a1510;
+  --wood-dark-rgb:  26, 21, 16;
+  --wood-medium:    #2a2118;
+  --wood-light:     #3a2d1c;
+
+  --leather:        #362a1e;
+  --leather-rgb:    54, 42, 30;
+
+  /* ---- FRAME / BORDER COLORS ---- */
+  --frame-outer:    #2a1f14;
+  --frame-inner:    #4a3928;
+  --frame-highlight:#b89a5a;
+  --frame-shadow:   #0d0a06;
+
+  /* ---- TEXT ---- */
+  --ink:            #2c1810;
+  --ink-rgb:        44, 24, 16;
+  --ink-light:      #5a4030;
+  --text-gold:      #d4a843;
+  --text-light:     #e0dbd0;
+  --text-light-rgb: 224, 219, 208;
+
+  /* ---- BUTTON COLORS ---- */
+  --btn-primary-bg:     linear-gradient(180deg, #5a8a9a 0%, #3a6878 50%, #2a5060 100%);
+  --btn-primary-border: #7ab0c0;
+  --btn-danger-bg:      linear-gradient(180deg, #a03030 0%, #802020 50%, #601818 100%);
+  --btn-danger-border:  #c04040;
+  --btn-success-bg:     linear-gradient(180deg, #3a7a3a 0%, #286028 50%, #1e4a1e 100%);
+  --btn-success-border: #4a9a4a;
+
+  /* ---- STATUS COLORS ---- */
+  --status-online:  #4caf50;
+  --status-offline: #f44336;
+  --status-idle:    #ff9800;
+  --status-info:    #5aaccc;
+
+  /* ---- TYPOGRAPHY ---- */
+  --font-title:    "EB Garamond", "Noto Serif", Georgia, serif;
+  --font-body:     "Work Sans", "Segoe UI", sans-serif;
+  --font-mono:     "JetBrains Mono", "Fira Code", monospace;
+  --font-display:  "Cinzel", "EB Garamond", serif;
+
+  /* ---- LAYOUT ---- */
+  --header-height:      clamp(44px, 7vh, 60px);
+  --sector-gap:         16px;
+  --sector-border-radius: 10px;
+  --menu-z:             500;
+  --overlay-z:          400;
+  --sector-z:           100;
+
+  /* ---- EMBOSSED EFFECT TOKENS ---- */
+  --emboss-light:  rgba(255, 220, 150, 0.15);
+  --emboss-shadow: rgba(0, 0, 0, 0.5);
+  --emboss-border: 
+    inset 0 1px 0 var(--emboss-light),
+    inset 0 -1px 0 var(--emboss-shadow),
+    0 2px 4px var(--emboss-shadow);
+  --emboss-border-strong:
+    inset 0 2px 0 var(--emboss-light),
+    inset 0 -2px 0 var(--emboss-shadow),
+    0 3px 8px rgba(0,0,0,0.6),
+    0 1px 0 rgba(255,220,150,0.1);
+
+  /* ---- CARD / PANEL SHADOW ---- */
+  --card-shadow: 
+    0 4px 16px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,220,150,0.08);
+  --card-border: 1px solid var(--frame-inner);
+  --card-border-gold: 1px solid rgba(var(--gold-rgb), 0.3);
+
+  /* ---- TRANSITIONS ---- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.2s var(--ease-in-out);
+  --transition-normal: 0.35s var(--ease-out-expo);
+  --transition-slow: 0.5s var(--ease-out-expo);
+
+  /* ---- SEMANTIC ALIASES (overridden by themes) ---- */
+  --bg-app:           var(--wood-dark);
+  --bg-header:        var(--wood-medium);
+  --bg-sector-card:   var(--parchment);
+  --bg-sector-active: var(--parchment-light);
+  --bg-menu-overlay:  rgba(var(--wood-dark-rgb), 0.92);
+  --bg-input:         rgba(0,0,0,0.25);
+
+  --border-sector:    var(--frame-inner);
+  --border-header:    var(--frame-inner);
+
+  --text-primary:     var(--ink);
+  --text-secondary:   var(--ink-light);
+  --text-accent:      var(--gold);
+  --text-on-dark:     var(--text-light);
+}
+
+/* ---- GLOBAL RESET ---- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-app);
+  color: var(--text-primary);
+  height: 100dvh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+ul, ol { list-style: none; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+input, select, textarea { font: inherit; }
+
+/* ---- SCROLLBAR STYLING ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--gold-rgb), 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--gold-rgb), 0.5);
+}
+
+/* ---- UTILITY CLASSES ---- */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+.hidden { display: none !important; }
+
+/* ---- RPG BUTTON BASE ---- */
+.rpg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  border: 1px solid rgba(var(--gold-rgb), 0.4);
+  background: var(--btn-primary-bg);
+  color: var(--text-light);
+  box-shadow: var(--emboss-border);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  user-select: none;
+}
+
+.rpg-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--emboss-border-strong);
+}
+
+.rpg-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.rpg-btn--danger {
+  background: var(--btn-danger-bg);
+  border-color: rgba(var(--crimson-rgb), 0.5);
+}
+
+.rpg-btn--success {
+  background: var(--btn-success-bg);
+  border-color: var(--btn-success-border);
+}
+
+/* ---- RPG INPUT ---- */
+.rpg-input {
+  width: 100%;
+  padding: 10px 16px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  background: var(--bg-input);
+  border: 1px solid var(--frame-inner);
+  border-radius: 4px;
+  color: var(--text-on-dark);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+  transition: border-color var(--transition-fast);
+}
+
+.rpg-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 0 0 2px rgba(var(--gold-rgb), 0.15);
+}
+
+.rpg-input::placeholder {
+  color: rgba(var(--text-light-rgb), 0.4);
+}
+
+/* ---- EMBOSSED PANEL / FRAME ---- */
+.rpg-panel {
+  background: var(--bg-sector-card);
+  border: 1px solid var(--frame-inner);
+  border-radius: var(--sector-border-radius);
+  box-shadow: var(--card-shadow);
+  position: relative;
+}
+
+/* Decorative corner accents (pseudo-elements) */
+.rpg-panel--ornate::before,
+.rpg-panel--ornate::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(var(--gold-rgb), 0.3);
+  pointer-events: none;
+}
+
+.rpg-panel--ornate::before {
+  top: 4px; left: 4px;
+  border-right: none; border-bottom: none;
+  border-radius: 4px 0 0 0;
+}
+
+.rpg-panel--ornate::after {
+  bottom: 4px; right: 4px;
+  border-left: none; border-top: none;
+  border-radius: 0 0 4px 0;
+}
+
+/* ---- EMBOSSED HEADER BAR ---- */
+.rpg-header-bar {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--frame-inner);
+  box-shadow: 
+    0 2px 6px rgba(0,0,0,0.4),
+    inset 0 -1px 0 rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,220,150,0.06);
+}
+
+/* ---- EMBOSSED FOOTER BAR ---- */
+.rpg-footer-bar {
+  background: var(--bg-header);
+  border-top: 1px solid var(--frame-inner);
+  box-shadow:
+    0 -2px 6px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(0,0,0,0.3),
+    inset 0 -1px 0 rgba(255,220,150,0.06);
+}
+
+/* ---- DIVIDER ---- */
+.rpg-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--gold-rgb), 0.3) 20%,
+    rgba(var(--gold-rgb), 0.5) 50%,
+    rgba(var(--gold-rgb), 0.3) 80%,
+    transparent 100%
+  );
+  margin: 12px 0;
+}

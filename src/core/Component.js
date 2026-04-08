@@ -1,67 +1,120 @@
+/**
+ * EatPan Frontend v2 — Base Component
+ * Vanilla JS component system (React-like, without React)
+ *
+ * Usage:
+ *   class MyComp extends Component {
+ *     async template() { return '<div>...</div>'; }
+ *     async onMount() { ... }
+ *     onDestroy() { ... }
+ *   }
+ */
 export default class Component {
-    constructor(props = {}) {
-        this.props = props;
-        this.element = null;
+  /**
+   * @param {Object} props — immutable props passed from parent
+   */
+  constructor(props = {}) {
+    this.props = props;
+    this.element = null;
+    this._mounted = false;
+  }
+
+  /**
+   * Override in subclass — return HTML string
+   */
+  async template() {
+    return '<div></div>';
+  }
+
+  /**
+   * Lifecycle: called after element is in the DOM
+   */
+  async onMount() {}
+
+  /**
+   * Lifecycle: called before element is removed
+   */
+  onDestroy() {}
+
+  /**
+   * Render component into target element
+   * @param {HTMLElement} target — DOM node to mount into
+   * @param {'innerHTML'|'appendChild'|'prepend'|'replace'} mode
+   */
+  async render(target, mode = 'innerHTML') {
+    if (!target) {
+      console.warn(`[Component] No target to render into`);
+      return this;
     }
 
-    createNode(template) {
-        const div = document.createElement('div');
-        div.innerHTML = template.trim();
-        return div.firstElementChild || div.firstChild;
+    const html = await this.template();
+
+    // Parse HTML into element
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html.trim();
+    this.element = wrapper.firstElementChild || wrapper;
+
+    // Mount
+    switch (mode) {
+      case 'innerHTML':
+        target.innerHTML = '';
+        target.appendChild(this.element);
+        break;
+      case 'appendChild':
+        target.appendChild(this.element);
+        break;
+      case 'prepend':
+        target.prepend(this.element);
+        break;
+      case 'replace':
+        target.replaceWith(this.element);
+        break;
+      default:
+        target.appendChild(this.element);
     }
 
-    getRenderTarget(selector = null) {
-        if (!this.element) return null;
-        return selector ? this.element.querySelector(selector) : this.element;
+    this._mounted = true;
+    await this.onMount();
+
+    return this;
+  }
+
+  /**
+   * Remove component from DOM
+   */
+  destroy() {
+    this.onDestroy();
+    if (this.element && this.element.parentNode) {
+      this.element.parentNode.removeChild(this.element);
     }
+    this._mounted = false;
+  }
 
-    async replaceContent(content, selector = null) {
-        const target = this.getRenderTarget(selector);
-        if (!target) return null;
+  /**
+   * Query within component scope
+   */
+  $(selector) {
+    return this.element?.querySelector(selector) || null;
+  }
 
-        let node = null;
+  $$(selector) {
+    return this.element ? Array.from(this.element.querySelectorAll(selector)) : [];
+  }
 
-        if (content && typeof content.render === 'function') {
-            node = await content.render();
-        } else if (typeof content === 'string') {
-            node = this.createNode(content);
-        } else if (typeof Node !== 'undefined' && content instanceof Node) {
-            node = content;
-        }
-
-        target.replaceChildren();
-
-        if (node) {
-            target.appendChild(node);
-        }
-
-        return node;
-    }
-
-    template() {
-        return `<div></div>`;
-    }
-
-    attachEvents() {}
-
-    async onMount() {}
-
-    async render() {
-        const templateString = await this.template();
-        this.element = this.createNode(templateString);
-        this.attachEvents();
-        await this.onMount();
-        return this.element;
-    }
-
-    async update(newProps) {
-        this.props = { ...this.props, ...newProps };
-        const oldElement = this.element;
-        const newElement = await this.render();
-        if (oldElement && oldElement.parentNode) {
-            oldElement.replaceWith(newElement);
-        } else {
-            this.element = newElement;
-        }
-    }
+  /**
+   * Re-render in place
+   */
+  async update() {
+    if (!this.element || !this.element.parentNode) return;
+    const parent = this.element.parentNode;
+    this.onDestroy();
+    const html = await this.template();
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html.trim();
+    const newEl = wrapper.firstElementChild || wrapper;
+    parent.replaceChild(newEl, this.element);
+    this.element = newEl;
+    this._mounted = true;
+    await this.onMount();
+  }
 }

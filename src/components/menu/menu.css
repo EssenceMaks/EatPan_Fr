@@ -1,0 +1,102 @@
+/* =============================================
+   MENU OVERLAY — RPG Style
+   Lives within #main-content bounds
+   ============================================= */
+
+#menu-content {
+  width: 90%;
+  max-width: 360px;
+  padding: 24px;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+.menu-section {
+  margin: 16px 0;
+}
+
+.menu-section-title {
+  font-family: var(--font-title);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-accent);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* Theme swatch grid */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  justify-items: center;
+}
+
+.theme-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--gold-rgb), 0.2);
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.theme-swatch:hover {
+  transform: scale(1.15);
+  border-color: rgba(var(--gold-rgb), 0.5);
+}
+
+.theme-swatch.active {
+  border-color: var(--gold-light);
+  box-shadow: 0 0 0 3px rgba(var(--gold-rgb), 0.3), 0 2px 8px rgba(0,0,0,0.4);
+  transform: scale(1.1);
+}
+
+/* Menu action buttons */
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-action-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Header icon buttons (used in header bar) */
+.header-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  color: var(--text-on-dark);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+}
+
+.header-icon-btn:hover {
+  opacity: 1;
+  background: rgba(var(--gold-rgb), 0.1);
+}
+
+/* Avatar button in header */
+.header-avatar-btn {
+  border-radius: 6px;
+  border: 1.5px solid rgba(var(--gold-rgb), 0.3);
+  overflow: hidden;
+}
+
+.header-avatar-btn.has-avatar {
+  padding: 0;
+}
+
+.header-avatar-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

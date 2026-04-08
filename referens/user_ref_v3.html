@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Header - Flared Bento Style</title>
+
+    <!-- Подключение фэнтезийных шрифтов -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- Подключение иконок Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* =========================================
+           ОБЩИЕ CSS ПЕРЕМЕННЫЕ
+           ========================================= */
+        :root {
+            --bg-main: #14110f;
+            --bg-panel-dark: #1e2124;
+
+            --gold-light: #fcebc4;
+            --gold-base: #c19b54;
+            --gold-dark: #8c6931;
+            --gold-shadow: #3a2a0d;
+
+            --font-title: 'Cinzel', serif;
+            --font-text: 'Merriweather', serif;
+
+            --hp-top: #d65656;
+            --hp-bottom: #6b1919;
+            --mp-top: #52c2d6;
+            --mp-bottom: #154c5e;
+            --stamina-top: #e8d058;
+            --stamina-bottom: #9e821b;
+
+            --body-bg: #fcebc5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            font-family: var(--font-text);
+            color: #fff;
+            padding: 30px;
+            /* Отступ чтобы было видно как галтели уходят в края */
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow-x: hidden;
+        }
+
+        /* =========================================
+           ОБЕРТКА ХЕДЕРА
+           ========================================= */
+        .rpg-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            pointer-events: none;
+        }
+
+        .bento-panel {
+            pointer-events: auto;
+            background: linear-gradient(135deg, #2a2118, #110c08);
+            border: 2px solid var(--gold-dark);
+            box-shadow:
+                inset 0 0 30px rgba(0, 0, 0, 0.9),
+                0 10px 20px rgba(0, 0, 0, 0.7);
+            position: relative;
+            padding: 15px;
+        }
+
+        /* =========================================
+           ЛЕВАЯ ПАНЕЛЬ (ЮЗЕР И СТАТЫ)
+           ========================================= */
+        .header-left {
+            display: flex;
+            align-items: top;
+            height: 150px;
+            gap: 15px;
+            width: 450px;
+            /* Скруглен только нижний правый угол самой панели */
+            border-radius: 0 0 40px 0;
+        }
+
+        /* ГАЛТЕЛЬ 1: Верхний Правый (растекается ВПРАВО по потолку) */
+        .corner-top-right {
+            position: absolute;
+            top: -2px;
+            right: -32px;
+            width: 32px;
+            height: 32px;
+            border-top: 2px solid var(--gold-dark);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .corner-top-right::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 0 50px #0c0908;
+        }
+
+        /* ГАЛТЕЛЬ 2: Нижний Левый (растекается ВНИЗ по стене) */
+        .corner-bottom-left {
+            position: absolute;
+            bottom: -32px;
+            left: -2px;
+            width: 32px;
+            height: 32px;
+            border-left: 2px solid var(--gold-dark);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .corner-bottom-left::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -2px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 0 50px #17110b;
+        }
+
+        /* =========================================
+           ПРАВАЯ ПАНЕЛЬ (МЕНЮ)
+           ========================================= */
+        .header-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 15px;
+            /* Скруглен только нижний левый угол */
+            border-radius: 0 0 0 40px;
+        }
+
+        /* ГАЛТЕЛЬ 3: Верхний Левый (растекается ВЛЕВО по потолку) - Зеркало от ГАЛТЕЛЬ 1 */
+        .corner-top-left {
+            position: absolute;
+            top: -2px;
+            left: -32px;
+            width: 32px;
+            height: 32px;
+            border-top: 2px solid var(--gold-dark);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .corner-top-left::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -32px;
+            width: 60px;
+            height: 60px;
+            border-top-right-radius: 33px;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 0 50px #18130d;
+        }
+
+        /* ГАЛТЕЛЬ 4: Нижний Правый (растекается ВНИЗ по правой стене) - Зеркало от ГАЛТЕЛЬ 2 */
+        .corner-bottom-right {
+            position: absolute;
+            bottom: -32px;
+            right: -2px;
+            width: 32px;
+            height: 32px;
+            border-right: 2px solid var(--gold-dark);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .corner-bottom-right::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -32px;
+            width: 60px;
+            height: 60px;
+            border-top-right-radius: 33px;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 0 50px #0d0907;
+        }
+
+        /* =========================================
+           ОСТАЛЬНЫЕ ЭЛЕМЕНТЫ
+           ========================================= */
+        .avatar-container {
+            position: relative;
+            top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: -5px;
+            z-index: 20;
+        }
+
+        .hex-outer {
+            padding: 3px;
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.8));
+        }
+
+        .hex-inner-gap {
+            height: 115px;
+            padding: 2px;
+            background: #1a1205;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .hex-avatar {
+            width: 70px;
+            height: 80px;
+            background: radial-gradient(circle at 50% 30%, #444, #111);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- ОБНОВЛЕННЫЙ ФЛАЖОК УРОВНЯ В СТИЛЕ UI KIT --- */
+        .level-ribbon {
+            margin-top: -20px;
+            /* Подтягиваем под гексагон */
+            width: 44px;
+            /* Компактная ширина для флажка */
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+            padding: 2px;
+            /* Толщина рамки */
+            /* Форма флажка: плоский верх, острый конец (V) вниз */
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), 50% 100%, 0 calc(100% - 12px));
+            z-index: -1;
+            filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.9));
+        }
+
+        .level-ribbon-inner {
+            background: linear-gradient(to bottom, #2a1b10, #0a0603);
+            /* Темный градиент в стиле UI Kit */
+            /* Тот же clip-path для поддержания ровной окантовки */
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 11px), 50% 100%, 0 calc(100% - 11px));
+            padding: 24px 0 12px 0;
+            /* Отступ сверху, чтобы текст был ниже угла гексагона */
+            color: #fff;
+            font-family: var(--font-title);
+            font-weight: 700;
+            font-size: 13px;
+            text-align: center;
+            text-shadow: 0 0 5px var(--gold-base), 1px 1px 2px #000;
+            /* Эффект свечения */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        /* ------------------------------------------------ */
+
+        .stats-container {
+            position: relative;
+            top: 10px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 20;
+            padding-right: 15px;
+        }
+
+        .player-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .player-name {
+            font-family: var(--font-title);
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 3px #000, 0 0 10px var(--gold-dark);
+            letter-spacing: 1px;
+        }
+
+        .player-badges {
+            display: flex;
+            gap: 5px;
+        }
+
+        .badge-icon {
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--gold-dark);
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold-light);
+            box-shadow: inset 0 0 5px #000;
+        }
+
+        .badge-icon i {
+            width: 12px;
+            height: 12px;
+        }
+
+        .bar-wrapper {
+            position: relative;
+            width: 100%;
+            height: 14px;
+            background: #080605;
+            border: 1px solid #000;
+            border-radius: 4px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .bar-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-title);
+            font-size: 9px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+            z-index: 2;
+        }
+
+        .bar-health .bar-fill {
+            width: 85%;
+            background: linear-gradient(to bottom, var(--hp-top), var(--hp-bottom));
+        }
+
+        .bar-mana .bar-fill {
+            width: 60%;
+            background: linear-gradient(to bottom, var(--mp-top), var(--mp-bottom));
+        }
+
+        .bar-segmented {
+            display: flex;
+            gap: 3px;
+            height: 12px;
+            margin-top: 2px;
+        }
+
+        .segment {
+            flex: 1;
+            background: #080605;
+            border: 1px solid #000;
+            border-radius: 2px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .segment.filled::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: 1px;
+            bottom: 1px;
+            background: linear-gradient(to bottom, var(--stamina-top), var(--stamina-bottom));
+            border-radius: 1px;
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4);
+        }
+
+        .menu-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--gold-light);
+            transition: all 0.1s;
+            z-index: 20;
+            border: 2px solid var(--gold-base);
+            background: radial-gradient(circle at 50% 50%, #52c2d6 0%, #154c5e 60%, #0d3644 100%);
+            box-shadow:
+                inset 0 0 15px rgba(255, 255, 255, 0.4),
+                inset 0 0 20px rgba(0, 0, 0, 0.8),
+                0 5px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .menu-btn i {
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.8));
+            width: 28px;
+            height: 28px;
+        }
+
+        .menu-btn:active {
+            box-shadow:
+                inset 0 0 10px rgba(255, 255, 255, 0.2),
+                inset 0 0 30px rgba(0, 0, 0, 0.9),
+                0 2px 5px rgba(0, 0, 0, 0.8);
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="rpg-header">
+
+        <!-- ЛЕВЫЙ БЛОК -->
+        <div class="bento-panel header-left">
+            <div class="corner-top-right"></div>
+            <div class="corner-bottom-left"></div>
+
+            <div class="avatar-container">
+                <div class="hex-outer">
+                    <div class="hex-inner-gap">
+                        <div class="hex-avatar">
+                            <i data-lucide="skull" style="color: var(--gold-light); width: 35px; height: 35px;"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Обновленный блок с многослойным флажком -->
+                <div class="level-ribbon">
+                    <div class="level-ribbon-inner">LV 42</div>
+                </div>
+            </div>
+
+            <div class="stats-container">
+                <div class="player-header-row">
+                    <div class="player-name">SIR GALAHAD</div>
+                    <div class="player-badges">
+                        <div class="badge-icon"><i data-lucide="crown"></i></div>
+                        <div class="badge-icon" style="border-color: #52c2d6; color: #52c2d6;"><i data-lucide="gem"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bar-wrapper bar-health">
+                    <div class="bar-text">3450 / 4000</div>
+                    <div class="bar-fill"></div>
+                </div>
+
+                <div class="bar-wrapper bar-mana">
+                    <div class="bar-text">1200 / 2500</div>
+                    <div class="bar-fill"></div>
+                </div>
+
+                <div class="bar-segmented">
+                    <div class="segment filled"></div>
+                    <div class="segment filled"></div>
+                    <div class="segment filled"></div>
+                    <div class="segment filled"></div>
+                    <div class="segment filled"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ПРАВЫЙ БЛОК -->
+        <div class="bento-panel header-right">
+            <!-- Добавлены новые галтели в виде DIV-ов, как слева -->
+            <div class="corner-top-left"></div>
+            <div class="corner-bottom-right"></div>
+
+            <div class="menu-btn">
+                <i data-lucide="menu"></i>
+            </div>
+        </div>
+
+    </header>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,148 @@
+/* =============================================
+   EATPAN FRONTEND v2 — RESPONSIVE
+   Header ALWAYS visible (all sizes)
+   Footer (Back+Menu FABs): <1024px only
+   Desktop menu button in header: >=1024px only
+   ============================================= */
+
+/* ================================================
+   MOBILE — FOOTER VISIBLE (with Back + Menu FABs)
+   Header stays with: Profile(left) + Clock(center)
+   ================================================ */
+
+/* --- Phone Portrait (320-479) --- */
+@media (max-width: 479px) and (orientation: portrait) {
+  #app { grid-template-rows: var(--header-height) 1fr auto; }
+  #app-footer { display: block; }
+  .desktop-only { display: none !important; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 36px); max-width: calc(100% - 36px); }
+  #sector-carousel { padding: 6px 6px; gap: 6px; }
+  .sector-card .sector-preview .sector-title { font-size: 1.1rem; }
+}
+
+/* --- Phone Landscape (320-479) --- */
+@media (max-width: 479px) and (orientation: landscape) {
+  #app { grid-template-rows: var(--header-height) 1fr auto; }
+  #app-footer { display: block; }
+  .desktop-only { display: none !important; }
+  :root { --header-height: 38px; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 80px); max-width: calc(100% - 80px); }
+}
+
+/* --- Small Tablet Portrait (480-767) --- */
+@media (min-width: 480px) and (max-width: 767px) and (orientation: portrait) {
+  #app { grid-template-rows: var(--header-height) 1fr auto; }
+  #app-footer { display: block; }
+  .desktop-only { display: none !important; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 48px); max-width: calc(100% - 48px); }
+}
+
+/* --- Small Tablet Landscape (480-767) --- */
+@media (min-width: 480px) and (max-width: 767px) and (orientation: landscape) {
+  #app { grid-template-rows: var(--header-height) 1fr auto; }
+  #app-footer { display: block; }
+  .desktop-only { display: none !important; }
+  :root { --header-height: 42px; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 100px); max-width: calc(100% - 100px); }
+}
+
+/* --- Tablet Portrait (768-1023) --- */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
+  #app { grid-template-rows: var(--header-height) 1fr auto; }
+  #app-footer { display: block; }
+  .desktop-only { display: none !important; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 60px); max-width: calc(100% - 60px); }
+}
+
+/* --- Tablet Landscape (768-1023) --- */
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
+  #app { grid-template-rows: var(--header-height) 1fr auto; }
+  #app-footer { display: block; }
+  .desktop-only { display: none !important; }
+  :root { --header-height: 44px; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 120px); max-width: calc(100% - 120px); }
+}
+
+/* ================================================
+   DESKTOP — NO FOOTER, MENU BUTTON IN HEADER
+   ================================================ */
+
+/* --- Small Desktop Portrait (1024-1199) --- */
+@media (min-width: 1024px) and (max-width: 1199px) and (orientation: portrait) {
+  #app { grid-template-rows: var(--header-height) 1fr; }
+  #app-footer { display: none; }
+  .desktop-only { display: flex !important; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 140px); max-width: calc(100% - 140px); }
+}
+
+/* --- Small Desktop Landscape (1024-1199) --- */
+@media (min-width: 1024px) and (max-width: 1199px) and (orientation: landscape) {
+  #app { grid-template-rows: var(--header-height) 1fr; }
+  #app-footer { display: none; }
+  .desktop-only { display: flex !important; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 200px); max-width: calc(100% - 200px); }
+}
+
+/* --- Medium Desktop (1200-1439) --- */
+@media (min-width: 1200px) and (max-width: 1439px) {
+  #app { grid-template-rows: var(--header-height) 1fr; }
+  #app-footer { display: none; }
+  .desktop-only { display: flex !important; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 260px); max-width: calc(100% - 260px); }
+}
+
+/* --- Large Desktop (1440-1919) --- */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  #app { grid-template-rows: var(--header-height) 1fr; }
+  #app-footer { display: none; }
+  .desktop-only { display: flex !important; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 340px); max-width: calc(100% - 340px); }
+}
+
+/* --- Short Desktop Overrides --- */
+@media (min-width: 1024px) and (max-width: 1199px) and (max-height: 750px) and (orientation: landscape) {
+  :root { --header-height: 40px; }
+}
+
+@media (min-width: 1200px) and (max-width: 1439px) and (max-height: 750px) {
+  :root { --header-height: 42px; }
+}
+
+@media (min-width: 1440px) and (max-width: 1919px) and (max-height: 850px) {
+  :root { --header-height: 44px; }
+}
+
+@media (min-width: 1920px) and (max-height: 950px) {
+  :root { --header-height: 48px; }
+}
+
+/* --- Ultra-wide (1920+) --- */
+@media (min-width: 1920px) {
+  #app { grid-template-rows: var(--header-height) 1fr; }
+  #app-footer { display: none; }
+  .desktop-only { display: flex !important; }
+  :root { --header-height: 56px; }
+
+  .sector-card,
+  .wedge-block { flex: 0 0 calc(100% - 440px); max-width: calc(100% - 440px); }
+}
