@@ -1,0 +1,130 @@
+/* =============================================
+   ARC DESIGN SYSTEM — GearSlider
+   Custom range inputs:
+   - classic (gold sphere thumb + dark track)
+   - diamond-thin (diamond thumb + gold line)
+   - hex (hex-shaped thumb + rounded track)
+   - hex-diamond (diamond thumb + horizontal borders track)
+   - theme (circle thumb + theme-colored track)
+   ============================================= */
+
+.arc-gear-slider {
+  margin-bottom: 12px;
+}
+
+.arc-gear-slider__label {
+  display: block;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--gold-light);
+  margin-bottom: 8px;
+}
+
+/* Base */
+input[type=range].arc-gear-slider__input {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+  margin: 0;
+}
+
+/* --- Classic --- */
+input[type=range].arc-gear-slider--classic::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: #080605;
+  border: 1px solid var(--gold-shadow);
+  border-top-color: #000;
+  border-radius: 3px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+input[type=range].arc-gear-slider--classic::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--gold-light) 0%, var(--gold-base) 40%, var(--gold-very-dark) 100%);
+  border: 1px solid var(--gold-light);
+  box-shadow: inset 0 0 0 1px #2a1a08, inset 0 0 0 2px var(--gold-base), 0 2px 6px rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+  margin-top: -9px;
+}
+
+/* --- Diamond thin --- */
+input[type=range].arc-gear-slider--diamond-thin::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--gold-base);
+  border: none;
+}
+input[type=range].arc-gear-slider--diamond-thin::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  background: #110e0c;
+  border: 2px solid var(--gold-light);
+  transform: rotate(45deg);
+  margin-top: -8px;
+  cursor: pointer;
+  box-shadow: inset 0 0 2px var(--gold-base), 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* --- Hex --- */
+input[type=range].arc-gear-slider--hex::-webkit-slider-runnable-track {
+  height: 12px;
+  background: #080605;
+  border: 1px solid var(--gold-dark);
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+input[type=range].arc-gear-slider--hex::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 14px;
+  background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  margin-top: -5px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* --- Hex-diamond --- */
+input[type=range].arc-gear-slider--hex-diamond::-webkit-slider-runnable-track {
+  height: 10px;
+  background: #0d0a08;
+  border-top: 1px solid var(--gold-base);
+  border-bottom: 1px solid var(--gold-base);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+input[type=range].arc-gear-slider--hex-diamond::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  background: var(--gold-light);
+  transform: rotate(45deg);
+  margin-top: -4px;
+  cursor: pointer;
+  box-shadow: inset 0 0 4px #fff, 0 2px 4px rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--gold-dark);
+}
+
+/* --- Theme --- */
+input[type=range].arc-gear-slider--theme::-webkit-slider-runnable-track {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--t-color-mid, #154c5e);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+input[type=range].arc-gear-slider--theme::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, var(--t-color-glare, #298d9e), var(--t-color-bottom, #0d3644));
+  border: 2px solid var(--gold-base);
+  margin-top: -7px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}

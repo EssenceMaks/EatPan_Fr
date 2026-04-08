@@ -1,0 +1,71 @@
+/* =============================================
+   ARC DESIGN SYSTEM — FluxProgressBar
+   Progress bars: solid, segmented, pill, theme-color
+   ============================================= */
+
+.arc-flux-prog {
+  margin-bottom: 10px;
+}
+
+.arc-flux-prog__label {
+  display: block;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  color: var(--gold-light);
+  margin-bottom: 5px;
+}
+
+.arc-flux-prog__outer {
+  padding: 1px;
+  background: var(--gold-base);
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+  height: 16px;
+}
+
+.arc-flux-prog__inner {
+  background: #0d0a08;
+  height: 100%;
+  width: 100%;
+  clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.9);
+  position: relative;
+}
+
+/* --- Solid Fill --- */
+.arc-flux-prog__fill--solid {
+  height: 100%;
+  background: var(--gold-light);
+  clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+}
+
+/* --- Segmented Fill --- */
+.arc-flux-prog__fill-seg-wrap {
+  height: 100%;
+  overflow: hidden;
+  clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+}
+
+.arc-flux-prog__fill--seg {
+  height: 100%;
+  width: 200%;
+  background: repeating-linear-gradient(to right, var(--gold-light) 0, var(--gold-light) 15px, transparent 15px, transparent 20px);
+}
+
+/* --- Pill Fill --- */
+.arc-flux-prog__fill--pill {
+  height: 8px;
+  background: var(--gold-light);
+  border-radius: 4px;
+  margin-top: 3px;
+  margin-left: 4px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+/* --- Theme Color Fill --- */
+.arc-flux-prog__fill--theme {
+  height: 100%;
+  background: linear-gradient(to right, var(--t-color-glare, #298d9e), var(--t-color-mid, #154c5e));
+  clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}

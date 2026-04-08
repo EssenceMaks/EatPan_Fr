@@ -1,0 +1,60 @@
+/* =============================================
+   ARC DESIGN SYSTEM — ArcPopup
+   Dark panel popup with gold header strip
+   ============================================= */
+
+.arc-popup {
+  background-color: var(--bg-panel-dark, #1e2124);
+  border: 2px solid var(--gold-base);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.9), inset 0 0 20px #000;
+  margin: 0 15px;
+}
+
+.arc-popup__header {
+  background: linear-gradient(to right, #1a1205, var(--gold-dark), #1a1205);
+  padding: 8px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--gold-light);
+}
+
+.arc-popup__header-title {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--gold-light);
+  text-shadow: 1px 1px 2px #000;
+}
+
+.arc-popup__header-close {
+  color: var(--gold-base);
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.1s;
+}
+
+.arc-popup__header-close:hover {
+  color: var(--gold-light);
+}
+
+.arc-popup__body {
+  padding: 20px 15px;
+  text-align: center;
+  font-size: 13px;
+  color: #ccc;
+  font-family: 'Merriweather', serif;
+}
+
+.arc-popup__footer {
+  padding: 10px 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}

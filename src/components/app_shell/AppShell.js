@@ -8,6 +8,7 @@
 import Component from '../../core/Component.js';
 import SectorCarousel from '../sector_carousel/SectorCarousel.js';
 import MenuOverlay from '../menu/MenuOverlay.js';
+import ArcBentoHeader from '../arc_bento_header/ArcBentoHeader.js';
 
 export default class AppShell extends Component {
   constructor(props = {}) {
@@ -27,12 +28,6 @@ export default class AppShell extends Component {
    * Initialize — call this instead of render() since DOM is in index.html
    */
   async init() {
-    // DOM refs
-    this.headerClock = document.getElementById('header-clock');
-    this.btnUser = document.getElementById('btn-user');
-    this.btnMenuDesktop = document.getElementById('btn-menu-desktop');
-    this.btnMenuMobile = document.getElementById('btn-menu-mobile');
-    this.btnBackMobile = document.getElementById('btn-back-mobile');
     this.mainContent = document.getElementById('main-content');
 
     // 1. Load saved theme
@@ -45,7 +40,6 @@ export default class AppShell extends Component {
     });
     const carouselTarget = document.getElementById('sector-carousel');
     if (carouselTarget) {
-      // Replace the empty #sector-carousel with the component
       await this.carousel.render(carouselTarget.parentNode, 'innerHTML');
     }
 
@@ -58,77 +52,69 @@ export default class AppShell extends Component {
       await this.menu.render(menuTarget, 'innerHTML');
     }
 
-    // 4. Setup header clock
+    // 4. Mount Header
+    await this._mountHeader();
+
+    // 5. Setup header clock
     this._startClock();
 
-    // 5. Setup controls
-    this._setupControls();
-
-    // 6. Update user button state
-    this._updateUserButton();
-
-    // 7. Initial back button state
-    this._updateBackButton();
-
-    // 8. Init Lucide icons
+    // 6. Init Lucide icons
     if (window.lucide) lucide.createIcons();
 
-    // 9. Expose globals for compatibility
+    // 7. Expose globals for compatibility
     this._exposeGlobals();
 
     console.log('🎮 EatPan Frontend v2 — AppShell initialized');
   }
 
   // ============================================================
-  // CONTROLS
+  // HEADER MOUNT
   // ============================================================
-  _setupControls() {
-    // Header: profile button → auth or profile wedge
-    this.btnUser?.addEventListener('click', () => {
-      if (this.menu?.isOpen) this.menu.close();
-      const isActive = document.body.classList.contains('active-mode') &&
-                       (document.getElementById('profile-wedge')?.classList.contains('active') ||
-                        document.getElementById('auth-wedge')?.classList.contains('active'));
-      if (isActive) {
-        history.back();
-        return;
+  async _mountHeader() {
+    let isAuth = !!localStorage.getItem('eatpan_header_auth_user');
+    
+    this.header = new ArcBentoHeader({
+      isAuth,
+      onLoginClick: () => {
+        if (this.menu?.isOpen) this.menu.close();
+        if (document.body.classList.contains('active-mode')) {
+          history.back();
+          return;
+        }
+        
+        // TEMPORARY: Toggle the auth state to immediately show/hide user block
+        isAuth = !isAuth;
+        if (isAuth) {
+          localStorage.setItem('eatpan_header_auth_user', 'true');
+        } else {
+          localStorage.removeItem('eatpan_header_auth_user');
+        }
+        
+        if (this.header) {
+          this.header.setAuth(isAuth);
+        }
+      },
+      onClockClick: () => {
+        if (this.menu?.isOpen) this.menu.close();
+        if (document.body.classList.contains('clock-mode')) {
+          history.back();
+          return;
+        }
+        this.carousel?.toggleClockWedge();
+      },
+      onMenuClick: () => {
+        this.menu?.toggle();
+      },
+      onBackClick: () => {
+        if (this.menu?.isOpen) this.menu.close();
+        else history.back();
       }
-      const hasUser = localStorage.getItem('eatpan_header_auth_user');
-      if (hasUser) {
-        this.carousel?.toggleProfileWedge();
-      } else {
-        this.carousel?.toggleAuthWedge();
-      }
     });
 
-    // Header: clock → toggle clock wedge
-    this.headerClock?.addEventListener('click', () => {
-      if (this.menu?.isOpen) this.menu.close();
-      if (document.body.classList.contains('clock-mode') || document.getElementById('clock-wedge')?.classList.contains('active')) {
-        history.back();
-        return;
-      }
-      this.carousel?.toggleClockWedge();
-    });
-
-    // Header desktop: menu
-    this.btnMenuDesktop?.addEventListener('click', () => this.menu?.toggle());
-
-    // Footer mobile: back
-    this.btnBackMobile?.addEventListener('click', () => {
-      if (this.menu?.isOpen) this.menu.close();
-      else history.back();
-    });
-
-    // Header desktop: back
-    const btnBackDesktop = document.getElementById('btn-back-desktop');
-    btnBackDesktop?.addEventListener('click', () => {
-      if (this.menu?.isOpen) this.menu.close();
-      else history.back();
-    });
-
-    // Footer mobile: menu
-    this.btnMenuMobile?.addEventListener('click', () => this.menu?.toggle());
+    const headerTarget = document.getElementById('arc-header-mount');
+    if (headerTarget) {
+      await this.header.render(headerTarget, 'innerHTML');
+    }
 
     // Escape / Back handling for menu
     document.addEventListener('keydown', (e) => {
@@ -142,15 +128,12 @@ export default class AppShell extends Component {
   // ============================================================
   // CALLBACKS from Carousel
   // ============================================================
-  _onBlockActivated(element) {}
+  _onBlockActivated(el) {
+    document.body.classList.add('active-mode');
+  }
 
-  _onBlockDeactivated() {}
-
-  // ============================================================
-  // BACK BUTTON
-  // ============================================================
-  _updateBackButton() {
-    // Handled purely by CSS active-mode now
+  _onBlockDeactivated() {
+    document.body.classList.remove('active-mode');
   }
 
   // ============================================================
@@ -164,8 +147,8 @@ export default class AppShell extends Component {
       const hh = String(now.getHours()).padStart(2, '0');
       const mm = String(now.getMinutes()).padStart(2, '0');
       
-      // Update header clock
-      if (this.headerClock) this.headerClock.textContent = `${hh}:${mm}`;
+      // Update dynamic header clock
+      if (this.header) this.header.updateTime(hh, mm);
 
       // Initialize ticks and labels if not done
       const clockFace = document.getElementById('bigClockFace');
@@ -229,25 +212,7 @@ export default class AppShell extends Component {
     this.clockInterval = setInterval(update, 1000);
   }
 
-  // ============================================================
-  // USER BUTTON — login icon ↔ avatar
-  // ============================================================
-  _updateUserButton() {
-    if (!this.btnUser) return;
-    try {
-      const raw = localStorage.getItem('eatpan_header_auth_user');
-      if (raw) {
-        const user = JSON.parse(raw);
-        if (user?.avatar_url) {
-          this.btnUser.innerHTML = `<img src="${user.avatar_url}" alt="Avatar">`;
-          this.btnUser.classList.add('has-avatar');
-        } else if (user?.email) {
-          this.btnUser.innerHTML = `<span style="font-family:var(--font-display);font-size:0.9rem;color:var(--text-accent);">${user.email[0].toUpperCase()}</span>`;
-          this.btnUser.classList.add('has-avatar');
-        }
-      }
-    } catch (e) {}
-  }
+
 
   // ============================================================
   // THEME

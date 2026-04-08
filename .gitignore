@@ -1,9 +1,27 @@
-node_modules/
-.env
-.env.*
-!.env.example
-dist/
-build/
+# OS
 .DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+*.swp
+
+# Logs
 *.log
-.gemini/
+
+# Node (if it appears in the future)
+node_modules/
+
+# Archive
+_archive/
+
+# Other folders
+audio/
+
+
+# AI Agents & Figma Tooling
+Figma_EatPan_Antigravity/
+figma_uikit_generator.js
+.agents/rules/sync_with_figma.md
+docs/changelogs/figma_changelog.md
+docs/changelogs/figma_validation.md

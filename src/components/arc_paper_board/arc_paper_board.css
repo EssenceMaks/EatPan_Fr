@@ -1,0 +1,17 @@
+/* =============================================
+   ARC DESIGN SYSTEM — ArcPaperBoard
+   Board with pinned paper slips (wooden texture)
+   ============================================= */
+
+.arc-paper-board {
+  margin: 0 15px;
+  background: #4a3525;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.1) 2px, rgba(0, 0, 0, 0.1) 4px);
+  border: 3px solid #2a1b10;
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 5px 15px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

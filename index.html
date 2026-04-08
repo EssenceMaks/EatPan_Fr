@@ -18,6 +18,20 @@
   <link rel="stylesheet" href="./src/styles/layout.css">
   <link rel="stylesheet" href="./src/styles/themes.css">
   <link rel="stylesheet" href="./src/styles/responsive.css">
+  
+  <!-- UI Kit Atoms -->
+  <link rel="stylesheet" href="./src/components/ui_kit/sigil_diamond/sigil_diamond.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/core_avatar/core_avatar.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/flux_stat_bar/flux_stat_bar.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/flux_segment_bar/flux_segment_bar.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/edge_galtel/edge_galtel.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/glyph_nav/glyph_nav.css">
+  
+  <!-- Composite Components -->
+  <link rel="stylesheet" href="./src/components/arc_bento_header_full/arc_bento_header_full.css">
+  <link rel="stylesheet" href="./src/components/arc_bento_header/arc_bento_header.css">
+  
+  <!-- Legacy Components (To be replaced) -->
   <link rel="stylesheet" href="./src/components/clock/clock.css">
   <link rel="stylesheet" href="./src/components/menu/menu.css">
   <link rel="stylesheet" href="./src/components/auth_panel/auth_panel.css">
@@ -28,29 +42,9 @@
   <div id="app">
     <!-- ==========================================
          HEADER — always visible on ALL screen sizes
-         Mobile: profile(left) + clock(center) + empty(right)
-         Desktop: profile(left) + clock(center) + menu(right)
+         (Now mounted dynamically via ArcBentoHeader)
          ========================================== -->
-    <header id="app-header" class="rpg-header-bar">
-      <div class="header-left">
-        <button id="btn-user" class="header-icon-btn header-avatar-btn" aria-label="Profile">
-          <i data-lucide="log-in" style="width:20px;height:20px;"></i>
-        </button>
-      </div>
-      <div class="header-center">
-        <span id="header-clock" class="header-clock-display">00:00</span>
-      </div>
-      <div class="header-right">
-        <!-- Desktop only: menu button here -->
-        <button id="btn-menu-desktop" class="header-icon-btn desktop-only fab-menu" aria-label="Menu">
-          <i data-lucide="menu" style="width:22px;height:22px;"></i>
-        </button>
-        <!-- Desktop only: back button -->
-        <button id="btn-back-desktop" class="header-icon-btn desktop-only fab-back" aria-label="Back">
-          <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
-        </button>
-      </div>
-    </header>
+    <div id="arc-header-mount"></div>
 
     <!-- ==========================================
          MAIN CONTENT AREA — carousel + overlays
@@ -68,22 +62,6 @@
         </div>
       </div>
     </main>
-
-    <!-- ==========================================
-         FOOTER — mobile only (<1024px)
-         Only: [Back ←] [Menu ≡]
-         Back appears dynamically in active-mode
-         ========================================== -->
-    <footer id="app-footer" class="rpg-footer-bar">
-      <div class="footer-controls">
-        <button id="btn-menu-mobile" class="footer-fab fab-menu" aria-label="Menu">
-          <i data-lucide="menu" style="width:18px;height:18px;"></i>
-        </button>
-        <button id="btn-back-mobile" class="footer-fab fab-back" aria-label="Back">
-          <i data-lucide="arrow-left" style="width:18px;height:18px;"></i>
-        </button>
-      </div>
-    </footer>
   </div>
 
   <!-- Main Application Entry -->

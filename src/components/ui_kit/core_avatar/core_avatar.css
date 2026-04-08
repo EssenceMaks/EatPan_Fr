@@ -1,0 +1,38 @@
+/* =============================================
+   ARC DESIGN SYSTEM — CoreAvatar
+   Avatar frame with gold border
+   Sizes: sm (40px), md (50px), lg (70px)
+   ============================================= */
+
+.arc-core-avatar {
+  border: 2px solid var(--gold-base);
+  box-shadow: 0 0 5px #000;
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-base);
+  flex-shrink: 0;
+}
+
+.arc-core-avatar--sm {
+  width: 40px;
+  height: 40px;
+}
+
+.arc-core-avatar--md {
+  width: 50px;
+  height: 50px;
+  border: 2px solid var(--gold-light);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+.arc-core-avatar--lg {
+  width: 70px;
+  height: 70px;
+}
+
+.arc-core-avatar--rounded {
+  border-radius: 50%;
+}

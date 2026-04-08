@@ -1,0 +1,78 @@
+/* =============================================
+   ARC DESIGN SYSTEM — GearDropdown
+   Hover-reveal dropdown selector
+   ============================================= */
+
+.arc-gear-dropdown {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.arc-gear-dropdown__trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: #110e0c;
+  border: 1px solid var(--gold-base);
+  color: var(--parchment-light);
+  font-family: 'Merriweather', serif;
+  padding: 12px 15px;
+  font-size: 13px;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.9);
+  transition: border-color 0.2s;
+}
+
+.arc-gear-dropdown__trigger:hover {
+  border-color: var(--gold-light);
+}
+
+.arc-gear-dropdown__arrow {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--gold-base);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s;
+  color: var(--gold-base);
+}
+
+.arc-gear-dropdown:hover .arc-gear-dropdown__arrow {
+  background-color: var(--gold-base);
+  color: #1a0f04;
+}
+
+.arc-gear-dropdown__list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 5px;
+  background: #110e0c;
+  border: 1px solid var(--gold-base);
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.9);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.arc-gear-dropdown:hover .arc-gear-dropdown__list {
+  display: block;
+}
+
+.arc-gear-dropdown__item {
+  padding: 10px 15px;
+  font-size: 13px;
+  color: var(--parchment-light);
+  cursor: pointer;
+  transition: background 0.1s;
+  font-family: 'Merriweather', serif;
+}
+
+.arc-gear-dropdown__item:hover {
+  background: rgba(193, 155, 84, 0.2);
+  color: var(--gold-light);
+}

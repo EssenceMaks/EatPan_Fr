@@ -1,0 +1,21 @@
+/* =============================================
+   ARC DESIGN SYSTEM — RuneTitle
+   Section heading with rune-style typography
+   ============================================= */
+
+.arc-rune-title {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--gold-base);
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px #000;
+  margin: 10px 0 5px 0;
+}
+
+.arc-rune-title--sm {
+  font-size: 10px;
+  margin-top: 15px;
+}

@@ -1,0 +1,396 @@
+/* =============================================
+   ARC DESIGN SYSTEM — ArcBentoHeaderFull
+   EXACT replica of user_ref_v3.html
+   Two-panel bento layout with galtel corners,
+   hex avatar with level ribbon, and menu button.
+   Uses CSS Grid for 2D layout.
+   ============================================= */
+
+/* --- CSS Variables for galtel corner fills --- */
+:root {
+  --arc-bento-bg-light: #2a2118;
+  --arc-bento-bg-dark: #110c08;
+  /* Galtel corner fills — derived from panel gradient tones */
+  --arc-bento-corner-tr: #0c0908;
+  /* top-right corner (near bottom of gradient) */
+  --arc-bento-corner-bl: #17110b;
+  /* bottom-left corner (near mid gradient) */
+  --arc-bento-corner-tl: #18130d;
+  /* top-left corner (right panel) */
+  --arc-bento-corner-br: #0d0907;
+  /* bottom-right corner (right panel) */
+}
+
+/* =========================================
+   WRAPPER — Grid layout for two panels
+   ========================================= */
+.arc-bento-full {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-content: start;
+  align-items: start;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* =========================================
+   SHARED PANEL STYLES
+   ========================================= */
+.arc-bento-full__panel {
+  pointer-events: auto;
+  background: linear-gradient(135deg, var(--arc-bento-bg-light), var(--arc-bento-bg-dark));
+  border: 2px solid var(--gold-dark);
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.9),
+    0 10px 20px rgba(0, 0, 0, 0.7);
+  position: relative;
+  padding: 15px;
+}
+
+/* =========================================
+   LEFT PANEL — User info + Stats
+   Uses Grid: [avatar] [stats]
+   ========================================= */
+.arc-bento-full__left {
+  display: grid;
+  margin-right: 32px;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 15px;
+  height: 150px;
+  /* Only bottom-right corner is rounded */
+  border-radius: 0 0 40px 0;
+}
+
+/* =========================================
+   GALTEL CORNERS (Flowing bezier border effect)
+   These divs extend OUTSIDE the panel using
+   absolute positioning + overflow:hidden +
+   ::before circles with huge box-shadow fills.
+   The box-shadow color matches the panel gradient
+   at that corner's position, creating the illusion
+   of a continuously flowing curved border.
+   ========================================= */
+
+/* GALTEL 1: Top-Right (flows RIGHT along the top edge of left panel) */
+.arc-bento-full__corner-tr {
+  position: absolute;
+  top: -2px;
+  right: -32px;
+  width: 32px;
+  height: 32px;
+  border-top: 2px solid var(--gold-dark);
+  overflow: hidden;
+  z-index: 10;
+}
+
+.arc-bento-full__corner-tr::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 0 0 50px var(--arc-bento-corner-tr);
+}
+
+/* GALTEL 2: Bottom-Left (flows DOWN along the left edge of left panel) */
+.arc-bento-full__corner-bl {
+  position: absolute;
+  bottom: -32px;
+  left: -2px;
+  width: 32px;
+  height: 32px;
+  border-left: 2px solid var(--gold-dark);
+  overflow: hidden;
+  z-index: 10;
+}
+
+.arc-bento-full__corner-bl::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -2px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 0 0 50px var(--arc-bento-corner-bl);
+}
+
+/* =========================================
+   RIGHT PANEL — Menu Button
+   ========================================= */
+.arc-bento-full__right {
+  display: grid;
+  place-items: center;
+  margin-left: 32px;
+  padding: 15px;
+  /* Only bottom-left corner is rounded */
+  border-radius: 0 0 0 40px;
+}
+
+/* GALTEL 3: Top-Left (flows LEFT along the top edge of right panel) */
+.arc-bento-full__corner-tl {
+  position: absolute;
+  top: -2px;
+  left: -32px;
+  width: 32px;
+  height: 32px;
+  border-top: 2px solid var(--gold-dark);
+  overflow: hidden;
+  z-index: 10;
+}
+
+.arc-bento-full__corner-tl::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -28px;
+  width: 60px;
+  height: 60px;
+  border-top-right-radius: 33px;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 0 0 50px var(--arc-bento-corner-tl);
+}
+
+/* GALTEL 4: Bottom-Right (flows DOWN along the right edge of right panel) */
+.arc-bento-full__corner-br {
+  position: absolute;
+  bottom: -32px;
+  right: -2px;
+  width: 32px;
+  height: 32px;
+  border-right: 2px solid var(--gold-dark);
+  overflow: hidden;
+  z-index: 10;
+}
+
+.arc-bento-full__corner-br::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -28px;
+  width: 60px;
+  height: 60px;
+  border-top-right-radius: 33px;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 0 0 50px var(--arc-bento-corner-br);
+}
+
+/* =========================================
+   AVATAR CONTAINER — Hex + Level Ribbon
+   ========================================= */
+.arc-bento-full__avatar-zone {
+  position: relative;
+  top: 10px;
+  display: grid;
+  justify-items: center;
+  margin-top: -5px;
+  z-index: 20;
+}
+
+.arc-bento-full__hex-outer {
+  padding: 3px;
+  background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.8));
+}
+
+.arc-bento-full__hex-gap {
+  height: 115px;
+  padding: 2px;
+  background: #1a1205;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.arc-bento-full__hex-avatar {
+  width: 70px;
+  height: 80px;
+  background: radial-gradient(circle at 50% 30%, #444, #111);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: grid;
+  place-items: center;
+  position: relative;
+  color: var(--gold-light);
+}
+
+/* --- LEVEL RIBBON (V-shaped pennant extending below panel) --- */
+.arc-bento-full__level-ribbon {
+  margin-top: -20px;
+  width: 44px;
+  background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+  padding: 2px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), 50% 100%, 0 calc(100% - 12px));
+  z-index: -1;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.9));
+}
+
+.arc-bento-full__level-ribbon-inner {
+  background: linear-gradient(to bottom, #2a1b10, #0a0603);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 11px), 50% 100%, 0 calc(100% - 11px));
+  padding: 24px 0 12px 0;
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-align: center;
+  text-shadow: 0 0 5px var(--gold-base), 1px 1px 2px #000;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+/* =========================================
+   STATS CONTAINER — Name, HP, MP, Stamina
+   ========================================= */
+.arc-bento-full__stats {
+  position: relative;
+  top: 10px;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  z-index: 20;
+  padding-right: 15px;
+}
+
+.arc-bento-full__name-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.arc-bento-full__name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 3px #000, 0 0 10px var(--gold-dark);
+  letter-spacing: 1px;
+}
+
+.arc-bento-full__badges {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 5px;
+}
+
+.arc-bento-full__badge {
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--gold-dark);
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  color: var(--gold-light);
+  box-shadow: inset 0 0 5px #000;
+}
+
+.arc-bento-full__badge i {
+  width: 12px;
+  height: 12px;
+}
+
+/* HP / MP Bars */
+.arc-bento-full__bar {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  background: #080605;
+  border: 1px solid #000;
+  border-radius: 4px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.arc-bento-full__bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.arc-bento-full__bar-fill--hp {
+  background: linear-gradient(to bottom, #d65656, #6b1919);
+}
+
+.arc-bento-full__bar-fill--mp {
+  background: linear-gradient(to bottom, #52c2d6, #154c5e);
+}
+
+.arc-bento-full__bar-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  z-index: 2;
+}
+
+/* Stamina Segments */
+.arc-bento-full__segments {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+  height: 12px;
+  margin-top: 2px;
+}
+
+.arc-bento-full__segment {
+  background: #080605;
+  border: 1px solid #000;
+  border-radius: 2px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+  position: relative;
+  overflow: hidden;
+}
+
+.arc-bento-full__segment--filled::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: linear-gradient(to bottom, #e8d058, #9e821b);
+  border-radius: 1px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* =========================================
+   MENU BUTTON (Right Panel)
+   ========================================= */
+.arc-bento-full__menu-btn {
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--gold-light);
+  transition: all 0.1s;
+  z-index: 20;
+  border: 2px solid var(--gold-base);
+  background: radial-gradient(circle at 50% 50%, #52c2d6 0%, #154c5e 60%, #0d3644 100%);
+  box-shadow:
+    inset 0 0 15px rgba(255, 255, 255, 0.4),
+    inset 0 0 20px rgba(0, 0, 0, 0.8),
+    0 5px 10px rgba(0, 0, 0, 0.6);
+}
+
+.arc-bento-full__menu-btn i {
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.8));
+  width: 28px;
+  height: 28px;
+}
+
+.arc-bento-full__menu-btn:active {
+  box-shadow:
+    inset 0 0 10px rgba(255, 255, 255, 0.2),
+    inset 0 0 30px rgba(0, 0, 0, 0.9),
+    0 2px 5px rgba(0, 0, 0, 0.8);
+  transform: scale(0.95);
+}

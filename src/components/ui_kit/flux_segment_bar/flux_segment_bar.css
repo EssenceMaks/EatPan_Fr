@@ -1,0 +1,32 @@
+/* =============================================
+   ARC DESIGN SYSTEM — FluxSegmentBar
+   Segmented-cell progress (like XP segments)
+   ============================================= */
+
+.arc-flux-seg {
+  display: flex;
+  gap: 3px;
+  height: 14px;
+  padding: 2px;
+  background: #0d0a08;
+  border: 1px solid var(--gold-dark);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.arc-flux-seg__cell {
+  flex: 1;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.2s;
+}
+
+.arc-flux-seg__cell--active {
+  background: var(--gold-light);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.arc-flux-seg__cell--theme-active {
+  background: linear-gradient(to bottom, var(--t-color-glare, #298d9e), var(--t-color-mid, #154c5e));
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}

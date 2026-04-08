@@ -1,0 +1,57 @@
+/* =============================================
+   ARC DESIGN SYSTEM — SigilShield
+   Shield badge: normal, double-border
+   ============================================= */
+
+.arc-sigil-shield {
+  width: 70px;
+  height: 85px;
+  position: relative;
+  border-radius: 12px 12px 50% 50% / 5px 5px 45% 45%;
+  border: 2px solid var(--gold-base);
+  border-top-color: var(--gold-light);
+  border-bottom-color: var(--gold-dark);
+  background: radial-gradient(ellipse at 50% 20%, #ffffff 0%, #e0e0e0 40%, #888888 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8), inset 0 -6px 12px rgba(0, 0, 0, 0.25), inset 0 0 0 2px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.arc-sigil-shield::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 5%;
+  width: 90%;
+  height: 40%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 8px 8px 50% 50% / 5px 5px 30% 30%;
+  pointer-events: none;
+}
+
+.arc-sigil-shield i {
+  font-size: 32px;
+  color: var(--t-color-bottom, #0d3644);
+  filter: drop-shadow(0 2px 3px rgba(255, 255, 255, 0.5));
+  z-index: 2;
+  margin-bottom: 5px;
+}
+
+.arc-sigil-shield:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8), inset 0 -5px 10px rgba(0, 0, 0, 0.8), inset 0 0 0 2px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(0, 0, 0, 0.8);
+}
+
+/* --- Double Border Shield --- */
+.arc-sigil-shield--double {
+  border: 3px solid var(--gold-base);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8), inset 0 0 0 1px #1a1205, inset 0 0 0 3px var(--gold-light), inset 0 -6px 12px rgba(0, 0, 0, 0.25), inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.arc-sigil-shield--double:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8), inset 0 0 0 1px #1a1205, inset 0 0 0 3px var(--gold-light), inset 0 0 25px rgba(0, 0, 0, 0.8);
+}

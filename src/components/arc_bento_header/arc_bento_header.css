@@ -1,0 +1,398 @@
+/* =============================================
+   ARC DESIGN SYSTEM — ArcBentoHeader
+   Integrated Header with Auth/Guest Dynamic State
+   Uses the beautiful galtel corners and accurate styling 
+   provided by the user's reference.
+   ============================================= */
+
+:root {
+  --arc-bento-bg-light: #2a2118;
+  --arc-bento-bg-dark: #110c08;
+  --arc-bento-corner-tr: #0c0908;
+  --arc-bento-corner-bl: #17110b;
+  --arc-bento-corner-tl: #18130d;
+  --arc-bento-corner-br: #0d0907;
+}
+
+.arc-bento-header {
+  position: relative;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  justify-content: space-between;
+  align-items: start;
+  width: 100%;
+  pointer-events: none;
+  padding: 15px;
+  gap: 15px;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   SHARED PANEL STYLES
+   ========================================= */
+.arc-bento-full__panel {
+  pointer-events: auto;
+  background: linear-gradient(135deg, var(--arc-bento-bg-light), var(--arc-bento-bg-dark));
+  border: 2px solid var(--gold-dark);
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.9),
+    0 10px 20px rgba(0, 0, 0, 0.7);
+  position: relative;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out-expo);
+}
+
+/* =========================================
+   LEFT PANEL — User info + Stats
+   ========================================= */
+.arc-bento-full__left {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 15px;
+  border-radius: 0 0 40px 0;
+  min-height: 85px;
+  overflow: visible;
+}
+
+.arc-bento-full__left.arc-guest-mode {
+  grid-template-columns: auto;
+  border-radius: 0 0 20px 0;
+  padding: 10px 15px;
+  min-height: auto;
+  gap: 0;
+}
+
+.arc-bento-full__corner-tr {
+  position: absolute;
+  top: -2px; right: -32px;
+  width: 32px; height: 32px;
+  border-top: 2px solid var(--gold-dark);
+  overflow: hidden; z-index: 10;
+}
+.arc-bento-full__corner-tr::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: 0;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 0 0 50px var(--arc-bento-corner-tr);
+}
+
+.arc-bento-full__corner-bl {
+  position: absolute;
+  bottom: -32px; left: -2px;
+  width: 32px; height: 32px;
+  border-left: 2px solid var(--gold-dark);
+  overflow: hidden; z-index: 10;
+}
+.arc-bento-full__corner-bl::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -2px;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 0 0 50px var(--arc-bento-corner-bl);
+}
+
+/* Hide TR, BL galtels in Guest mode */
+.arc-bento-full__left.arc-guest-mode .arc-bento-full__corner-tr,
+.arc-bento-full__left.arc-guest-mode .arc-bento-full__corner-bl {
+  display: none;
+}
+/* But maybe just the BL corner is naturally hidden by logic... actually we need one galtel for guest */
+.arc-bento-full__left.arc-guest-mode .arc-bento-full__corner-tr {
+  display: block; /* Guest mode has one top-right corner to curve into the screen edge! */
+}
+
+/* =========================================
+   AVATAR / GUEST DIAMOND
+   ========================================= */
+.arc-bento-full__avatar-zone {
+  position: relative;
+  top: 5px;
+  display: grid;
+  justify-items: center;
+  z-index: 20;
+}
+
+/* =========================================
+   STATS INNER CONTAINER
+   ========================================= */
+.arc-bento-full__stats {
+  position: relative;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  z-index: 20;
+  padding-right: 5px;
+}
+.arc-bento-full__name-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  margin-bottom: 2px;
+}
+.arc-bento-full__name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 3px #000, 0 0 10px var(--gold-dark);
+}
+.arc-bento-full__badges {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 5px;
+}
+.arc-bento-full__badge {
+  width: 20px; height: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--gold-dark);
+  border-radius: 4px;
+  display: grid; place-items: center;
+  color: var(--gold-light);
+}
+.arc-bento-full__badge i { width: 12px; height: 12px; }
+
+/* =========================================
+   CENTER — CLOCK
+   ========================================= */
+.arc-bento-header__center {
+  pointer-events: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 16px;
+  background: radial-gradient(circle at 50% 50%, #17110b, #000);
+  border: 2px solid var(--gold-dark);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.8), inset 0 0 10px rgba(232, 208, 88, 0.2);
+  color: var(--gold-light);
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin: 0 auto;
+  transition: transform 0.2s ease;
+}
+
+.bh-mini-clock {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--gold-light);
+  border-radius: 50%;
+  position: relative;
+  margin-right: 8px;
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.5);
+  background: radial-gradient(circle, #332 0%, #000 100%);
+}
+.bh-mini-clock-hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 2px;
+  height: 45%;
+  background: var(--gold-light);
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(0deg);
+  border-radius: 1px;
+}
+
+.arc-bento-header__center:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.2);
+}
+
+/* =========================================
+   RIGHT PANEL — Menu Button
+   ========================================= */
+.arc-bento-full__right {
+  display: flex; /* flex for back+menu buttons */
+  align-items: center;
+  border-radius: 0 0 0 40px;
+  gap: 10px;
+}
+
+.arc-bento-full__corner-tl {
+  position: absolute;
+  top: -2px; left: -32px;
+  width: 32px; height: 32px;
+  border-top: 2px solid var(--gold-dark);
+  overflow: hidden; z-index: 10;
+}
+.arc-bento-full__corner-tl::before {
+  content: ''; position: absolute;
+  top: -2px; left: -28px;
+  width: 60px; height: 60px;
+  border-top-right-radius: 33px;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 0 0 50px var(--arc-bento-corner-tl);
+}
+
+.arc-bento-full__corner-br {
+  position: absolute;
+  bottom: -32px; right: -2px;
+  width: 32px; height: 32px;
+  border-right: 2px solid var(--gold-dark);
+  overflow: hidden; z-index: 10;
+}
+.arc-bento-full__corner-br::before {
+  content: ''; position: absolute;
+  top: 0; left: -28px;
+  width: 60px; height: 60px;
+  border-top-right-radius: 33px;
+  border: 2px solid var(--gold-dark);
+  box-shadow: 0 0 0 50px var(--arc-bento-corner-br);
+}
+
+/* Back button transition container logic */
+#bh-back-btn-container {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+body.active-mode #bh-back-btn-container {
+  display: grid !important; /* Grid preserves place-items: center for icon centering! */
+  opacity: 1;
+  animation: slideInLeft 0.3s forwards;
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Hide mobile flares unconditionally on desktop */
+.arc-bento-mobile-flare {
+  display: none;
+}
+
+/* =========================================
+   MOBILE RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .arc-bento-header {
+    grid-template-columns: 1fr auto;
+  }
+  
+  /* RIGHT PANEL flies to bottom right, anchored seamlessly */
+  .arc-bento-full__right {
+    position: fixed;
+    bottom: -2px; /* hide bottom border */
+    right: -2px; /* hide right border */
+    border-radius: 40px 0 0 0; /* Inward curve on top-left */
+    margin-left: 0;
+    padding: 15px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px; /* keep 10px consistent with right margin */
+
+    /* Custom borders flush against the screen */
+    border: none;
+    border-top: 2px solid var(--gold-dark);
+    border-left: 2px solid var(--gold-dark);
+    
+    background: var(--bg-arc-panel, #080605);
+    box-shadow: inset 10px 10px 20px rgba(0, 0, 0, 0.8), 0 0 0 rgba(0,0,0,0);
+  }
+  
+  /* Hide desktop galtels on mobile */
+  .arc-hide-mobile {
+    display: none !important;
+  }
+
+  /* Show mobile corner flares */
+  .arc-flare-top, .arc-flare-left {
+    display: block !important;
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  /* LEFT FLARE: Sweeps to the bottom edge */
+  .arc-flare-left {
+    bottom: 0; 
+    left: -32px;
+    border-bottom: 2px solid var(--gold-dark);
+  }
+  .arc-flare-left::before {
+    content: '';
+    position: absolute;
+    top: -32px; left: -32px;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    border: 2px solid var(--gold-dark);
+    box-shadow: 0 0 0 50px var(--bg-arc-panel, #080605);
+  }
+
+  /* TOP FLARE: Sweeps to the right edge */
+  .arc-flare-top {
+    top: -32px; 
+    right: 0;
+    border-right: 2px solid var(--gold-dark);
+  }
+  .arc-flare-top::before {
+    content: '';
+    position: absolute;
+    top: -32px; left: -32px;
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    border: 2px solid var(--gold-dark);
+    box-shadow: 0 0 0 50px var(--bg-arc-panel, #080605);
+  }
+
+  .arc-bento-header__center {
+    width: 90px;
+    height: 70px;
+    border-radius: 50%;
+    top: 5px;
+    position: relative;
+    flex-direction: column;
+    padding: 0;
+    z-index: 20;
+  }
+  
+  .bh-mini-clock {
+    margin-right: 0;
+    margin-bottom: 2px;
+  }
+}
+
+/* Force GlyphButton to exactly match 55x55 bento reference size */
+#bh-menu-btn-container {
+  /* Inject cyan theme variables for the GlyphButton convex variant */
+  --t-color-glare: #52c2d6;
+  --t-color-mid: #154c5e;
+  --t-color-bottom: #0d3644;
+}
+
+#bh-menu-btn-container .arc-glyph,
+#bh-back-btn-container .arc-glyph {
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  padding: 0;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+#bh-back-btn-container .arc-glyph {
+  /* Back button uses dark red theme override */
+  border-color: #5a3f28;
+  background: radial-gradient(circle at 50% 50%, #d65656 0%, #6b1919 60%, #360808 100%);
+}

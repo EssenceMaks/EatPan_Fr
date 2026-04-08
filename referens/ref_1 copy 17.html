@@ -1,0 +1,2908 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy RPG UI - Full Kit</title>
+
+    <!-- Подключение фэнтезийных шрифтов -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Подключение иконок Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* =========================================
+           ОБЩИЕ CSS ПЕРЕМЕННЫЕ
+           ========================================= */
+        :root {
+            --bg-main: #14110f;
+            --bg-panel-dark: #1e2124;
+
+            --gold-light: #fcebc4;
+            --gold-base: #c19b54;
+            --gold-dark: #8c6931;
+            --gold-shadow: #3a2a0d;
+            --gold-very-dark: #1a1205;
+
+            --parchment-light: #e3c792;
+            --parchment-base: #c89e5d;
+            --parchment-dark: #9e7539;
+
+            --bar-stamina: #2a87a8;
+            --bar-exp: #b54924;
+            --bar-bg: #0f0d0c;
+
+            --font-title: 'Cinzel', serif;
+            --font-text: 'Merriweather', serif;
+
+            /* Цвета для нового хедера Bento Style */
+            --hp-top: #d65656;
+            --hp-bottom: #6b1919;
+            --mp-top: #52c2d6;
+            --mp-bottom: #154c5e;
+            --stamina-top: #e8d058;
+            --stamina-bottom: #9e821b;
+        }
+
+        /* =========================================
+           НАСТРОЙКИ ТЕМ (ЦВЕТОВЫЕ СХЕМЫ)
+           ========================================= */
+        .theme-blue {
+            --t-color-glare: #298d9e;
+            --t-color-top: #1f677a;
+            --t-color-mid: #154c5e;
+            --t-color-bottom: #0d3644;
+            --t-glass-border: rgba(82, 194, 214, 0.35);
+        }
+
+        .theme-red {
+            --t-color-glare: #d65656;
+            --t-color-top: #a63232;
+            --t-color-mid: #6b1919;
+            --t-color-bottom: #360808;
+            --t-glass-border: rgba(214, 82, 82, 0.35);
+        }
+
+        .theme-green {
+            --t-color-glare: #70c456;
+            --t-color-top: #44912d;
+            --t-color-mid: #235714;
+            --t-color-bottom: #0f2908;
+            --t-glass-border: rgba(100, 214, 82, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: #080808;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            font-family: var(--font-text);
+            color: #fff;
+            padding: 20px;
+        }
+
+        /* =========================================
+           ПАНЕЛЬ ПЕРЕКЛЮЧЕНИЯ ТЕМ
+           ========================================= */
+        .theme-switcher-panel {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #111;
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--gold-dark);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .theme-btn {
+            padding: 8px 20px;
+            font-family: var(--font-title);
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            border: 2px solid var(--gold-base);
+            border-radius: 20px;
+            cursor: pointer;
+            text-shadow: 1px 1px 2px #000;
+            transition: transform 0.1s;
+        }
+
+        .theme-btn:active {
+            transform: scale(0.95);
+        }
+
+        .theme-btn.blue {
+            background: linear-gradient(to bottom, #1f677a, #0d3644);
+        }
+
+        .theme-btn.red {
+            background: linear-gradient(to bottom, #a63232, #360808);
+        }
+
+        .theme-btn.green {
+            background: linear-gradient(to bottom, #44912d, #0f2908);
+        }
+
+        /* Главный контейнер приложения */
+        .app-container {
+            width: 100%;
+            max-width: 440px;
+            background-color: var(--bg-main);
+            background-image:
+                radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%),
+                repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2) 0px, rgba(0, 0, 0, 0.2) 2px, transparent 2px, transparent 4px);
+            border: 4px solid var(--gold-dark);
+            box-shadow: inset 0 0 20px #000, 0 0 15px rgba(193, 155, 84, 0.2), 0 0 0 1px var(--gold-base);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* =========================================
+           ОБЩИЕ ЭЛЕМЕНТЫ: РАЗДЕЛИТЕЛИ И ЗАГОЛОВКИ
+           ========================================= */
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px 0;
+            opacity: 0.7;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            height: 1px;
+            width: 30%;
+            background: linear-gradient(to right, transparent, var(--gold-base), transparent);
+        }
+
+        .divider i {
+            color: var(--gold-base);
+            margin: 0 10px;
+            width: 12px;
+            height: 12px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: var(--font-title);
+            font-size: 14px;
+            color: var(--gold-base);
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px #000;
+            margin: 10px 0 5px 0;
+        }
+
+        /* =========================================
+           БЛОК 1: ВЕРХНЯЯ ПАНЕЛЬ (ВАРИАНТ 1)
+           ========================================= */
+        .top-bar-container {
+            background: linear-gradient(to bottom, var(--gold-dark), #2a1f0d);
+            padding: 4px;
+            border-bottom: 2px solid var(--gold-base);
+        }
+
+        .top-bar-parchment {
+            background: linear-gradient(135deg, var(--parchment-light), var(--parchment-base), var(--parchment-dark));
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--gold-shadow);
+            padding: 8px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .avatar-box {
+            width: 70px;
+            height: 70px;
+            border: 2px solid var(--gold-base);
+            box-shadow: 0 0 5px #000;
+            background-color: #333;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stats-col {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(107, 81, 30, 0.6);
+            padding: 2px 6px;
+            border-radius: 2px;
+            box-shadow: inset 0 1px 3px #000;
+        }
+
+        .stat-label {
+            font-family: var(--font-title);
+            font-size: 10px;
+            color: var(--bg-main);
+            font-weight: 700;
+            width: 60px;
+        }
+
+        .bar-container {
+            flex-grow: 1;
+            height: 8px;
+            background-color: var(--bar-bg);
+            border: 1px solid #000;
+            margin: 0 8px;
+            box-shadow: inset 0 1px 2px #000;
+        }
+
+        .bar-fill {
+            height: 100%;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+
+        .bar-stamina .bar-fill {
+            background-color: var(--bar-stamina);
+            width: 80%;
+        }
+
+        .bar-exp .bar-fill {
+            background-color: var(--bar-exp);
+            width: 35%;
+        }
+
+        .stat-value {
+            font-family: var(--font-title);
+            font-size: 11px;
+            color: #fff;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .resource-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 3px 8px;
+            border: 1px solid var(--gold-dark);
+            border-radius: 15px;
+            box-shadow: inset 0 1px 4px #000;
+        }
+
+        .resource-icon {
+            color: var(--gold-light);
+            width: 14px;
+            height: 14px;
+        }
+
+        /* =========================================
+           БЛОК 1.5: ВЕРХНЯЯ ПАНЕЛЬ (ВАРИАНТ 2 - Компактный)
+           ========================================= */
+        .top-bar-v2 {
+            margin: 0 10px;
+            background: linear-gradient(to bottom, #3a2212, #1f1108);
+            border: 2px solid var(--gold-dark);
+            border-radius: 6px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 5px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .avatar-v2 {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--gold-light);
+            border-radius: 4px;
+            background: #222;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+        }
+
+        .info-v2 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .name-v2 {
+            font-family: var(--font-title);
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px #000;
+            margin-bottom: 4px;
+        }
+
+        .lvl-bar-v2 {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .lvl-text-v2 {
+            font-family: var(--font-title);
+            font-size: 9px;
+            color: var(--gold-base);
+        }
+
+        .bar-track-v2 {
+            flex-grow: 1;
+            height: 4px;
+            background: #000;
+            border-radius: 2px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .bar-fill-v2 {
+            height: 100%;
+            width: 70%;
+            background: var(--gold-base);
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .currencies-v2 {
+            display: flex;
+            gap: 5px;
+        }
+
+        .curr-box-v2 {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #5a3f28;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 2px 5px;
+            gap: 4px;
+        }
+
+        .curr-box-v2 span {
+            font-family: var(--font-title);
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .curr-btn-add {
+            background: linear-gradient(to bottom, #d4a96a, #8c6931);
+            border: 1px solid #ffeba1;
+            border-radius: 3px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .curr-btn-add:active {
+            transform: scale(0.9);
+        }
+
+        /* =========================================
+           ВПУКЛЫЕ И ВЫПУКЛЫЕ КНОПКИ
+           ========================================= */
+        .btn-theme-concave,
+        .btn-theme-convex {
+            border: 2px solid var(--gold-base);
+            border-radius: 4px;
+            color: var(--gold-light);
+            font-family: var(--font-title);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 12px 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.1s ease-in-out;
+            margin: 0 15px;
+        }
+
+        /* Впуклая (Concave) */
+        .btn-theme-concave {
+            background: linear-gradient(to bottom, var(--t-color-bottom) 0%, var(--t-color-mid) 100%);
+            box-shadow:
+                inset 0 6px 12px rgba(0, 0, 0, 0.9),
+                inset 0 -2px 4px rgba(255, 255, 255, 0.15),
+                0 1px 2px rgba(255, 255, 255, 0.1);
+            border-top-color: var(--gold-dark);
+            border-bottom-color: var(--gold-light);
+        }
+
+        .btn-theme-concave:active {
+            box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.95);
+        }
+
+        /* Выпуклая (Convex) */
+        .btn-theme-convex {
+            background: radial-gradient(circle at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 60%, var(--t-color-bottom) 100%);
+            box-shadow:
+                inset 0 0 15px rgba(255, 255, 255, 0.3),
+                inset 0 0 25px rgba(0, 0, 0, 0.8),
+                0 0 10px rgba(0, 0, 0, 0.6);
+            border-color: var(--gold-base);
+        }
+
+        .btn-theme-convex:active {
+            transform: scale(0.98);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.8);
+        }
+
+        /* =========================================
+           ЩИТЫ И ЭКИПИРОВКА
+           ========================================= */
+        .shield-panel {
+            margin: 0 15px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--gold-dark);
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .shield-badge {
+            width: 70px;
+            height: 85px;
+            position: relative;
+            border-radius: 12px 12px 50% 50% / 5px 5px 45% 45%;
+            border: 2px solid var(--gold-base);
+            border-top-color: var(--gold-light);
+            border-bottom-color: var(--gold-dark);
+            background: radial-gradient(ellipse at 50% 20%, #ffffff 0%, #e0e0e0 40%, #888888 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8), inset 0 -6px 12px rgba(0, 0, 0, 0.25), inset 0 0 0 2px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .shield-badge::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 5%;
+            width: 90%;
+            height: 40%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 8px 8px 50% 50% / 5px 5px 30% 30%;
+            pointer-events: none;
+        }
+
+        .shield-badge i {
+            font-size: 32px;
+            color: var(--t-color-bottom);
+            filter: drop-shadow(0 2px 3px rgba(255, 255, 255, 0.5));
+            z-index: 2;
+            margin-bottom: 5px;
+        }
+
+        .shield-badge:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8), inset 0 -5px 10px rgba(0, 0, 0, 0.8), inset 0 0 0 2px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(0, 0, 0, 0.8);
+        }
+
+        .shield-badge-double {
+            width: 70px;
+            height: 85px;
+            position: relative;
+            border-radius: 12px 12px 50% 50% / 5px 5px 45% 45%;
+            border: 3px solid var(--gold-base);
+            background: radial-gradient(ellipse at 50% 20%, #ffffff 0%, #e0e0e0 40%, #888888 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.8), inset 0 0 0 1px #1a1205, inset 0 0 0 3px var(--gold-light), inset 0 -6px 12px rgba(0, 0, 0, 0.25), inset 0 0 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .shield-badge-double::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 5%;
+            width: 90%;
+            height: 40%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 8px 8px 50% 50% / 5px 5px 30% 30%;
+            pointer-events: none;
+        }
+
+        .shield-badge-double i {
+            font-size: 32px;
+            color: var(--t-color-bottom);
+            filter: drop-shadow(0 2px 3px rgba(255, 255, 255, 0.5));
+            z-index: 2;
+            margin-bottom: 5px;
+        }
+
+        .shield-badge-double:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8), inset 0 0 0 1px #1a1205, inset 0 0 0 3px var(--gold-light), inset 0 0 25px rgba(0, 0, 0, 0.8);
+        }
+
+        /* =========================================
+           ПЕРГАМЕНТНЫЕ ДИАЛОГИ
+           ========================================= */
+        .dialog-container {
+            margin: 0 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.8));
+        }
+
+        .dialog-header {
+            background: radial-gradient(circle at center, var(--parchment-light) 0%, var(--parchment-dark) 120%);
+            border: 2px solid #24160a;
+            padding: 20px 15px;
+            text-align: center;
+            color: #2b1a08;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: inset 0 0 30px rgba(107, 81, 30, 0.4), 0 5px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .dialog-corner {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-color: #a67c38;
+            border-style: solid;
+            border-width: 0;
+        }
+
+        .corner-tl {
+            top: 4px;
+            left: 4px;
+            border-top-width: 2px;
+            border-left-width: 2px;
+        }
+
+        .corner-tr {
+            top: 4px;
+            right: 4px;
+            border-top-width: 2px;
+            border-right-width: 2px;
+        }
+
+        .corner-bl {
+            bottom: 4px;
+            left: 4px;
+            border-bottom-width: 2px;
+            border-left-width: 2px;
+        }
+
+        .corner-br {
+            bottom: 4px;
+            right: 4px;
+            border-bottom-width: 2px;
+            border-right-width: 2px;
+        }
+
+        .dialog-header strong {
+            font-family: var(--font-title);
+            font-size: 16px;
+            display: block;
+            margin-bottom: 5px;
+            color: #1a0f04;
+        }
+
+        .btn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px 0 10px 0;
+        }
+
+        .btn-theme-radial {
+            border: 2px solid var(--gold-base);
+            background: radial-gradient(ellipse at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 55%, var(--t-color-bottom) 100%);
+            color: #fcebc4;
+            font-family: var(--font-title);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px #000;
+            padding: 14px 10px;
+            cursor: pointer;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), inset 0 0 4px rgba(255, 255, 255, 0.6), inset 0 0 25px rgba(0, 0, 0, 0.8);
+            transition: all 0.1s ease-in-out;
+        }
+
+        .btn-theme-radial::before,
+        .btn-theme-radial::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+            width: 6px;
+            height: 6px;
+            background-color: var(--gold-light);
+            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .btn-theme-radial::before {
+            left: 15px;
+        }
+
+        .btn-theme-radial::after {
+            right: 15px;
+        }
+
+        .btn-theme-radial:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 1);
+        }
+
+        /* Диалог Вариант 2 элементы */
+        .quest-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quest-title-row strong {
+            margin-bottom: 0;
+        }
+
+        .quest-thesis-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            text-align: left;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .quest-thesis-row i {
+            flex-shrink: 0;
+            color: #5a3f28;
+            cursor: pointer;
+        }
+
+        .quest-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            align-items: center;
+        }
+
+        .quest-dropdown-btn {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gold-dark);
+            padding: 8px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #1a0f04;
+            font-weight: bold;
+        }
+
+        .quest-btn-add {
+            background: var(--gold-base);
+            border: 1px solid var(--gold-light);
+            color: #1a0f04;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+        }
+
+        .quest-btn-add:active {
+            transform: scale(0.95);
+        }
+
+        .quest-btn-large-add {
+            background: linear-gradient(to bottom, #d4a96a, #8c6931);
+            border: 2px solid var(--gold-light);
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        .quest-btn-large-add:active {
+            transform: translateY(2px);
+        }
+
+        /* =========================================
+           БЛОК: ГЕКСАГОНАЛЬНЫЕ КНОПКИ
+           ========================================= */
+        .hex-container {
+            display: flex;
+            justify-content: space-around;
+            padding: 0 15px;
+            margin-top: 10px;
+            gap: 10px;
+        }
+
+        /* Одинарный гекс */
+        .btn-hex-wrapper {
+            position: relative;
+            padding: 2px;
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%);
+            display: inline-block;
+            flex: 1;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn-hex-wrapper:active {
+            transform: scale(0.95);
+        }
+
+        .btn-hex-inner {
+            background: linear-gradient(to bottom, var(--t-color-glare), var(--t-color-bottom));
+            clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%);
+            padding: 12px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-family: var(--font-title);
+            font-size: 11px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        /* Двойной гекс (Многослойный Clip-Path для бокового двойного бордера) */
+        .btn-hex-double-side-outer {
+            padding: 2px;
+            background: linear-gradient(to bottom, var(--gold-base), var(--gold-dark));
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%);
+            display: inline-block;
+            flex: 1;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn-hex-double-side-outer:active {
+            transform: scale(0.95);
+        }
+
+        .btn-hex-double-side-gap {
+            padding: 2px;
+            background: #1a1205;
+            /* Темная прослойка */
+            clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%);
+        }
+
+        .btn-hex-double-side-inner-border {
+            padding: 2px;
+            background: linear-gradient(to right, var(--gold-light) 0%, var(--gold-base) 14px, #1a1205 14px, #1a1205 calc(100% - 14px), var(--gold-base) calc(100% - 14px), var(--gold-light) 100%);
+            clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 50%, calc(100% - 13px) 100%, 13px 100%, 0 50%);
+        }
+
+        .btn-hex-double-side-inner {
+            background: radial-gradient(ellipse at 50% 50%, var(--t-color-glare), var(--t-color-bottom));
+            clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-family: var(--font-title);
+            font-size: 11px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Двойной гекс (ПОЛНЫЙ ДВОЙНОЙ БОРДЕР - ВАРИАНТ 3) */
+        .btn-hex-double-outer {
+            padding: 2px;
+            background: var(--gold-base);
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%);
+            display: inline-block;
+            flex: 1;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn-hex-double-outer:active {
+            transform: scale(0.95);
+        }
+
+        .btn-hex-double-gap {
+            padding: 2px;
+            background: #1a1205;
+            clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%);
+        }
+
+        .btn-hex-double-inner-border {
+            padding: 2px;
+            background: var(--gold-base);
+            clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 50%, calc(100% - 13px) 100%, 13px 100%, 0 50%);
+        }
+
+        .btn-hex-double-inner {
+            background: radial-gradient(ellipse at 50% 50%, var(--t-color-glare), var(--t-color-bottom));
+            clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-family: var(--font-title);
+            font-size: 11px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Дополнительные цвета для гексов */
+        .hex-brown .btn-hex-wrapper,
+        .hex-brown.btn-hex-double-side-outer,
+        .hex-brown.btn-hex-double-outer {
+            background: linear-gradient(to bottom, #d4a96a, #5a3f28);
+        }
+
+        .hex-brown.btn-hex-double-outer {
+            background: #8a6343;
+        }
+
+        .hex-brown.btn-hex-double-outer .btn-hex-double-inner-border {
+            background: #8a6343;
+        }
+
+        .hex-brown .btn-hex-inner,
+        .hex-brown .btn-hex-double-side-inner,
+        .hex-brown .btn-hex-double-inner {
+            background: linear-gradient(to bottom, #8a6343, #3a2515);
+        }
+
+        .hex-gold .btn-hex-wrapper,
+        .hex-gold.btn-hex-double-side-outer,
+        .hex-gold.btn-hex-double-outer {
+            background: linear-gradient(to bottom, #fff6d9, #c19b54);
+        }
+
+        .hex-gold.btn-hex-double-outer {
+            background: #c19b54;
+        }
+
+        .hex-gold.btn-hex-double-outer .btn-hex-double-inner-border {
+            background: #c19b54;
+        }
+
+        .hex-gold .btn-hex-inner,
+        .hex-gold .btn-hex-double-side-inner,
+        .hex-gold .btn-hex-double-inner {
+            background: linear-gradient(to bottom, #e3c792, #9e7539);
+            color: #1a0f04;
+            text-shadow: none;
+        }
+
+
+        /* =========================================
+           БЛОК: РОМБОВИДНЫЕ ИКОНКИ (DIAMONDS)
+           ========================================= */
+        .diamond-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .diamond-btn {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4a3525, #2a1b10);
+            border: 2px solid var(--gold-dark);
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 0, 0, 0.8);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .diamond-btn svg {
+            transform: rotate(-45deg);
+            color: var(--gold-base);
+            transition: all 0.2s;
+        }
+
+        .diamond-btn.filled svg {
+            fill: var(--gold-light);
+            stroke: none;
+            transform: rotate(-45deg) scale(1.6) translateY(-2px);
+            filter: drop-shadow(0px 5px 0px var(--gold-dark)) drop-shadow(0px 8px 4px rgba(0, 0, 0, 0.8));
+        }
+
+        .diamond-btn:active {
+            transform: rotate(45deg) scale(0.95);
+        }
+
+
+        /* =========================================
+           БЛОК: ДОСКА С БУМАЖНЫМИ СТИКЕРАМИ
+           ========================================= */
+        .paper-board-container {
+            margin: 0 15px;
+            background: #4a3525;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.1) 2px, rgba(0, 0, 0, 0.1) 4px);
+            border: 3px solid #2a1b10;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 5px 15px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .paper-slip {
+            background: linear-gradient(to right, var(--parchment-light), var(--parchment-base));
+            padding: 12px 15px;
+            color: #2b1a08;
+            font-family: var(--font-text);
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(107, 81, 30, 0.3);
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.1s;
+            clip-path: polygon(0 0, 100% 0, 97% 50%, 100% 100%, 0 100%, 3% 50%);
+        }
+
+        .paper-slip:active {
+            transform: scale(0.98);
+        }
+
+        .paper-slip-seal {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #a63232, #5a1a1a);
+            border: 1px solid #ff9999;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* =========================================
+           БЛОК: УВЕДОМЛЕНИЯ / ФЛАЖКИ (АЛЕРТЫ С ЛЕНТОЙ)
+           ========================================= */
+        .alert-ribbon {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(to right, var(--parchment-light), var(--parchment-base));
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.1s;
+            filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.6));
+            color: #1a0f04;
+        }
+
+        .alert-ribbon:active {
+            transform: scale(0.98);
+        }
+
+        .alert-ribbon.inward {
+            clip-path: polygon(0 0, 100% 0, 93% 50%, 100% 100%, 0 100%);
+        }
+
+        .alert-ribbon.outward {
+            clip-path: polygon(0 0, 93% 0, 100% 50%, 93% 100%, 0 100%);
+        }
+
+        .alert-ribbon.rtl {
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+
+        .alert-ribbon.rtl.inward {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 7% 50%);
+        }
+
+        .alert-ribbon.rtl.outward {
+            clip-path: polygon(7% 0, 100% 0, 100% 100%, 7% 100%, 0 50%);
+        }
+
+        .alert-ribbon-accent {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+        }
+
+        .alert-ribbon.rtl .alert-ribbon-accent {
+            left: auto;
+            right: 0;
+        }
+
+        .alert-ribbon-accent.success {
+            background: #44912d;
+        }
+
+        .alert-ribbon-accent.warning {
+            background: #c19b54;
+        }
+
+        .alert-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            margin-left: 10px;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .alert-ribbon.rtl .alert-icon {
+            margin-right: 0;
+            margin-left: 15px;
+        }
+
+        .alert-seal {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--t-color-glare), var(--t-color-bottom));
+            border: 2px solid var(--gold-light);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 0 8px rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            margin-left: 10px;
+            color: #fff;
+        }
+
+        .alert-seal.square {
+            border-radius: 8px;
+        }
+
+        .alert-ribbon.rtl .alert-seal {
+            margin-right: 0;
+            margin-left: 15px;
+        }
+
+        .alert-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .alert-title {
+            font-family: var(--font-title);
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .alert-desc {
+            font-family: var(--font-text);
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+
+        /* =========================================
+           БЛОК: КНОПКИ СЛИТКИ И ПИЛЮЛИ
+           ========================================= */
+        .btn-ingot {
+            background: radial-gradient(ellipse at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 50%, var(--t-color-bottom) 100%);
+            border-top: 2px solid var(--gold-base);
+            border-bottom: 2px solid var(--gold-base);
+            border-left: none;
+            border-right: none;
+            color: var(--gold-light);
+            font-family: var(--font-title);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px #000;
+            padding: 12px 10px;
+            cursor: pointer;
+            position: relative;
+            text-align: center;
+            margin: 0 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7), inset 0 0 10px rgba(0, 0, 0, 0.6);
+            transition: all 0.1s;
+        }
+
+        .btn-ingot::before,
+        .btn-ingot::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            bottom: -2px;
+            width: 12px;
+            background: radial-gradient(circle at 50% 50%, var(--gold-light) 0%, var(--gold-base) 60%, var(--gold-dark) 100%);
+            border: 1px solid #1a1205;
+            border-radius: 3px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.8), inset 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-ingot::before {
+            left: -6px;
+        }
+
+        .btn-ingot::after {
+            right: -6px;
+        }
+
+        .btn-ingot:active {
+            transform: scale(0.98);
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0, 0, 0, 0.9);
+        }
+
+        .btn-pill {
+            border: 2px solid var(--gold-base);
+            border-radius: 30px;
+            background: radial-gradient(ellipse at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 50%, var(--t-color-bottom) 100%);
+            color: var(--gold-light);
+            font-family: var(--font-title);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px #000;
+            padding: 12px 25px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.6);
+            margin: 0 15px;
+        }
+
+        .btn-pill:active {
+            transform: scale(0.98);
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.9);
+        }
+
+        /* =========================================
+           БЛОК: СОСТАВНЫЕ КНОПКИ
+           ========================================= */
+        .combo-btn-container {
+            display: flex;
+            align-items: center;
+            margin: 5px 15px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .combo-btn-container:active {
+            transform: scale(0.97);
+        }
+
+        .combo-btn-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-base);
+            background: radial-gradient(circle at 50% 50%, #5a3f28 0%, #1a1205 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 0, 0, 0.8), inset 0 0 5px rgba(255, 255, 255, 0.2);
+        }
+
+        .combo-btn-text {
+            flex-grow: 1;
+            margin-left: -20px;
+            padding: 12px 15px 12px 30px;
+            border: 2px solid var(--gold-base);
+            border-left: none;
+            border-radius: 0 25px 25px 0;
+            font-family: var(--font-title);
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+            background: radial-gradient(ellipse at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 70%, var(--t-color-bottom) 100%);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.6), 0 0 6px rgba(0, 0, 0, 0.6);
+        }
+
+        .combo-btn-text.ltr {
+            background: linear-gradient(to right, var(--t-color-glare) 0%, var(--t-color-bottom) 100%);
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.6), 0 0 6px rgba(0, 0, 0, 0.6);
+        }
+
+        /* =========================================
+           БЛОК 5: UI UX KIT (Скроллы, инпуты, модалки)
+           ========================================= */
+        .ui-kit-panel {
+            background-color: rgba(15, 13, 12, 0.85);
+            border-top: 2px solid var(--gold-dark);
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: inset 0 15px 25px rgba(0, 0, 0, 0.9);
+        }
+
+        .ui-paper-large {
+            background: radial-gradient(circle at center, var(--parchment-light) 0%, var(--parchment-dark) 150%);
+            border: 2px solid var(--gold-dark);
+            padding: 20px;
+            color: #2b1a08;
+            font-size: 12px;
+            line-height: 1.6;
+            box-shadow: inset 0 0 40px rgba(107, 81, 30, 0.5), 0 5px 15px rgba(0, 0, 0, 0.7);
+            position: relative;
+            text-align: justify;
+        }
+
+        .ui-paper-large::before,
+        .ui-paper-large::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(to right, var(--gold-dark), var(--gold-light), var(--gold-dark));
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .ui-paper-large::before {
+            top: -4px;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .ui-paper-large::after {
+            bottom: -4px;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .ui-popup {
+            background-color: var(--bg-panel-dark);
+            border: 2px solid var(--gold-base);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.9), inset 0 0 20px #000;
+        }
+
+        .ui-popup-header {
+            background: linear-gradient(to right, #1a1205, var(--gold-dark), #1a1205);
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gold-light);
+        }
+
+        .ui-popup-body {
+            padding: 20px 15px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .ui-input-field {
+            background: #110e0c;
+            border: 1px solid var(--gold-base);
+            color: var(--parchment-light);
+            font-family: var(--font-text);
+            padding: 12px 15px;
+            width: 100%;
+            font-size: 13px;
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.9);
+            outline: none;
+            transition: border-color 0.2s;
+            cursor: text;
+        }
+
+        .ui-input-field:focus {
+            border-color: var(--gold-light);
+        }
+
+        .ui-dropdown-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .ui-dropdown {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .ui-dropdown:hover {
+            border-color: var(--gold-light);
+        }
+
+        .dropdown-trigger {
+            width: 22px;
+            height: 22px;
+            border: 1px solid var(--gold-base);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .ui-dropdown-container:hover .dropdown-trigger {
+            background-color: var(--gold-base);
+        }
+
+        .ui-dropdown-container:hover .dropdown-trigger svg {
+            color: #1a0f04 !important;
+        }
+
+        .ui-dropdown-list {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            margin-top: 5px;
+            background: #110e0c;
+            border: 1px solid var(--gold-base);
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.9);
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .ui-dropdown-container:hover .ui-dropdown-list {
+            display: block;
+        }
+
+        .ui-dropdown-item {
+            padding: 10px 15px;
+            font-size: 13px;
+            color: var(--parchment-light);
+            cursor: pointer;
+            transition: background 0.1s;
+            font-family: var(--font-text);
+        }
+
+        .ui-dropdown-item:hover {
+            background: rgba(193, 155, 84, 0.2);
+            color: var(--gold-light);
+        }
+
+        .ui-slider-container {
+            margin-bottom: 15px;
+        }
+
+        .ui-slider-label {
+            display: block;
+            text-align: center;
+            font-family: var(--font-title);
+            font-size: 11px;
+            color: var(--gold-light);
+            margin-bottom: 8px;
+        }
+
+        input[type=range].ui-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range].ui-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--gold-light) 0%, var(--gold-base) 40%, var(--gold-very-dark) 100%);
+            border: 1px solid var(--gold-light);
+            box-shadow: inset 0 0 0 1px #2a1a08, inset 0 0 0 2px var(--gold-base), 0 2px 6px rgba(0, 0, 0, 0.9);
+            cursor: pointer;
+            margin-top: -9px;
+        }
+
+        input[type=range].ui-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #080605;
+            border: 1px solid var(--gold-shadow);
+            border-top-color: #000;
+            border-radius: 3px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        /* =========================================
+           НОВЫЕ ПРОГРЕСС БАРЫ (СТАТИЧНЫЕ И С ПИНОМ)
+           ========================================= */
+        .prog-bar-container {
+            margin-bottom: 15px;
+        }
+
+        .prog-hex-outer {
+            padding: 1px;
+            background: var(--gold-base);
+            clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%);
+            height: 16px;
+        }
+
+        .prog-hex-inner {
+            background: #0d0a08;
+            height: 100%;
+            width: 100%;
+            clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.9);
+            position: relative;
+        }
+
+        .prog-fill-solid {
+            height: 100%;
+            background: var(--gold-light);
+            clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+        }
+
+        .prog-fill-seg-wrapper {
+            height: 100%;
+            overflow: hidden;
+            clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+        }
+
+        .prog-fill-seg {
+            height: 100%;
+            width: 200%;
+            background: repeating-linear-gradient(to right, var(--gold-light) 0, var(--gold-light) 15px, transparent 15px, transparent 20px);
+        }
+
+        .prog-fill-pill {
+            height: 8px;
+            background: var(--gold-light);
+            border-radius: 4px;
+            margin-top: 3px;
+            margin-left: 4px;
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .prog-fill-theme-color {
+            height: 100%;
+            background: linear-gradient(to right, var(--t-color-glare), var(--t-color-mid));
+            clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Ползунки (Range Inputs) */
+        input[type=range].ui-slider-custom {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            margin: 0;
+        }
+
+        input[type=range].slider-diamond-thin::-webkit-slider-runnable-track {
+            height: 2px;
+            background: var(--gold-base);
+            border: none;
+        }
+
+        input[type=range].slider-diamond-thin::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            background: #110e0c;
+            border: 2px solid var(--gold-light);
+            transform: rotate(45deg);
+            margin-top: -8px;
+            cursor: pointer;
+            box-shadow: inset 0 0 2px var(--gold-base), 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        input[type=range].slider-hex::-webkit-slider-runnable-track {
+            height: 12px;
+            background: #080605;
+            border: 1px solid var(--gold-dark);
+            border-radius: 6px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        input[type=range].slider-hex::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 14px;
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            margin-top: -5px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        input[type=range].slider-hex-diamond::-webkit-slider-runnable-track {
+            height: 10px;
+            background: #0d0a08;
+            border-top: 1px solid var(--gold-base);
+            border-bottom: 1px solid var(--gold-base);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        input[type=range].slider-hex-diamond::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            background: var(--gold-light);
+            transform: rotate(45deg);
+            margin-top: -4px;
+            cursor: pointer;
+            box-shadow: inset 0 0 4px #fff, 0 2px 4px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--gold-dark);
+        }
+
+        input[type=range].slider-theme::-webkit-slider-runnable-track {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--t-color-mid);
+            border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        input[type=range].slider-theme::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            background: radial-gradient(circle, var(--t-color-glare) 0%, var(--t-color-bottom) 100%);
+            border: 2px solid var(--t-color-glare);
+            border-radius: 50%;
+            margin-top: -7px;
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--t-color-glare), inset 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        /* =========================================
+           НИЖНЯЯ ПАНЕЛЬ ИКОНОК
+           ========================================= */
+        .bottom-nav-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .nav-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 10px;
+        }
+
+        .nav-row-title {
+            text-align: center;
+            font-family: var(--font-title);
+            font-size: 10px;
+            color: var(--gold-base);
+            opacity: 0.8;
+            margin-bottom: -5px;
+            margin-top: 5px;
+        }
+
+        .nav-btn {
+            width: 55px;
+            height: 55px;
+            background: radial-gradient(circle at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 50%, var(--t-color-bottom) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--gold-light);
+            transition: all 0.1s;
+        }
+
+        .nav-btn i {
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.8));
+            margin-bottom: 2px;
+            color: #fcebc4;
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+            background: radial-gradient(circle at 50% 50%, var(--t-color-mid) 0%, var(--t-color-bottom) 100%);
+        }
+
+        .shape-circle {
+            border-radius: 50%;
+        }
+
+        .shape-square {
+            border-radius: 12px;
+        }
+
+        .border-normal {
+            border: 2px solid var(--gold-base);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0, 0, 0, 0.95);
+        }
+
+        .border-normal:active {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 1);
+        }
+
+        .border-double {
+            border: 1px solid var(--gold-light);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), inset 0 0 0 2px #181410, inset 0 0 0 4px var(--gold-base), inset 0 0 15px rgba(0, 0, 0, 0.95);
+        }
+
+        .border-double:active {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), inset 0 0 0 2px #181410, inset 0 0 0 4px var(--gold-base), inset 0 0 25px rgba(0, 0, 0, 1);
+        }
+
+        .border-convex {
+            border: 2px solid var(--gold-base);
+            background: radial-gradient(circle at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 60%, var(--t-color-bottom) 100%);
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .border-convex:active {
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.8);
+        }
+
+        .border-double-convex {
+            border: 1px solid var(--gold-light);
+            background: radial-gradient(circle at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 60%, var(--t-color-bottom) 100%);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.6), inset 0 0 0 2px #181410, inset 0 0 0 4px var(--gold-base), inset 0 0 15px rgba(255, 255, 255, 0.4), inset 0 0 25px rgba(0, 0, 0, 0.9);
+        }
+
+        .border-double-convex:active {
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.8), inset 0 0 0 2px #181410, inset 0 0 0 4px var(--gold-base), inset 0 0 35px rgba(0, 0, 0, 1);
+        }
+
+        .border-convex-strong {
+            border: 2px solid var(--gold-base);
+            background: radial-gradient(circle at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 50%, var(--t-color-bottom) 100%);
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.5), inset 0 0 35px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .border-convex-strong:active {
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2), inset 0 0 40px rgba(0, 0, 0, 1), 0 0 4px rgba(0, 0, 0, 0.8);
+            transform: scale(0.95);
+        }
+
+        .border-double-convex-strong {
+            border: 1px solid var(--gold-light);
+            background: radial-gradient(circle at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 50%, var(--t-color-bottom) 100%);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.6), inset 0 0 0 2px #181410, inset 0 0 0 4px var(--gold-base), inset 0 0 15px rgba(255, 255, 255, 0.5), inset 0 0 35px rgba(0, 0, 0, 0.95);
+        }
+
+        .border-double-convex-strong:active {
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.8), inset 0 0 0 2px #181410, inset 0 0 0 4px var(--gold-base), inset 0 0 40px rgba(0, 0, 0, 1);
+            transform: scale(0.95);
+        }
+
+        /* =========================================
+           БЛОК 7: ХЕДЕР (FLARED BENTO STYLE)
+           ========================================= */
+        .rpg-header-flared {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            gap: 15px;
+            pointer-events: none;
+            margin: 10px 0;
+            padding: 0 15px;
+            /* Чтобы не прилипало к краям контейнера */
+        }
+
+        .bento-panel {
+            pointer-events: auto;
+            background: linear-gradient(135deg, #2a2118, #110c08);
+            border: 2px solid var(--gold-dark);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 10px 20px rgba(0, 0, 0, 0.7);
+            position: relative;
+            padding: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: flex-start;
+            height: 150px;
+            gap: 15px;
+            flex: 1;
+            min-width: 0;
+            border-radius: 0 0 40px 0;
+        }
+
+        /* ГАЛТЕЛЬ 1: Верхний Правый */
+        .corner-top-right {
+            position: absolute;
+            top: -2px;
+            right: -32px;
+            width: 32px;
+            height: 32px;
+            border-top: 2px solid var(--gold-dark);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .corner-top-right::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 0 50px #110c08;
+        }
+
+        /* ГАЛТЕЛЬ 2: Нижний Левый */
+        .corner-bottom-left {
+            position: absolute;
+            bottom: -32px;
+            left: -2px;
+            width: 32px;
+            height: 32px;
+            border-left: 2px solid var(--gold-dark);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .corner-bottom-left::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -2px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 0 50px #2a2118;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border-radius: 0 0 0 40px;
+            flex-shrink: 0;
+        }
+
+        /* ГАЛТЕЛЬ 3: Верхний Левый */
+        .corner-top-left {
+            position: absolute;
+            top: -2px;
+            left: -32px;
+            width: 32px;
+            height: 32px;
+            border-top: 2px solid var(--gold-dark);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .corner-top-left::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -32px;
+            width: 60px;
+            height: 60px;
+            border-top-right-radius: 33px;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 0 50px #110c08;
+        }
+
+        /* ГАЛТЕЛЬ 4: Нижний Правый */
+        .corner-bottom-right {
+            position: absolute;
+            bottom: -32px;
+            right: -2px;
+            width: 32px;
+            height: 32px;
+            border-right: 2px solid var(--gold-dark);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .corner-bottom-right::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -32px;
+            width: 60px;
+            height: 60px;
+            border-top-right-radius: 33px;
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 0 50px #2a2118;
+        }
+
+        .header-avatar-container {
+            position: relative;
+            top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: -5px;
+            z-index: 20;
+        }
+
+        .header-hex-outer {
+            padding: 3px;
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.8));
+        }
+
+        .header-hex-inner-gap {
+            height: 115px;
+            padding: 2px;
+            background: #1a1205;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .header-hex-avatar {
+            width: 70px;
+            height: 80px;
+            background: radial-gradient(circle at 50% 30%, #444, #111);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .header-level-ribbon {
+            margin-top: -20px;
+            width: 44px;
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+            padding: 2px;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), 50% 100%, 0 calc(100% - 12px));
+            z-index: -1;
+            filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.9));
+        }
+
+        .header-level-ribbon-inner {
+            background: linear-gradient(to bottom, #2a1b10, #0a0603);
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 11px), 50% 100%, 0 calc(100% - 11px));
+            padding: 24px 0 12px 0;
+            color: #fff;
+            font-family: var(--font-title);
+            font-weight: 700;
+            font-size: 13px;
+            text-align: center;
+            text-shadow: 0 0 5px var(--gold-base), 1px 1px 2px #000;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .header-stats-container {
+            position: relative;
+            top: 10px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 20;
+        }
+
+        .header-player-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .header-player-name {
+            font-family: var(--font-title);
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 3px #000, 0 0 10px var(--gold-dark);
+            letter-spacing: 1px;
+        }
+
+        .header-player-badges {
+            display: flex;
+            gap: 5px;
+        }
+
+        .header-badge-icon {
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--gold-dark);
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold-light);
+            box-shadow: inset 0 0 5px #000;
+        }
+
+        .header-badge-icon i {
+            width: 12px;
+            height: 12px;
+        }
+
+        .flared-bar-wrapper {
+            position: relative;
+            width: 100%;
+            height: 14px;
+            background: #080605;
+            border: 1px solid #000;
+            border-radius: 4px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .flared-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .flared-bar-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-title);
+            font-size: 9px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+            z-index: 2;
+        }
+
+        .flared-bar-health .flared-bar-fill {
+            width: 85%;
+            background: linear-gradient(to bottom, var(--hp-top), var(--hp-bottom));
+        }
+
+        .flared-bar-mana .flared-bar-fill {
+            width: 60%;
+            background: linear-gradient(to bottom, var(--mp-top), var(--mp-bottom));
+        }
+
+        .flared-bar-segmented {
+            display: flex;
+            gap: 3px;
+            height: 12px;
+            margin-top: 2px;
+        }
+
+        .flared-segment {
+            flex: 1;
+            background: #080605;
+            border: 1px solid #000;
+            border-radius: 2px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flared-segment.filled::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: 1px;
+            bottom: 1px;
+            background: linear-gradient(to bottom, var(--stamina-top), var(--stamina-bottom));
+            border-radius: 1px;
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Интерактивная кнопка меню с тематической заливкой */
+        .flared-menu-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--gold-light);
+            transition: all 0.1s;
+            z-index: 20;
+            border: 2px solid var(--gold-base);
+            background: radial-gradient(circle at 50% 50%, var(--t-color-glare) 0%, var(--t-color-mid) 60%, var(--t-color-bottom) 100%);
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.8), 0 5px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .flared-menu-btn i {
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.8));
+            width: 28px;
+            height: 28px;
+        }
+
+        .flared-menu-btn:active {
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.9), 0 2px 5px rgba(0, 0, 0, 0.8);
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Переключатель Тем -->
+    <div class="theme-switcher-panel">
+        <button class="theme-btn blue" onclick="setTheme('theme-blue')">СИНИЙ</button>
+        <button class="theme-btn red" onclick="setTheme('theme-red')">КРАСНЫЙ</button>
+        <button class="theme-btn green" onclick="setTheme('theme-green')">ЗЕЛЕНЫЙ</button>
+    </div>
+
+    <!-- Единый контейнер телефона -->
+    <div class="app-container theme-blue" id="main-app">
+
+        <!-- БЛОК 1: Верхняя панель (Оригинал) -->
+        <div class="top-bar-container">
+            <div class="top-bar-parchment">
+                <div class="avatar-box"><i data-lucide="user" style="color: #ccc; width: 32px; height: 32px;"></i></div>
+                <div class="stats-col">
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <div class="stat-row bar-stamina"><span class="stat-label">ВЫНОСЛ.</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill"></div>
+                                </div><span class="stat-value">254</span>
+                            </div>
+                            <div class="stat-row bar-exp"><span class="stat-label">ОПЫТ</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill"></div>
+                                </div><span class="stat-value">35</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 85px;">
+                            <div class="resource-row"><i data-lucide="circle-dollar-sign"
+                                    class="resource-icon"></i><span class="stat-value">4545</span></div>
+                            <div class="resource-row"><i data-lucide="gem" class="resource-icon"
+                                    style="color: #63dcf2;"></i><span class="stat-value">5</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЛОК 1.5: Вторая версия шапки профиля -->
+        <div class="top-bar-v2">
+            <div class="avatar-v2">
+                <i data-lucide="user-circle" style="color: #aaa; width: 30px; height: 30px;"></i>
+            </div>
+            <div class="info-v2">
+                <div class="name-v2">NEWPLAYER1984</div>
+                <div class="lvl-bar-v2">
+                    <span class="lvl-text-v2">LV: 102</span>
+                    <div class="bar-track-v2">
+                        <div class="bar-fill-v2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="currencies-v2">
+                <div class="curr-box-v2">
+                    <i data-lucide="coins" style="color: #f5d58c; width: 14px; height: 14px;"></i>
+                    <span style="color: #fff;">123K</span>
+                </div>
+                <div class="curr-box-v2">
+                    <i data-lucide="gem" style="color: #63dcf2; width: 14px; height: 14px;"></i>
+                    <span style="color: #fff;">15</span>
+                    <div class="curr-btn-add">+</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК: ВПУКЛЫЕ И ВЫПУКЛЫЕ КНОПКИ -->
+        <div class="section-title">ОБЪЕМНЫЕ КНОПКИ</div>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin: 5px 0;">
+            <div class="btn-theme-concave">ВПУКЛАЯ КНОПКА (CONCAVE)</div>
+            <div class="btn-theme-convex">ВЫПУКЛАЯ КНОПКА (CONVEX)</div>
+        </div>
+
+        <div class="divider"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК 2: Экипировка (Щиты) -->
+        <div class="section-title">ЭКИПИРОВКА</div>
+        <div class="shield-panel">
+            <div class="shield-badge"><i data-lucide="flame"></i></div>
+            <div class="shield-badge"><i data-lucide="droplet"></i></div>
+            <div class="shield-badge"><i data-lucide="leaf"></i></div>
+        </div>
+
+        <div class="section-title" style="margin-top: 15px; font-size: 10px;">ЭКИПИРОВКА (ДВОЙНОЙ БОРДЕР)</div>
+        <div class="shield-panel">
+            <div class="shield-badge-double"><i data-lucide="flame"></i></div>
+            <div class="shield-badge-double"><i data-lucide="droplet"></i></div>
+            <div class="shield-badge-double"><i data-lucide="leaf"></i></div>
+        </div>
+
+        <div class="divider" style="margin-top: 15px;"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК 3: Центральное диалоговое окно (Оригинал) -->
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <div class="dialog-corner corner-tl"></div>
+                <div class="dialog-corner corner-tr"></div>
+                <div class="dialog-corner corner-bl"></div>
+                <div class="dialog-corner corner-br"></div>
+                <strong>СЮЖЕТНЫЙ КВЕСТ</strong>
+                Давайте поможем этим бедным жителям деревни!
+            </div>
+            <div class="btn-list">
+                <div class="btn-theme-radial">ОТВЕТ А</div>
+                <div class="btn-theme-radial">ОТВЕТ Б</div>
+            </div>
+        </div>
+
+        <!-- БЛОК 3.5: Сюжетный квест (Расширенный Вариант) -->
+        <div class="dialog-container" style="margin-top: 15px;">
+            <div class="dialog-header">
+                <div class="dialog-corner corner-tl"></div>
+                <div class="dialog-corner corner-tr"></div>
+                <div class="dialog-corner corner-bl"></div>
+                <div class="dialog-corner corner-br"></div>
+
+                <div class="quest-title-row">
+                    <i data-lucide="scroll" style="color: #1a0f04;"></i>
+                    <strong>СЮЖЕТНЫЙ КВЕСТ</strong>
+                </div>
+
+                <div class="quest-thesis-row">
+                    <i data-lucide="check-square"></i>
+                    <span>Давайте поможем этим бедным жителям деревни, они в беде!</span>
+                </div>
+
+                <div class="quest-thesis-row">
+                    <i data-lucide="square"></i>
+                    <span>Новый тезис: Найти утерянный артефакт в лесу.</span>
+                </div>
+
+                <div class="quest-controls">
+                    <div class="quest-dropdown-btn">
+                        <span style="display:flex; align-items:center; gap:5px;">
+                            <i data-lucide="star" style="width:16px; height:16px; color:#c19b54;"></i>
+                            Иконка Звезды
+                        </span>
+                        <i data-lucide="chevron-down" style="width:16px; height:16px;"></i>
+                    </div>
+                    <div class="quest-btn-add"><i data-lucide="plus"></i></div>
+                </div>
+            </div>
+            <div class="quest-btn-large-add"><i data-lucide="plus"></i></div>
+        </div>
+
+        <div class="divider" style="margin-top: 15px;"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК: НОВЫЕ ГЕКСАГОНАЛЬНЫЕ КНОПКИ -->
+        <div class="section-title">РУБЛЕНЫЕ КНОПКИ (HEX)</div>
+        <div class="hex-container">
+            <div class="btn-hex-wrapper">
+                <div class="btn-hex-inner">АКАДЕМИЯ</div>
+            </div>
+            <div class="hex-brown btn-hex-wrapper">
+                <div class="btn-hex-inner">КУЗНИЦА</div>
+            </div>
+            <div class="hex-gold btn-hex-wrapper">
+                <div class="btn-hex-inner">АРСЕНАЛ</div>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 15px; font-size: 10px;">БОКОВОЙ ДВОЙНОЙ БОРДЕР (HEX)</div>
+        <div class="hex-container">
+            <div class="btn-hex-double-side-outer">
+                <div class="btn-hex-double-side-gap">
+                    <div class="btn-hex-double-side-inner-border">
+                        <div class="btn-hex-double-side-inner">АКАДЕМИЯ</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hex-brown btn-hex-double-side-outer">
+                <div class="btn-hex-double-side-gap">
+                    <div class="btn-hex-double-side-inner-border">
+                        <div class="btn-hex-double-side-inner">КУЗНИЦА</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hex-gold btn-hex-double-side-outer">
+                <div class="btn-hex-double-side-gap">
+                    <div class="btn-hex-double-side-inner-border">
+                        <div class="btn-hex-double-side-inner">АРСЕНАЛ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 15px; font-size: 10px;">ПОЛНЫЙ ДВОЙНОЙ БОРДЕР (HEX)</div>
+        <div class="hex-container">
+            <div class="btn-hex-double-outer">
+                <div class="btn-hex-double-gap">
+                    <div class="btn-hex-double-inner-border">
+                        <div class="btn-hex-double-inner">АКАДЕМИЯ</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hex-brown btn-hex-double-outer">
+                <div class="btn-hex-double-gap">
+                    <div class="btn-hex-double-inner-border">
+                        <div class="btn-hex-double-inner">КУЗНИЦА</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hex-gold btn-hex-double-outer">
+                <div class="btn-hex-double-gap">
+                    <div class="btn-hex-double-inner-border">
+                        <div class="btn-hex-double-inner">АРСЕНАЛ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider" style="margin-top: 15px;"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК: РОМБОВИДНЫЕ ИКОНКИ -->
+        <div class="section-title">РОМБОВИДНЫЕ ИКОНКИ (DIAMONDS)</div>
+        <div class="diamond-container">
+            <div class="diamond-btn"><i data-lucide="book-open"></i></div>
+            <div class="diamond-btn filled"><i data-lucide="gem"></i></div>
+            <div class="diamond-btn"><i data-lucide="scroll-text"></i></div>
+            <div class="diamond-btn filled"><i data-lucide="shield-half"></i></div>
+        </div>
+
+        <div class="divider" style="margin-top: 15px;"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК 4: КНОПКИ СЛИТКИ И ПИЛЮЛИ -->
+        <div class="section-title">ФОРМАТЫ КНОПОК</div>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin: 10px 0;">
+            <div class="btn-pill">КНОПКА-КАПСУЛА</div>
+            <div class="btn-ingot">КНОПКА-СЛИТОК</div>
+        </div>
+
+        <div class="divider" style="margin-top: 15px;"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК: СОСТАВНЫЕ КНОПКИ -->
+        <div class="section-title">СОСТАВНЫЕ КНОПКИ (ЦЕНТРАЛЬНЫЕ)</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin: 10px 0;">
+            <div class="combo-btn-container">
+                <div class="combo-btn-icon"><i data-lucide="scroll" style="color:var(--gold-base);"></i></div>
+                <div class="combo-btn-text">КВЕСТЫ (QUESTS)</div>
+            </div>
+            <div class="combo-btn-container">
+                <div class="combo-btn-icon"><i data-lucide="swords" style="color:var(--gold-base);"></i></div>
+                <div class="combo-btn-text"
+                    style="background: radial-gradient(ellipse at 50% 50%, #44912d 0%, #235714 70%, #0f2908 100%);">
+                    АРМОРИ (ARMOURY)</div>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 15px; font-size: 10px;">СОСТАВНЫЕ КНОПКИ 2 (СЛЕВА НАПРАВО)</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin: 10px 0;">
+            <div class="combo-btn-container">
+                <div class="combo-btn-icon"><i data-lucide="shopping-bag" style="color:var(--gold-base);"></i></div>
+                <div class="combo-btn-text ltr">ТОРГОВЕЦ (MERCHANT)</div>
+            </div>
+            <div class="combo-btn-container">
+                <div class="combo-btn-icon"><i data-lucide="landmark" style="color:var(--gold-base);"></i></div>
+                <div class="combo-btn-text ltr"
+                    style="background: linear-gradient(to right, #44912d 0%, #0f2908 100%);">ЛОГОВО (LAIR)</div>
+            </div>
+        </div>
+
+        <div class="divider" style="margin-top: 15px;"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК: ДОСКА С БУМАЖНЫМИ ПЛАШКАМИ -->
+        <div class="section-title">ДОСКА ОБЪЯВЛЕНИЙ</div>
+        <div class="paper-board-container">
+            <div class="paper-slip">
+                <div class="paper-slip-seal"><i data-lucide="swords" style="width:12px; height:12px; color:#fff;"></i>
+                </div>
+                <span>Охота на Гоблинов</span>
+            </div>
+            <div class="paper-slip">
+                <div class="paper-slip-seal"
+                    style="background: radial-gradient(circle, #298d9e, #0d3644); border-color:#63dcf2;">
+                    <i data-lucide="droplet" style="width:12px; height:12px; color:#fff;"></i>
+                </div>
+                <span>Собрать эликсиры</span>
+            </div>
+            <div class="paper-slip">
+                <div class="paper-slip-seal"
+                    style="background: radial-gradient(circle, #c19b54, #3a2a0d); border-color:#fcebc4;">
+                    <i data-lucide="crown" style="width:12px; height:12px; color:#fff;"></i>
+                </div>
+                <span>Доставить послание Королю</span>
+            </div>
+        </div>
+
+        <div class="divider" style="margin-top: 15px;"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК: УВЕДОМЛЕНИЯ И ФЛАЖКИ -->
+        <div class="section-title">УВЕДОМЛЕНИЯ (ALERTS) - ВАРИАНТЫ 1-3 (LTR)</div>
+        <div style="padding: 0 15px;">
+            <div class="alert-ribbon inward">
+                <div class="alert-ribbon-accent success"></div>
+                <div class="alert-icon" style="background:#44912d;"><i data-lucide="check"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Успех (Var 1)</div>
+                    <div class="alert-desc">Квест успешно завершен. Награда добавлена.</div>
+                </div>
+            </div>
+            <div class="alert-ribbon outward">
+                <div class="alert-ribbon-accent warning"></div>
+                <div class="alert-seal"><i data-lucide="alert-triangle" style="width: 18px;"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Внимание (Var 2)</div>
+                    <div class="alert-desc">Круглая печать-иконка в стиле доски.</div>
+                </div>
+            </div>
+            <div class="alert-ribbon inward">
+                <div class="alert-ribbon-accent" style="background: #a63232;"></div>
+                <div class="alert-seal square" style="background: radial-gradient(circle, #d65656, #360808);"><i
+                        data-lucide="x" style="width: 18px;"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Ошибка (Var 3)</div>
+                    <div class="alert-desc">Квадратная печать-иконка.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 15px; font-size: 10px;">УВЕДОМЛЕНИЯ (ALERTS) - ВАРИАНТЫ 4-6 (RTL)
+        </div>
+        <div style="padding: 0 15px;">
+            <div class="alert-ribbon rtl inward">
+                <div class="alert-ribbon-accent success"></div>
+                <div class="alert-icon" style="background:#44912d;"><i data-lucide="check"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Успех (Var 4)</div>
+                    <div class="alert-desc">Текст и иконка выровнены по правому краю.</div>
+                </div>
+            </div>
+            <div class="alert-ribbon rtl outward">
+                <div class="alert-ribbon-accent warning"></div>
+                <div class="alert-seal"><i data-lucide="alert-triangle" style="width: 18px;"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Внимание (Var 5)</div>
+                    <div class="alert-desc">Форма флажка инвертирована.</div>
+                </div>
+            </div>
+            <div class="alert-ribbon rtl inward">
+                <div class="alert-ribbon-accent" style="background: #a63232;"></div>
+                <div class="alert-seal square" style="background: radial-gradient(circle, #d65656, #360808);"><i
+                        data-lucide="x" style="width: 18px;"></i></div>
+                <div class="alert-content">
+                    <div class="alert-title">Ошибка (Var 6)</div>
+                    <div class="alert-desc">Квадратная печать в RTL режиме.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider" style="margin-top: 15px;"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК 5: UI UX KIT (Скроллы, инпуты, модалки) -->
+        <div class="ui-kit-panel">
+            <div class="section-title" style="font-size: 16px; margin-bottom: 10px;">UI / UX KIT</div>
+
+            <div style="margin-bottom: 5px;">
+                <input type="text" class="ui-input-field" placeholder="Введите имя героя..." value="Sir Lancelot">
+            </div>
+
+            <div class="ui-dropdown-container">
+                <div class="ui-input-field ui-dropdown">
+                    <span>Выберите класс...</span>
+                    <div class="dropdown-trigger">
+                        <i data-lucide="chevron-down"
+                            style="width:14px; height:14px; color:var(--gold-base); transition: color 0.2s;"></i>
+                    </div>
+                </div>
+                <div class="ui-dropdown-list">
+                    <div class="ui-dropdown-item">Воин (Warrior)</div>
+                    <div class="ui-dropdown-item">Маг (Mage)</div>
+                    <div class="ui-dropdown-item">Стрелок (Ranger)</div>
+                </div>
+            </div>
+
+            <div class="ui-slider-container">
+                <span class="ui-slider-label">ГРОМКОСТЬ ЗВУКОВ</span>
+                <input type="range" min="1" max="100" value="75" class="ui-slider">
+            </div>
+            <div class="ui-slider-container">
+                <span class="ui-slider-label">МУЗЫКА</span>
+                <input type="range" min="1" max="100" value="40" class="ui-slider">
+            </div>
+
+            <!-- ПРОГРЕСС БАРЫ (БЕЗ ПИНА) -->
+            <div class="section-title" style="font-size: 12px; margin: 15px 0 10px 0;">ПРОГРЕСС БАРЫ (СТАТИЧНЫЕ)</div>
+
+            <div class="prog-bar-container">
+                <div class="prog-hex-outer">
+                    <div class="prog-hex-inner">
+                        <div class="prog-fill-solid" style="width: 70%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="prog-bar-container">
+                <div class="prog-hex-outer">
+                    <div class="prog-hex-inner">
+                        <div class="prog-fill-seg-wrapper" style="width: 50%;">
+                            <div class="prog-fill-seg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="prog-bar-container">
+                <div class="prog-hex-outer">
+                    <div class="prog-hex-inner">
+                        <div class="prog-fill-pill" style="width: 85%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="prog-bar-container">
+                <div class="prog-hex-outer">
+                    <div class="prog-hex-inner">
+                        <div class="prog-fill-theme-color" style="width: 40%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ПОЛЗУНКИ С ПИНОМ (АЛЬТЕРНАТИВНЫЕ) -->
+            <div class="section-title" style="font-size: 12px; margin: 15px 0 10px 0;">ПОЛЗУНКИ (С ПИНОМ)</div>
+
+            <div class="ui-slider-container">
+                <input type="range" min="1" max="100" value="30" class="ui-slider-custom slider-diamond-thin">
+            </div>
+
+            <div class="ui-slider-container">
+                <input type="range" min="1" max="100" value="60" class="ui-slider-custom slider-hex">
+            </div>
+
+            <div class="ui-slider-container">
+                <input type="range" min="1" max="100" value="80" class="ui-slider-custom slider-hex-diamond">
+            </div>
+
+            <div class="ui-slider-container">
+                <input type="range" min="1" max="100" value="50" class="ui-slider-custom slider-theme">
+            </div>
+
+
+            <div class="ui-paper-large" style="margin-top: 20px;">
+                <strong
+                    style="display:block; text-align:center; font-family: var(--font-title); font-size: 14px; margin-bottom: 10px; color: #1a0f04;">ДРЕВНИЙ
+                    СВИТОК</strong>
+                Легенда гласит, что глубоко в горах скрыт древний артефакт. Многие герои пытались найти его, но никто не
+                вернулся. Будьте осторожны на своем пути, ибо тьма сгущается там, куда не падает свет солнца.
+            </div>
+
+            <div class="ui-popup">
+                <div class="ui-popup-header">
+                    <span
+                        style="font-family: var(--font-title); color: var(--gold-light); font-size: 12px; letter-spacing: 1px;">ПОДТВЕРЖДЕНИЕ</span>
+                    <i data-lucide="x" style="width:16px; height:16px; color: #fff; cursor: pointer;"></i>
+                </div>
+                <div class="ui-popup-body">
+                    Вы уверены, что хотите покинуть подземелье? Прогресс будет потерян.
+                    <div style="display:flex; gap: 10px; margin-top: 20px;">
+                        <div class="btn-theme-radial" style="flex:1; padding: 10px;">ДА</div>
+                        <div class="btn-theme-radial"
+                            style="flex:1; padding: 10px; filter: grayscale(1) brightness(0.7);">НЕТ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="flex-grow: 1;"></div> <!-- Спейсер -->
+
+        <!-- БЛОК 6: РЯДЫ НАВИГАЦИОННЫХ КНОПОК -->
+        <div class="bottom-nav-container" style="background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
+
+            <div class="nav-row-title">ОБЫЧНЫЕ КРУГЛЫЕ</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-circle border-normal"><i data-lucide="swords" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-normal"><i data-lucide="shield" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-normal"><i data-lucide="treasure-chest" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-circle border-normal"><i data-lucide="settings" stroke-width="1.5"></i></div>
+            </div>
+
+            <div class="nav-row-title">ОБЫЧНЫЕ КВАДРАТНЫЕ</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-square border-normal"><i data-lucide="swords" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-normal"><i data-lucide="shield" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-normal"><i data-lucide="treasure-chest" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-square border-normal"><i data-lucide="settings" stroke-width="1.5"></i></div>
+            </div>
+
+            <div class="nav-row-title">ДВОЙНОЙ БОРДЕР (КРУГЛЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-circle border-double"><i data-lucide="swords" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-double"><i data-lucide="shield" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-double"><i data-lucide="treasure-chest" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-circle border-double"><i data-lucide="settings" stroke-width="1.5"></i></div>
+            </div>
+
+            <div class="nav-row-title">ДВОЙНОЙ БОРДЕР (КВАДРАТНЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-square border-double"><i data-lucide="swords" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-double"><i data-lucide="shield" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-double"><i data-lucide="treasure-chest" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-square border-double"><i data-lucide="settings" stroke-width="1.5"></i></div>
+            </div>
+
+            <div class="nav-row-title">ВЫПУКЛЫЕ (КРУГЛЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-circle border-convex"><i data-lucide="swords" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-convex"><i data-lucide="shield" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-convex"><i data-lucide="treasure-chest" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-circle border-convex"><i data-lucide="settings" stroke-width="1.5"></i></div>
+            </div>
+
+            <div class="nav-row-title">ВЫПУКЛЫЕ (КВАДРАТНЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-square border-convex"><i data-lucide="swords" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-convex"><i data-lucide="shield" stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-convex"><i data-lucide="treasure-chest" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-square border-convex"><i data-lucide="settings" stroke-width="1.5"></i></div>
+            </div>
+
+            <div class="nav-row-title">ВЫПУКЛЫЕ (ДВОЙНОЙ БОРДЕР - КРУГЛЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-circle border-double-convex"><i data-lucide="swords" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-circle border-double-convex"><i data-lucide="shield" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-circle border-double-convex"><i data-lucide="treasure-chest"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-double-convex"><i data-lucide="settings" stroke-width="1.5"></i>
+                </div>
+            </div>
+
+            <div class="nav-row-title">ВЫПУКЛЫЕ (ДВОЙНОЙ БОРДЕР - КВАДРАТНЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-square border-double-convex"><i data-lucide="swords" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-square border-double-convex"><i data-lucide="shield" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-square border-double-convex"><i data-lucide="treasure-chest"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-double-convex"><i data-lucide="settings" stroke-width="1.5"></i>
+                </div>
+            </div>
+
+            <div class="nav-row-title">СИЛЬНО ВЫПУКЛЫЕ (КРУГЛЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-circle border-convex-strong"><i data-lucide="swords" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-circle border-convex-strong"><i data-lucide="shield" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-circle border-convex-strong"><i data-lucide="treasure-chest"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-convex-strong"><i data-lucide="settings" stroke-width="1.5"></i>
+                </div>
+            </div>
+
+            <div class="nav-row-title">СИЛЬНО ВЫПУКЛЫЕ (КВАДРАТНЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-square border-convex-strong"><i data-lucide="swords" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-square border-convex-strong"><i data-lucide="shield" stroke-width="1.5"></i>
+                </div>
+                <div class="nav-btn shape-square border-convex-strong"><i data-lucide="treasure-chest"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-convex-strong"><i data-lucide="settings" stroke-width="1.5"></i>
+                </div>
+            </div>
+
+            <div class="nav-row-title">СИЛЬНО ВЫПУКЛЫЕ (ДВОЙНОЙ БОРДЕР - КРУГЛЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-circle border-double-convex-strong"><i data-lucide="swords"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-double-convex-strong"><i data-lucide="shield"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-double-convex-strong"><i data-lucide="treasure-chest"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-circle border-double-convex-strong"><i data-lucide="settings"
+                        stroke-width="1.5"></i></div>
+            </div>
+
+            <div class="nav-row-title">СИЛЬНО ВЫПУКЛЫЕ (ДВОЙНОЙ БОРДЕР - КВАДРАТНЫЕ)</div>
+            <div class="nav-row">
+                <div class="nav-btn shape-square border-double-convex-strong"><i data-lucide="swords"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-double-convex-strong"><i data-lucide="shield"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-double-convex-strong"><i data-lucide="treasure-chest"
+                        stroke-width="1.5"></i></div>
+                <div class="nav-btn shape-square border-double-convex-strong"><i data-lucide="settings"
+                        stroke-width="1.5"></i></div>
+            </div>
+        </div>
+
+        <div class="divider" style="margin-top: 15px;"><i data-lucide="diamond"></i></div>
+
+        <!-- БЛОК 7: ХЕДЕР (FLARED BENTO STYLE) -->
+        <div class="section-title">ХЕДЕР (FLARED BENTO STYLE)</div>
+        <div class="rpg-header-flared">
+
+            <!-- ЛЕВЫЙ БЛОК -->
+            <div class="bento-panel header-left">
+                <div class="corner-top-right"></div>
+                <div class="corner-bottom-left"></div>
+
+                <div class="header-avatar-container">
+                    <div class="header-hex-outer">
+                        <div class="header-hex-inner-gap">
+                            <div class="header-hex-avatar">
+                                <i data-lucide="skull" style="color: var(--gold-light); width: 35px; height: 35px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Флажок уровня -->
+                    <div class="header-level-ribbon">
+                        <div class="header-level-ribbon-inner">LV 42</div>
+                    </div>
+                </div>
+
+                <div class="header-stats-container">
+                    <div class="header-player-row">
+                        <div class="header-player-name">SIR GALAHAD</div>
+                        <div class="header-player-badges">
+                            <div class="header-badge-icon"><i data-lucide="crown"></i></div>
+                            <div class="header-badge-icon" style="border-color: #52c2d6; color: #52c2d6;"><i
+                                    data-lucide="gem"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="flared-bar-wrapper flared-bar-health">
+                        <div class="flared-bar-text">3450 / 4000</div>
+                        <div class="flared-bar-fill"></div>
+                    </div>
+
+                    <div class="flared-bar-wrapper flared-bar-mana">
+                        <div class="flared-bar-text">1200 / 2500</div>
+                        <div class="flared-bar-fill"></div>
+                    </div>
+
+                    <div class="flared-bar-segmented">
+                        <div class="flared-segment filled"></div>
+                        <div class="flared-segment filled"></div>
+                        <div class="flared-segment filled"></div>
+                        <div class="flared-segment filled"></div>
+                        <div class="flared-segment filled"></div>
+                        <div class="flared-segment"></div>
+                        <div class="flared-segment"></div>
+                        <div class="flared-segment"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ПРАВЫЙ БЛОК -->
+            <div class="bento-panel header-right">
+                <div class="corner-top-left"></div>
+                <div class="corner-bottom-right"></div>
+
+                <!-- Кнопка меню с тематической стилизацией -->
+                <div class="flared-menu-btn">
+                    <i data-lucide="menu"></i>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Инициализация иконок Lucide -->
+    <script>
+        lucide.createIcons();
+
+        // Функция смены темы
+        function setTheme(themeClass) {
+            const app = document.getElementById('main-app');
+            app.className = 'app-container ' + themeClass;
+        }
+    </script>
+
+    <!-- 
+    ========================================================================
+    АРХИТЕКТУРНАЯ ДОКУМЕНТАЦИЯ И СКИЛЛЫ ДЛЯ PDE АГЕНТОВ (VANILLA JS COMPONENT APPROACH)
+    ========================================================================
+    
+    1. ВВЕДЕНИЕ
+    Цель этой архитектуры — создавать переиспользуемые UI компоненты (как в React), 
+    но без использования тяжелых фреймворков. Только чистый JavaScript, HTML и CSS.
+    Это позволит вашим PDE агентам генерировать интерфейсы быстро и надежно.
+
+    2. РЕКОМЕНДУЕМАЯ ФАЙЛОВАЯ СТРУКТУРА
+    Ваш проект должен быть организован следующим образом для удобной работы агента:
+
+    /src
+      /styles
+        main.css         (Здесь лежат CSS переменные, сброс стилей, глобальные классы)
+        themes.css       (Здесь лежат классы .theme-blue, .theme-red)
+      /components
+        /ui
+          Button.js      (Базовые кнопки: .btn-theme-concave, .btn-theme-convex)
+          NavIcon.js     (Круглые/квадратные навигационные иконки: .nav-btn)
+          HexButton.js   (Рубленые кнопки с clip-path)
+          Alert.js       (Ленты уведомлений: .alert-ribbon)
+          ProgressBar.js (Бары: .prog-bar-container)
+          Slider.js      (Ползунки: .ui-slider-custom)
+          Icon.js        (Обертка над Lucide)
+        /layout
+          TopBar.js      (Шапка профиля пользователя)
+          ShieldPanel.js (Панель экипировки)
+          DialogBox.js   (Квестовые пергаменты)
+      /core
+        renderer.js      (Логика рендера строк в DOM)
+      main.js            (Точка входа и сборка приложения)
+
+    3. ПАТТЕРН VANILLA КОМПОНЕНТА (Как агенты должны писать код)
+    
+    Компонент — это чистая JS функция, которая принимает объект параметров (props) 
+    и возвращает строковый шаблон (Template Literal) с HTML.
+    
+    Пример Button.js:
+    -----------------------------------------------------
+    export const Button = ({ text, type = 'concave', onClick = '' }) => {
+        // type может быть: 'concave', 'convex', 'ingot', 'pill', 'radial'
+        return `
+            <div class="btn-theme-${type}" onclick="${onClick}">
+                ${text}
+            </div>
+        `;
+    };
+    -----------------------------------------------------
+
+    Пример Alert.js (Сложный компонент с вложенностью):
+    -----------------------------------------------------
+    export const Alert = ({ title, description, type = 'success', direction = 'inward', rtl = false }) => {
+        const iconName = type === 'success' ? 'check' : 'alert-triangle';
+        const colorClass = type === 'success' ? 'success' : 'warning';
+        const bgClass = type === 'success' ? '#44912d' : '#c19b54';
+        
+        return `
+            <div class="alert-ribbon ${direction} ${rtl ? 'rtl' : ''}">
+                <div class="alert-ribbon-accent ${colorClass}"></div>
+                <div class="alert-icon" style="background:${bgClass};">
+                    <i data-lucide="${iconName}"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">${title}</div>
+                    <div class="alert-desc">${description}</div>
+                </div>
+            </div>
+        `;
+    };
+    -----------------------------------------------------
+
+    4. ПАТТЕРН КОНТРОЛЛЕРА (Как собирать UI воедино)
+
+    Файл main.js берет компоненты и "вмонтирует" их в контейнер.
+    -----------------------------------------------------
+    import { Button } from './components/ui/Button.js';
+    import { Alert } from './components/ui/Alert.js';
+
+    const App = () => {
+        return `
+            <div class="app-container theme-blue">
+                ${Alert({ title: 'Успех', description: 'Сохранено', type: 'success' })}
+                <div style="display: flex; gap: 15px;">
+                    ${Button({ text: 'ОТМЕНА', type: 'concave' })}
+                    ${Button({ text: 'ПРИНЯТЬ', type: 'convex' })}
+                </div>
+            </div>
+        `;
+    };
+
+    // Рендер
+    document.getElementById('root').innerHTML = App();
+    // Инициализация иконок после рендера (ВАЖНО!)
+    lucide.createIcons();
+    -----------------------------------------------------
+
+
+    5. СКИЛЛ ДЛЯ PDE АГЕНТА (СКОПИРУЙТЕ ТЕКСТ НИЖЕ В НАСТРОЙКИ АГЕНТА)
+    ========================================================================
+    SKILL NAME: generate_vanilla_rpg_component
+    DESCRIPTION: Creates robust, modular Vanilla JS components for the Fantasy RPG UI System.
+    
+    SYSTEM PROMPT / INSTRUCTIONS:
+    You are an expert UI developer specializing in Vanilla JavaScript component architecture.
+    Your task is to generate UI components using JavaScript Template Literals, adhering to the Fantasy RPG UI design system.
+
+    RULES:
+    1. Do NOT use React, Vue, or Angular. Use pure JavaScript functions returning HTML strings.
+    2. Every component must be a constant function taking a single `props` object: `export const ComponentName = ({ prop1, prop2 }) => { ... }`
+    3. Use Template Literals (backticks) to build the HTML structure.
+    4. Do not write CSS inside the JS. Assume the global CSS (with all CSS variables like var(--gold-base), and pre-defined classes like .btn-theme-convex, .alert-ribbon) is already loaded.
+    5. For icons, use the Lucide icon format: `<i data-lucide="icon-name"></i>`.
+    6. Always handle default values for props if applicable (e.g., `variant = 'normal'`).
+    7. Allow children injection via a `children` prop (as an HTML string) if the component is a wrapper (like a Panel or Dialog).
+
+    EXAMPLE OUTPUT REQUIRED FROM YOU:
+    User Request: "Create a NavIcon component that takes an icon, text, shape, and border style."
+    Your Code:
+    ```javascript
+    export const NavIcon = ({ icon = 'swords', text = '', shape = 'circle', border = 'normal' }) => {
+        // shape: 'circle' | 'square'
+        // border: 'normal' | 'double' | 'convex' | 'double-convex' | 'convex-strong'
+        return \`
+            <div class="nav-btn shape-\${shape} border-\${border}">
+                <i data-lucide="\${icon}"></i>
+                \${text ? \`<span>\${text}</span>\` : ''}
+            </div>
+        \`;
+    };
+    ```
+    ========================================================================
+    -->
+
+</body>
+
+</html>

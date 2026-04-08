@@ -1,0 +1,126 @@
+/* =============================================
+   ARC DESIGN SYSTEM — GlyphButton
+   Variants: concave, convex, radial, pill, ingot
+   ============================================= */
+
+/* --- Base --- */
+.arc-glyph {
+  border: 2px solid var(--gold-base);
+  border-radius: 4px;
+  color: var(--gold-light);
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 12px 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.1s ease-in-out;
+  text-shadow: 1px 1px 2px #000;
+}
+
+/* --- Concave (впуклая) --- */
+.arc-glyph--concave {
+  background: linear-gradient(to bottom, var(--t-color-bottom, #0d3644) 0%, var(--t-color-mid, #154c5e) 100%);
+  box-shadow:
+    inset 0 6px 12px rgba(0, 0, 0, 0.9),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.15),
+    0 1px 2px rgba(255, 255, 255, 0.1);
+  border-top-color: var(--gold-dark);
+  border-bottom-color: var(--gold-light);
+}
+
+.arc-glyph--concave:active {
+  box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.95);
+}
+
+/* --- Convex (выпуклая) --- */
+.arc-glyph--convex {
+  background: radial-gradient(circle at 50% 50%, var(--t-color-glare, #298d9e) 0%, var(--t-color-mid, #154c5e) 60%, var(--t-color-bottom, #0d3644) 100%);
+  box-shadow:
+    inset 0 0 15px rgba(255, 255, 255, 0.3),
+    inset 0 0 25px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(0, 0, 0, 0.6);
+  border-color: var(--gold-base);
+}
+
+.arc-glyph--convex:active {
+  transform: scale(0.98);
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+/* --- Radial (эллиптическая с ромбами) --- */
+.arc-glyph--radial {
+  border: 2px solid var(--gold-base);
+  background: radial-gradient(ellipse at 50% 50%, var(--t-color-glare, #298d9e) 0%, var(--t-color-mid, #154c5e) 55%, var(--t-color-bottom, #0d3644) 100%);
+  color: #fcebc4;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), inset 0 0 4px rgba(255, 255, 255, 0.6), inset 0 0 25px rgba(0, 0, 0, 0.8);
+}
+
+.arc-glyph--radial::before,
+.arc-glyph--radial::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 6px;
+  height: 6px;
+  background-color: var(--gold-light);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.arc-glyph--radial::before { left: 15px; }
+.arc-glyph--radial::after { right: 15px; }
+
+.arc-glyph--radial:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 1);
+}
+
+/* --- Pill (капсула) --- */
+.arc-glyph--pill {
+  border: 2px solid var(--gold-base);
+  border-radius: 30px;
+  background: radial-gradient(ellipse at 50% 50%, var(--t-color-glare, #298d9e) 0%, var(--t-color-mid, #154c5e) 50%, var(--t-color-bottom, #0d3644) 100%);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 0, 0, 0.6);
+  padding: 12px 25px;
+}
+
+.arc-glyph--pill:active {
+  transform: scale(0.98);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+/* --- Ingot (слиток) --- */
+.arc-glyph--ingot {
+  background: radial-gradient(ellipse at 50% 50%, var(--t-color-glare, #298d9e) 0%, var(--t-color-mid, #154c5e) 50%, var(--t-color-bottom, #0d3644) 100%);
+  border-top: 2px solid var(--gold-base);
+  border-bottom: 2px solid var(--gold-base);
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.7), inset 0 0 10px rgba(0, 0, 0, 0.6);
+}
+
+.arc-glyph--ingot::before,
+.arc-glyph--ingot::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 12px;
+  background: radial-gradient(circle at 50% 50%, var(--gold-light) 0%, var(--gold-base) 60%, var(--gold-dark) 100%);
+  border: 1px solid var(--gold-very-dark);
+  border-radius: 3px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.8), inset 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.arc-glyph--ingot::before { left: -6px; }
+.arc-glyph--ingot::after { right: -6px; }
+
+.arc-glyph--ingot:active {
+  transform: scale(0.98);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0, 0, 0, 0.9);
+}
