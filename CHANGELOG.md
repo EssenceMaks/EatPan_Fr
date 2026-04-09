@@ -1,18 +1,18 @@
-# EatPan Frontend Changelog
+# Історія змін (Changelog) EatPan Frontend
 
 ## [1.0.0] - 2026-04-09
 
-### Added
-- **UI Architecture (Arc Bento Header Full)**: Integrated the RPG-themed "flared bento" header. Implemented dynamic "Guest" vs "Authenticated" layout morphing with precision CSS corner flares that map seamlessly to the structural grid parameters.
-- **Configuration Security Management**: Extracted all sensitive API credentials (Google Client ID, Supabase URL/Anon Key) into a standard `src/core/config.js` file (secured via `.gitignore`). Added `config.example.js` for safe developer onboarding.
-- **Local Storage Telemetry**: Implemented `localStorage` caching for the web authentication `nonce`. This resolves silent cross-tab authorization desyncs and browser strict-cache resets.
+### Додано
+- **Архітектура UI (Arc Bento Header Full)**: Інтегровано заголовок у стилі RPG "flared bento". Реалізовано динамічну зміну макету ("Гість" та "Авторизований користувач") з точними кутовими елементами, які ідеально вписуються в структурну CSS-сітку.
+- **Управління безпекою конфігурації**: Усі конфіденційні облікові дані API (Google Client ID, Supabase URL / Anon Key) винесено в окремий файл `src/core/config.js` (захищено через `.gitignore`). Додано файл `config.example.js` для безпечного налаштування середовища розробниками.
+- **Кешування Local Storage**: Реалізовано збереження `nonce` авторизації через `localStorage`. Це вирішує проблему тихої розсинхронізації між вкладками браузера та запобігає втраті даних при оновленні сторінки.
+- **Алгоритм вибору браузера для авторизації (Smart Fallback)**: Додано "розумний" алгоритм розпізнавання браузера. Тепер система використовує One Tap (FedCM) виключно в чистому Google Chrome. Для браузерів із захистом від трекерів (Opera, Firefox, Safari тощо) впроваджена автоматична переадресація через класичний Supabase OAuth. Це повністю вирішує проблеми з помилками 403 (Tracker Blocked) в Opera.
 
-### Changed
-- **Google Identity (FedCM / One Tap) Flow**: Refactored the token exchange initialization. The native Google One Tap popup is no longer spammed on load; it is now elegantly summoned on-demand when the user clicks our custom "Google Auth" button.
-- **AppShell State Transitions**: Upgraded `AppShell.js` to context-switch dynamically between unauthenticated layouts and the personalized `UserProfilePanel` layout based on live Supabase auth-state subscriptions.
+### Змінено
+- **Потік ідентифікації Google (FedCM / One Tap)**: Переобладнано ініціалізацію обміну токенами. Нативне вікно Google One Tap більше не "спамить" користувача відразу після завантаження сторінки; натомість воно елегантно викликається лише при натисканні на нашу власну кнопку "Google Auth".
+- **Переходи станів AppShell**: Оновлено `AppShell.js` для динамічного перемикання між макетами "гостя" та розширеною персоналізованою панеллю `UserProfilePanel` на основі підписок реального часу на стан авторизації від Supabase.
 
-### Fixed
-- **Google / Supabase Token 'Nonce' Mismatch (400 Bad Request)**: Engineered a self-healing fallback mechanism that locally decrypts and inspects the Google JWT payload before transmitting it. By dynamically detecting missing nonce claims caused by Google's aggressive credential caching, the code mathematically restructures the Supabase request payload to guarantee seamless, "red-error-free" sign-ins.
-- **Profile Avatars Blocked (403 Forbidden)**: Patched `<img>` structures in `UserProfilePanel` and bento headers with the `referrerpolicy="no-referrer"` attribute to bypass Chrome's cross-origin protection rendering errors for Google avatars.
-- **CSS Bento Corner "Bleeding"**: Eliminated hardcoded background masks for the bento flared corners (`arc-bento-full__corner-tr`, etc.), forcing them to inherit proper opacity and masking rather than clashing with the global RPG-themed body background.
-
+### Виправлено
+- **Конфлікт токена 'Nonce' (400 Bad Request)**: Розроблено механізм локальної розшифровки та перевірки навантаження Google JWT (самовідновлення) перед відправкою до сервера. Алгоритм динамічно виявляє відсутність `nonce` (спричинену кешуванням Google) і перебудовує запит до Supabase, гарантуючи безперебійний вхід без фатальних помилок мережі.
+- **Блокування аватарів профілю (403 Forbidden)**: Доповнено теги `<img>` в усіх панелях користувача атрибутом `referrerpolicy="no-referrer"`. Це розблоковує відображення аватарок з серверів Google, обходячи обмеження Cross-Origin захисту в Chrome.
+- **"Брудне" відображення кутів CSS Bento**: Замінено жорстко задані кольори фону (суцільні пікселі) у кутках заголовка (`arc-bento-full__corner-tr` та інших) на чисте наслідування масок та прозоростей. Це усунуло візуальні артефакти, що конфліктували із глобальним темним RPG-фоном сторінки.

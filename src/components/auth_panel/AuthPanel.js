@@ -105,7 +105,8 @@ export default class AuthPanel extends Component {
             <span class="auth-panel__flag" title="Español" style="font-size: 1.5rem; cursor: pointer;">🇪🇸</span>
           </div>
           <h2 class="auth-form-title">${title}</h2>
-          <div class="auth-form">
+          <div class="auth-form" style="position: relative;">
+            <div id="google-one-tap-container" style="position: absolute; top: -20px; right: calc(10% + 20px); z-index: 10000; min-width: 350px;"></div>
             ${content}
           </div>
         </div>
@@ -177,17 +178,24 @@ export default class AuthPanel extends Component {
 
     this.currentNonce = rawNonce;
 
-    // Initialize Google One Tap if library loaded
-    if (window.google) {
+    // Strict check for pure Google Chrome (excludes Opera, Edge, Brave)
+    this.isStrictChrome = /Chrome/.test(navigator.userAgent) && 
+                          /Google Inc/.test(navigator.vendor) && 
+                          !/OPR|Opera|Edg/.test(navigator.userAgent);
+
+    // Initialize Google One Tap ONLY if library is loaded AND browser is strictly Chrome
+    // This prevents Opera/Firefox/Safari from triggering background block errors
+    if (window.google && this.isStrictChrome) {
       google.accounts.id.initialize({
         client_id: APP_CONFIG.GOOGLE_CLIENT_ID,
         nonce: hashedNonce,
+        prompt_parent_id: 'google-one-tap-container',
         callback: async (response) => {
           // Parse Google JWT to check if it actually contains a nonce
           const payloadBase64Url = response.credential.split('.')[1];
           const payloadBase64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
-          const jwtPayload = JSON.parse(decodeURIComponent(atob(payloadBase64).split('').map(function(c) {
-              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          const jwtPayload = JSON.parse(decodeURIComponent(atob(payloadBase64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
           }).join('')));
 
           const authParams = {
@@ -286,10 +294,33 @@ export default class AuthPanel extends Component {
     const btnGoogle = this.element.querySelector('#auth-btn-google');
     if (btnGoogle) {
       btnGoogle.addEventListener('click', async () => {
-        if (window.google) {
-          google.accounts.id.prompt();
+        const fallbackToOAuth = async () => {
+          btnGoogle.innerHTML = 'Завантаження...';
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: window.location.origin,
+              queryParams: { access_type: 'offline', prompt: 'consent' }
+            }
+          });
+          if (error) {
+            this.showError('Помилка Google: ' + error.message);
+            btnGoogle.innerHTML = 'Google Auth';
+          }
+        };
+
+        if (window.google && this.isStrictChrome) {
+          google.accounts.id.prompt((notification) => {
+            // If the One Tap modal fails to display in Chrome (e.g., extensions, FedCM skipped)
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+               console.warn('[EatPan Auth] One Tap failed to display. Reason:', notification.getNotDisplayedReason());
+               fallbackToOAuth(); // Auto-fallback to Classic OAuth
+            }
+          });
         } else {
-          this.showError('Google SDK не завантажено.');
+          // Instantly fallback to Classic OAuth for Opera, Safari, Firefox, Edge, or if SDK is blocked
+          console.warn('[EatPan Auth] Non-Chrome or SDK blocked. Using Classic OAuth.');
+          fallbackToOAuth();
         }
       });
     }
