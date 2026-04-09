@@ -1,89 +1,249 @@
 /* =============================================
-   AUTH PANEL — RPG Login/Register Wedge
+   AUTH PANEL OVERLAY — Left Slidout
    ============================================= */
 
-#auth-wedge {
-  background: var(--bg-sector-card);
+.auth-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000; /* above everything */
+  display: flex;
+  background: rgba(14, 15, 20, 0);
+  backdrop-filter: blur(0px);
+  transition: background 0.4s ease, backdrop-filter 0.4s ease;
 }
 
-#auth-wedge.active .sector-content {
+/* Background overlay when active */
+.auth-overlay.is-open {
+  pointer-events: all;
+  background: rgba(14, 15, 20, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.auth-panel {
+  width: 85%;
+  max-width: 380px;
+  height: stretch; /* fill available height if using flex */
+  height: 100%;
+  background: var(--parchment);
+  border-right: 2px solid var(--ink);
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  pointer-events: all;
+  position: relative;
   display: flex;
   flex-direction: column;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+}
+
+.auth-overlay.is-open .auth-panel {
+  transform: translateX(0);
+}
+
+/* Decorative Galtel corners to mimic UI kit */
+.auth-panel__corner-tr,
+.auth-panel__corner-br {
+  position: absolute;
+  right: -2px;
+  width: 24px;
+  height: 24px;
+  background: var(--parchment);
+  border-left: 2px solid var(--ink);
+  z-index: 2;
+  border-radius: 0 0 0 100%;
+}
+.auth-panel__corner-tr {
+  top: -2px;
+  border-bottom: 2px solid var(--ink);
+}
+.auth-panel__corner-br {
+  bottom: -2px;
+  border-top: 2px solid var(--ink);
+  border-radius: 100% 0 0 0;
+}
+
+/* AuthPanel Top: Flags */
+.auth-panel__header {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.2);
+}
+
+.auth-panel__flags {
+  display: flex;
+  gap: 16px;
+}
+
+.auth-panel__flag {
+  font-size: 1.5rem;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.2s, filter 0.2s;
+  filter: grayscale(100%);
+}
+
+.auth-panel__flag.active,
+.auth-panel__flag:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+.auth-panel__close {
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(var(--ink-rgb), 0.05);
+}
+.auth-panel__close:hover {
   opacity: 1;
-  padding: 24px;
+  background: rgba(var(--ink-rgb), 0.1);
+}
+
+/* AuthPanel Content */
+.auth-panel__content {
+  flex: 1;
+  padding: 30px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .auth-form {
-  width: 100%;
-  max-width: 340px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .auth-form-title {
   font-family: var(--font-display);
-  font-size: 1.6rem;
-  color: var(--text-accent);
+  font-size: 2rem;
+  color: var(--ink);
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
 }
 
 .auth-field {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .auth-field label {
-  display: block;
   font-family: var(--font-title);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
+  letter-spacing: 0.15em;
+  color: var(--ink);
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.auth-field input {
+  background: rgba(var(--wine-rgb), 0.03);
+  border: none;
+  border-bottom: 2px solid rgba(var(--ink-rgb), 0.3);
+  padding: 10px 8px;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: var(--ink);
+  transition: border-color 0.2s, background 0.2s;
+}
+.auth-field input:focus {
+  outline: none;
+  border-bottom-color: var(--wine);
+  background: rgba(var(--wine-rgb), 0.08);
+}
+
+/* Buttons */
+.auth-btn-primary {
+  margin-top: 12px;
+  background: var(--ink);
+  color: var(--parchment);
+  border: 2px solid var(--ink);
+  padding: 14px;
+  font-family: var(--font-title);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+  box-shadow: 0 4px 10px rgba(var(--ink-rgb), 0.2);
+}
+.auth-btn-primary:active {
+  transform: translateY(1px);
+}
+.auth-btn-primary:hover {
+  background: var(--wine);
+  border-color: var(--wine);
+}
+
+.auth-btn-google {
+  margin-top: 8px;
+  background: transparent;
+  color: var(--ink);
+  border: 2px solid rgba(var(--ink-rgb), 0.5);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: var(--font-title);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.auth-btn-google svg {
+  width: 20px;
+  height: 20px;
+}
+.auth-btn-google:hover {
+  background: rgba(var(--ink-rgb), 0.05);
+  border-color: var(--ink);
 }
 
 .auth-divider-text {
   text-align: center;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin: 4px 0;
+  font-size: 0.8rem;
+  color: rgba(var(--ink-rgb), 0.5);
+  margin: 12px 0;
   font-style: italic;
+  font-family: var(--font-body);
 }
 
-/* Google OAuth Button */
-.rpg-btn--google {
-  background: linear-gradient(180deg, #4a3020 0%, #362218 50%, #2a1a10 100%);
-  border: 1px solid rgba(var(--gold-rgb), 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.rpg-btn--google svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* Toggle login/register */
 .auth-toggle {
   text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  margin-top: 8px;
+  font-size: 0.85rem;
+  color: rgba(var(--ink-rgb), 0.7);
+  margin-top: 24px;
+  font-family: var(--font-body);
 }
 
 .auth-toggle a {
-  color: var(--text-accent);
+  color: var(--wine);
   cursor: pointer;
   text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.2s;
 }
-
 .auth-toggle a:hover {
-  color: var(--gold-light);
+  color: var(--blood);
 }

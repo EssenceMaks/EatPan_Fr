@@ -29,7 +29,7 @@ export default class ArcBentoHeader extends Component {
       <header class="arc-bento-header${this.state.isAuth ? ' is-auth' : ''}">
         
         <!-- ====== LEFT PANEL ====== -->
-        <div class="arc-bento-full__panel arc-bento-full__left ${isAuth ? '' : 'arc-guest-mode'}" id="bh-left-btn">
+        <div class="arc-bento-full__panel arc-bento-full__left ${!isAuth ? 'arc-guest-mode' : ''}" id="bh-left-btn">
           
           <div class="arc-bento-full__corner-tr"></div>
           <div class="arc-bento-full__corner-bl"></div>
@@ -39,8 +39,11 @@ export default class ArcBentoHeader extends Component {
           <div class="arc-bento-full__avatar-zone">
             <div class="arc-bento-full__hex-outer">
               <div class="arc-bento-full__hex-gap">
-                <div class="arc-bento-full__hex-avatar">
-                  <i data-lucide="skull" style="width:35px;height:35px;"></i>
+                <div class="arc-bento-full__hex-avatar" style="overflow: hidden;">
+                  ${userStats.avatarUrl 
+                    ? `<img src="${userStats.avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar" referrerpolicy="no-referrer" />` 
+                    : `<i data-lucide="user" style="width:35px;height:35px; stroke-width: 1.5; color: var(--text-accent);"></i>`
+                  }
                 </div>
               </div>
             </div>
@@ -74,7 +77,9 @@ export default class ArcBentoHeader extends Component {
           </div>
           ` : `
           <!-- GUEST MODE -->
-          <div id="bh-guest-diamond"></div>
+          <div style="grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; width: 100%; min-height: 55px;">
+            <div id="bh-guest-diamond"></div>
+          </div>
           `}
         </div>
 
@@ -108,7 +113,6 @@ export default class ArcBentoHeader extends Component {
   }
 
   async onMount() {
-    // 1. Guest diamond (only component left)
     if (!this.state.isAuth) {
       await new SigilDiamond({ icon: 'log-in', variant: 'hollow' }).render(this.$('#bh-guest-diamond'), 'innerHTML');
     }

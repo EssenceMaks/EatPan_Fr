@@ -48,7 +48,7 @@ export default class ArcBentoHeaderFull extends Component {
             <div class="arc-bento-full__hex-outer">
               <div class="arc-bento-full__hex-gap">
                 <div class="arc-bento-full__hex-avatar">
-                  <i data-lucide="skull" style="width:35px;height:35px;"></i>
+                  <i data-lucide="user" style="width:35px;height:35px;"></i>
                 </div>
               </div>
             </div>

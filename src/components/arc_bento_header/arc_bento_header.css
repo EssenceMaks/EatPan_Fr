@@ -59,10 +59,13 @@
 
 .arc-bento-full__left.arc-guest-mode {
   grid-template-columns: auto;
-  border-radius: 0 0 20px 0;
-  padding: 10px 15px;
+  padding: 10px;
   min-height: auto;
   gap: 0;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  min-width: auto !important;
 }
 
 .arc-bento-full__corner-tr {
@@ -99,14 +102,10 @@
   box-shadow: 0 0 0 50px var(--arc-bento-corner-bl);
 }
 
-/* Hide TR, BL galtels in Guest mode */
+/* Hide TR, BL galtels in Guest mode since there is no background panel to blend with */
 .arc-bento-full__left.arc-guest-mode .arc-bento-full__corner-tr,
 .arc-bento-full__left.arc-guest-mode .arc-bento-full__corner-bl {
-  display: none;
-}
-/* But maybe just the BL corner is naturally hidden by logic... actually we need one galtel for guest */
-.arc-bento-full__left.arc-guest-mode .arc-bento-full__corner-tr {
-  display: block; /* Guest mode has one top-right corner to curve into the screen edge! */
+  display: none !important;
 }
 
 /* =========================================

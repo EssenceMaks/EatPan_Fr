@@ -60,6 +60,22 @@
   height: 150px;
   /* Only bottom-right corner is rounded */
   border-radius: 0 0 40px 0;
+  
+  /* Responsive width as requested: nominally 3x on large, 2x on mid */
+  min-width: 450px; 
+}
+
+@media (max-width: 1200px) {
+  .arc-bento-full__left {
+    min-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .arc-bento-full__left {
+    min-width: auto;
+    width: auto;
+  }
 }
 
 /* =========================================

@@ -25,3 +25,6 @@ figma_uikit_generator.js
 .agents/rules/sync_with_figma.md
 docs/changelogs/figma_changelog.md
 docs/changelogs/figma_validation.md
+
+# Secure config
+src/core/config.js

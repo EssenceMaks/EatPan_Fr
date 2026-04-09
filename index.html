@@ -10,6 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Work+Sans:wght@300;400;500;600;700&family=Cinzel:wght@400;600;700&family=Noto+Serif:wght@400;700;900&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Identity Services (One Tap / FedCM) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -26,6 +28,8 @@
   <link rel="stylesheet" href="./src/components/ui_kit/flux_segment_bar/flux_segment_bar.css">
   <link rel="stylesheet" href="./src/components/ui_kit/edge_galtel/edge_galtel.css">
   <link rel="stylesheet" href="./src/components/ui_kit/glyph_nav/glyph_nav.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/glyph_button/glyph_button.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/spark_ribbon/spark_ribbon.css">
   
   <!-- Composite Components -->
   <link rel="stylesheet" href="./src/components/arc_bento_header_full/arc_bento_header_full.css">
@@ -54,6 +58,9 @@
       <div id="sector-carousel">
         <!-- Sectors injected by main.js -->
       </div>
+
+      <!-- Auth Overlay (slides from left) -->
+      <div id="auth-overlay" class="auth-overlay"></div>
 
       <!-- Menu Overlay (within main-content, doesn't cover header/footer) -->
       <div id="menu-overlay">

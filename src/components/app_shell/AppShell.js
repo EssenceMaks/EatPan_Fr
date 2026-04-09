@@ -9,6 +9,9 @@ import Component from '../../core/Component.js';
 import SectorCarousel from '../sector_carousel/SectorCarousel.js';
 import MenuOverlay from '../menu/MenuOverlay.js';
 import ArcBentoHeader from '../arc_bento_header/ArcBentoHeader.js';
+import AuthPanel from '../auth_panel/AuthPanel.js';
+import UserProfilePanel from '../user_profile_panel/UserProfilePanel.js';
+import { supabase } from '../../core/supabaseClient.js';
 
 export default class AppShell extends Component {
   constructor(props = {}) {
@@ -52,6 +55,15 @@ export default class AppShell extends Component {
       await this.menu.render(menuTarget, 'innerHTML');
     }
 
+    // 3.5 Mount AuthPanel & UserProfilePanel
+    this.authPanel = new AuthPanel({
+      onAuthSuccess: (session) => this._handleAuthSuccess(session)
+    });
+
+    this.userProfilePanel = new UserProfilePanel({
+      onLogoutSuccess: () => this._handleLogoutSuccess()
+    });
+
     // 4. Mount Header
     await this._mountHeader();
 
@@ -71,27 +83,38 @@ export default class AppShell extends Component {
   // HEADER MOUNT
   // ============================================================
   async _mountHeader() {
-    let isAuth = !!localStorage.getItem('eatpan_header_auth_user');
-    
+    // Check real Supabase session on startup
+    const { data: { session } } = await supabase.auth.getSession();
+    let isAuth = !!session;
+    let initialStats = undefined;
+
+    if (isAuth) {
+      initialStats = {
+        name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || 'HERO',
+        avatarUrl: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || null,
+        level: 1,
+        hp: { value: 3450, max: 4000 },
+        mp: { value: 1200, max: 2500 },
+        stamina: { filled: 5, total: 8 }
+      };
+    }
+
     this.header = new ArcBentoHeader({
       isAuth,
+      userStats: initialStats,
       onLoginClick: () => {
         if (this.menu?.isOpen) this.menu.close();
         if (document.body.classList.contains('active-mode')) {
           history.back();
           return;
         }
-        
-        // TEMPORARY: Toggle the auth state to immediately show/hide user block
-        isAuth = !isAuth;
-        if (isAuth) {
-          localStorage.setItem('eatpan_header_auth_user', 'true');
+
+        if (!this.header.state.isAuth) {
+          // Show Auth Panel overlay
+          this.authPanel?.open();
         } else {
-          localStorage.removeItem('eatpan_header_auth_user');
-        }
-        
-        if (this.header) {
-          this.header.setAuth(isAuth);
+          // Show User Profile Panel overlay
+          this.userProfilePanel?.open();
         }
       },
       onClockClick: () => {
@@ -137,6 +160,29 @@ export default class AppShell extends Component {
   }
 
   // ============================================================
+  // AUTH
+  // ============================================================
+  _handleAuthSuccess(session) {
+    if (this.header) {
+      const userStats = {
+        name: session?.user?.user_metadata?.name || session?.user?.user_metadata?.full_name || 'HERO',
+        avatarUrl: session?.user?.user_metadata?.avatar_url || session?.user?.user_metadata?.picture || null,
+        level: 1,
+        hp: { value: 3450, max: 4000 },
+        mp: { value: 1200, max: 2500 },
+        stamina: { filled: 5, total: 8 }
+      };
+      this.header.setAuth(true, userStats);
+    }
+  }
+
+  _handleLogoutSuccess() {
+    if (this.header) {
+      this.header.setAuth(false);
+    }
+  }
+
+  // ============================================================
   // CLOCK
   // ============================================================
   _startClock() {
@@ -146,7 +192,7 @@ export default class AppShell extends Component {
       const now = new Date();
       const hh = String(now.getHours()).padStart(2, '0');
       const mm = String(now.getMinutes()).padStart(2, '0');
-      
+
       // Update dynamic header clock
       if (this.header) this.header.updateTime(hh, mm);
 
@@ -155,7 +201,7 @@ export default class AppShell extends Component {
       if (clockFace && !ticksGenerated) {
         // 24-hour clock: 360 degrees / 24 hours = 15 degrees per hour
         const DEG_PER_HOUR = 15;
-        
+
         // Remove existing ticks/labels just in case
         clockFace.querySelectorAll('.tick, .clock-label').forEach(el => el.remove());
 
@@ -172,10 +218,10 @@ export default class AppShell extends Component {
         const labels = [
           { hour: 12, text: '12' },
           { hour: 18, text: '18' },
-          { hour: 0,  text: '0' },
-          { hour: 6,  text: '6' }
+          { hour: 0, text: '0' },
+          { hour: 6, text: '6' }
         ];
-        
+
         // Function to calculate angle for given hour/minute
         const getAngle = (h, m = 0) => (((h - 12 + 24) % 24) * DEG_PER_HOUR + m * 0.25) % 360;
 
@@ -186,7 +232,7 @@ export default class AppShell extends Component {
           const label = document.createElement('div');
           label.className = 'clock-label';
           label.style.left = (50 + r * Math.cos(rad)) + '%';
-          label.style.top  = (50 + r * Math.sin(rad)) + '%';
+          label.style.top = (50 + r * Math.sin(rad)) + '%';
           label.textContent = text;
           clockFace.appendChild(label);
         });
@@ -197,7 +243,7 @@ export default class AppShell extends Component {
       // Update big clock display
       const bigTimeDisplay = document.getElementById('bigTimeDisplay');
       if (bigTimeDisplay) bigTimeDisplay.textContent = `${hh}:${mm}`;
-      
+
       const bigClockHand = document.getElementById('bigClockHand');
       if (bigClockHand) {
         const hours = now.getHours();
@@ -207,7 +253,7 @@ export default class AppShell extends Component {
         bigClockHand.style.transform = `translateX(-50%) rotate(${rot}deg)`;
       }
     };
-    
+
     update();
     this.clockInterval = setInterval(update, 1000);
   }
@@ -241,6 +287,11 @@ export default class AppShell extends Component {
     window.toggleProfileWedge = () => this.carousel?.toggleProfileWedge();
     window.toggleAuthWedge = () => this.carousel?.toggleAuthWedge();
     window.goBack = () => history.back();
+    // Helper to log out for testing purposes:
+    window.devLogOut = () => {
+      localStorage.removeItem('eatpan_header_auth_user');
+      if (this.header) this.header.setAuth(false);
+    };
   }
 
   // ============================================================
