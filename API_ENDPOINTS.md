@@ -72,3 +72,25 @@
   - **Stream:** `eatpan_sync`
   - **Subject:** `eatpan.sync`
 - Формат подій в Outbox включає тип сутності (`recipe`, `recipe_book`), `uuid`, операцію (`upsert`, `patch`, `delete`) та сам `payload`.
+
+
+
+меню внизу а не вверху
+@media (min-width: 320px) and (max-width: 479px) and (orientation: portrait)
+@media (min-width: 320px) and (max-width: 479px) and (orientation: landscape)
+@media (min-width: 480px) and (max-width: 767px) and (orientation: portrait)
+@media (min-width: 480px) and (max-width: 767px) and (orientation: landscape)
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait)
+@media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape)
+
+
+меню сверху
+@media (min-width: 1024px) and (max-width: 1199px) and (orientation: portrait)
+@media (min-width: 1024px) and (max-width: 1199px) and (orientation: landscape)
+@media (min-width: 1200px) and (max-width: 1439px)
+@media (min-width: 1440px) and (max-width: 1919px)
+@media (min-width: 1024px) and (max-width: 1199px) and (max-height: 750px) and (orientation: landscape)
+@media (min-width: 1200px) and (max-width: 1439px) and (max-height: 750px)
+@media (min-width: 1440px) and (max-width: 1919px) and (max-height: 850px)
+@media (min-width: 1920px) and (max-height: 950px)
+@media (min-width: 1920px)

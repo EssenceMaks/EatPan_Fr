@@ -6,18 +6,21 @@
  * Використовує display:flex для горизонтальної прокрутки (виняток із Grid-правила)
  */
 import Component from '../../core/Component.js';
+import RecipeBook from '../recipe_book/RecipeBook.js';
 
 // ============================================================
 // SECTOR REGISTRY — easy to add/remove/reorder
 // ============================================================
 const SECTORS = [
   { id: 'hero',        title: 'Hero',         icon: 'swords',       subtitle: 'Your adventure starts here' },
+  { id: 'dashboard',   title: 'My Dashboard', icon: 'layout-dashboard', subtitle: 'Overview' },
+  { id: 'taskboard',   title: 'Taskboard',    icon: 'clipboard-list', subtitle: 'Plan & organize' },
   { id: 'kitchen',     title: 'My Kitchen',   icon: 'cooking-pot',  subtitle: 'Cooking workspace' },
   { id: 'recipe-book', title: 'Recipe Book',  icon: 'book-open',    subtitle: 'Collection of recipes' },
-  { id: 'craft-space', title: 'Craft Space',  icon: 'wrench',       subtitle: 'Creative workshop' },
-  { id: 'taskboard',   title: 'Taskboard',    icon: 'clipboard-list', subtitle: 'Plan & organize' },
+  { id: 'storage',     title: 'Storage',      icon: 'package-open', subtitle: 'Pantry / Larder / Cellar / Fridge' },
+  { id: 'lists',       title: 'Lists',        icon: 'list-todo',    subtitle: 'Grocery List, Shop List' },
   { id: 'timeline',    title: 'Timeline',     icon: 'calendar-days', subtitle: 'Calendar & schedule' },
-  { id: 'social',      title: 'Social',       icon: 'users',        subtitle: 'Friends & community' },
+  { id: 'contacts',    title: 'Contacts',     icon: 'users',        subtitle: 'Friends & community' },
 ];
 
 const WEDGES = [
@@ -136,6 +139,14 @@ export default class SectorCarousel extends Component {
     this._setupHistoryListener();
 
     if (window.lucide) lucide.createIcons({ root: this.element });
+
+    // Mount complex blocks inside the original blocks
+    const originalRecipeBookContainer = this.carousel.querySelector('.original-block[data-sector-id="recipe-book"] .sector-content');
+    if (originalRecipeBookContainer) {
+      originalRecipeBookContainer.innerHTML = '';
+      this.recipeBookComponent = new RecipeBook();
+      await this.recipeBookComponent.render(originalRecipeBookContainer, 'innerHTML');
+    }
   }
 
   onDestroy() {
@@ -532,6 +543,17 @@ export default class SectorCarousel extends Component {
       if (!state || !state.type) {
         this.deactivateAll();
         return;
+      }
+
+      // Sub-state routing optimization:
+      // If the block is already active, don't perform the reset/reactivate logic here.
+      // This allows sub-components to handle their own pushState/popState logic nicely.
+      if (state.type === 'block') {
+        const block = this.carousel.querySelector(`.original-block[data-index="${state.index}"]`);
+        if (block && block.classList.contains('active')) {
+          // Block is already active, ignore it so sub-components can handle their own popstate
+          return;
+        }
       }
 
       document.body.classList.remove('active-mode', 'clock-mode');

@@ -60,9 +60,9 @@
   height: 150px;
   /* Only bottom-right corner is rounded */
   border-radius: 0 0 40px 0;
-  
+
   /* Responsive width as requested: nominally 3x on large, 2x on mid */
-  min-width: 450px; 
+  min-width: 450px;
 }
 
 @media (max-width: 1200px) {
@@ -224,13 +224,20 @@
 
 .arc-bento-full__hex-avatar {
   width: 70px;
-  height: 80px;
+  height: 100%;
   background: radial-gradient(circle at 50% 30%, #444, #111);
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: grid;
   place-items: center;
   position: relative;
   color: var(--gold-light);
+}
+
+.arc-bento-full__hex-avatar img {
+  width: 94%;
+  height: 94%;
+  object-fit: cover;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
 /* --- LEVEL RIBBON (V-shaped pennant extending below panel) --- */

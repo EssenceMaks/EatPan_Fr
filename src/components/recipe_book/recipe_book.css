@@ -1,0 +1,183 @@
+/* =============================================
+   EATPAN - RECIPE BOOK VISUAL COMPONENT
+   ============================================= */
+
+.rb-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.rb-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+  max-width: 1600px;
+  background: var(--ink, #2c1810);
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  /* The book cover border effect */
+  border: 4px solid var(--ink, #2c1810);
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s ease;
+}
+
+/* Base side styles */
+.rb-side {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+}
+
+/* The Left Side (Categories/List) */
+.rb-left-side {
+  background: linear-gradient(to left, rgba(0,0,0,0.15) 0%, transparent 6%), var(--parchment, #f1eacc);
+  border-right: 1px solid rgba(44, 24, 16, 0.2);
+  /* Inner spine shadow */
+  box-shadow: inset -25px 0 35px -15px rgba(0, 0, 0, 0.3);
+}
+
+/* The Right Side (Recipe Display) */
+.rb-right-side {
+  background: linear-gradient(to right, rgba(0,0,0,0.1) 0%, transparent 5%), var(--parchment, #f1eacc);
+  border-left: 1px solid rgba(255, 255, 255, 0.4);
+  /* Inner spine shadow */
+  box-shadow: inset 25px 0 35px -15px rgba(0, 0, 0, 0.25);
+}
+
+/* Typography & Mock Content */
+.rb-title {
+  font-family: var(--font-title, 'Noto Serif', serif);
+  color: var(--brand-red, #6b0d12);
+  text-align: center;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.rb-mock-list {
+  display: grid;
+  gap: 12px;
+}
+
+.rb-mock-item {
+  padding: 16px;
+  background: rgba(128, 85, 51, 0.05); /* very light accent */
+  border-radius: 6px;
+  border: 1px solid rgba(128, 85, 51, 0.2);
+  cursor: pointer;
+  font-family: var(--font-body, 'Work Sans', sans-serif);
+  font-weight: 500;
+  color: var(--ink, #2c1810);
+  transition: all 0.2s ease;
+}
+
+.rb-mock-item:hover {
+  background: rgba(128, 85, 51, 0.15);
+  transform: translateX(4px);
+  border-color: var(--accent, #805533);
+}
+
+.rb-right-content {
+  font-family: var(--font-body, 'Work Sans', sans-serif);
+  color: var(--ink, #2c1810);
+  line-height: 1.6;
+}
+
+.rb-back-btn {
+  display: none; /* Visible on mobile */
+  align-items: center;
+  gap: 8px;
+  color: var(--brand-red, #6b0d12);
+  background: transparent;
+  border: none;
+  font-family: var(--font-title, 'Noto Serif', serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 24px;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.rb-back-btn:hover {
+  opacity: 0.7;
+}
+
+/* -------------------------------------------
+   RESPONSIVE MODES
+   ------------------------------------------- */
+
+/* MOBILE / NARROW TABLET: max-width: 899px (shows only 1 page at a time) */
+@media (max-width: 899px) {
+  .rb-wrapper {
+    display: block; /* Switch to block layering instead of flex */
+    width: 100%;
+    /* Disable border since it's full screen anyway usually */
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  .rb-side {
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    background: var(--parchment, #f1eacc);
+  }
+
+  .rb-left-side {
+    border-right: none;
+    box-shadow: none;
+  }
+
+  .rb-right-side {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-left: none;
+    /* Extra shadow to show it sliding OVER the left */
+    box-shadow: -10px 0 20px rgba(0, 0, 0, 0.2);
+    /* Start out of view */
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 10;
+  }
+
+  /* class applied via JS when recipe selected */
+  .mobile-show-right .rb-right-side {
+    transform: translateX(0);
+  }
+
+  .rb-back-btn {
+    display: inline-flex;
+  }
+}
+
+/* NARROW DESKTOP / ALBUM BOOK: 900px - 1199px */
+@media (min-width: 900px) and (max-width: 1199px) {
+  .rb-wrapper {
+    width: 90%;
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .rb-side {
+    padding: 20px;
+  }
+}
+
+/* NORMAL DESKTOP: 1200px+ */
+@media (min-width: 1200px) {
+  .rb-wrapper {
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+  }
+}
