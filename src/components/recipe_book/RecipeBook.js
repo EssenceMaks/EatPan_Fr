@@ -1,5 +1,6 @@
 import Component from '../../core/Component.js';
 import { RecipeService } from '../../core/ApiClient.js';
+import { supabase } from '../../core/supabaseClient.js';
 import RecipeBookLeftPage from './RecipeBookLeftPage.js';
 import RecipeBookRightPage from './RecipeBookRightPage.js';
 import RecipeBookSideRibbons from './RecipeBookSideRibbons.js';
@@ -162,9 +163,9 @@ export default class RecipeBook extends Component {
     console.log(`📖 RecipeBook: loaded ${this.recipes.length} recipes`);
 
     if (this.recipes.length === 0) {
-      // Check if it's a 403 auth issue
-      const hasToken = !!localStorage.getItem('eatpan_header_auth_user');
-      this.leftPage.setAuthMessage(!hasToken);
+      // Check if user is logged in via Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      this.leftPage.setAuthMessage(!session);
     }
 
     // Extract unique categories from loaded recipes

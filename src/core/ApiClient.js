@@ -1,7 +1,10 @@
 /**
  * EatPan Frontend v2 — API Client
  * All requests go through Cloudflare Worker → backend
+ * Auth tokens managed by Supabase SDK (auto-refresh)
  */
+
+import { supabase } from './supabaseClient.js';
 
 export const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -11,17 +14,17 @@ const RENDER_API  = 'https://eatpan-back.onrender.com/api/v1';
 
 const API_BASE = IS_LOCAL ? LOCAL_API : CLOUD_API;
 
-function getAuthHeaders(extra = {}) {
+/** Get fresh auth token from Supabase SDK (auto-refreshed) */
+async function getAuthHeaders(extra = {}) {
   const headers = { ...extra };
   try {
-    const raw = localStorage.getItem('eatpan_header_auth_user');
-    if (raw) {
-      const user = JSON.parse(raw);
-      if (user?.access_token) {
-        headers['Authorization'] = `Bearer ${user.access_token}`;
-      }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.warn('Auth: failed to get session', e.message);
+  }
   return headers;
 }
 
@@ -41,21 +44,22 @@ async function apiFetch(path, options = {}) {
     localStorage.removeItem('eatpan_active_api');
   }
 
-  const doFetch = (base, withAuth = true) => fetch(`${base}${path}`, {
-    cache: 'no-store',
-    ...options,
-    headers: withAuth ? getAuthHeaders(options.headers || {}) : (options.headers || {}),
-  });
+  const doFetch = async (base, withAuth = true) => {
+    const hdrs = withAuth ? await getAuthHeaders(options.headers || {}) : (options.headers || {});
+    return fetch(`${base}${path}`, { cache: 'no-store', ...options, headers: hdrs });
+  };
 
   // Try a single endpoint: with auth → if 401/403 → retry anonymous
   const tryEndpoint = async (base, label) => {
+    const authHdrs = await getAuthHeaders();
+    const hasToken = !!authHdrs['Authorization'];
     const r = await doFetch(base, true);
     if (r.ok || r.status === 204) {
       console.log(`🟢 API [${base}] ${r.status} ${label}`);
       return r;
     }
     // If 401/403 and we sent a token, retry WITHOUT token (anonymous access)
-    if ((r.status === 401 || r.status === 403) && getAuthHeaders()['Authorization']) {
+    if ((r.status === 401 || r.status === 403) && hasToken) {
       console.warn(`🟡 API [${base}] ${r.status} with token — retrying anonymous...`);
       const r2 = await doFetch(base, false);
       if (r2.ok || r2.status === 204) {
@@ -63,7 +67,7 @@ async function apiFetch(path, options = {}) {
         return r2;
       }
       console.warn(`🟡 API [${base}] ${r2.status} anonymous also failed`);
-      return r2; // Return last response for fallback
+      return r2;
     }
     console.warn(`🟡 API [${base}] ${r.status} ${label} — trying next...`);
     return r;
