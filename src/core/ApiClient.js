@@ -25,13 +25,20 @@ function getAuthHeaders(extra = {}) {
   return headers;
 }
 
-/** Fetch with failover: try cached base → primary → fallback endpoints */
+/** Fetch with failover: Cloudflare tunnel → local Docker → Render */
 async function apiFetch(path, options = {}) {
+  // ALWAYS try Cloudflare first (it tunnels to local Docker when available)
+  // Then direct local Docker, then Render as last resort
   const endpoints = IS_LOCAL
-    ? [LOCAL_API, RENDER_API]
+    ? [CLOUD_API, LOCAL_API, RENDER_API]
     : [CLOUD_API, RENDER_API];
 
-  const cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
+  let cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
+  // Ensure cached base is in our endpoint list
+  if (cachedBase && !endpoints.includes(cachedBase)) {
+    cachedBase = null;
+    window._activeApiBase = null;
+  }
 
   const isValid = (r) => {
     if (r.status === 204) return true;
@@ -170,5 +177,11 @@ export const PreferencesService = {
 export const HealthService = {
   check: () => apiFetch('/../health'),
 };
+
+/** Check if connected to local media server (for recipe photos) */
+export function isLocalMedia() {
+  const active = window._activeApiBase || localStorage.getItem('eatpan_active_api') || '';
+  return active === LOCAL_API || active === CLOUD_API; // Cloudflare tunnels to local
+}
 
 export { API_BASE };

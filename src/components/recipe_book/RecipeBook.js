@@ -76,13 +76,17 @@ export default class RecipeBook extends Component {
           <!-- RIGHT SIDE INTERACTION TABS — absolute on right edge -->
           <aside class="rb-overlay rb-overlay--right-tabs">
             <div class="bm-right-tabs-top">
-              <button class="bm-right-tab" title="Вподобати"><i data-lucide="heart" style="width:16px;"></i></button>
+              <button class="bm-right-tab" title="Вподобати"><i data-lucide="heart" style="width:16px;"></i><span class="bm-right-tab-count">0</span></button>
               <button class="bm-right-tab" title="Поділитися"><i data-lucide="send" style="width:16px;"></i></button>
-              <button class="bm-right-tab" title="Зберегти"><i data-lucide="bookmark" style="width:16px;"></i></button>
+              <button class="bm-right-tab" title="Репости"><i data-lucide="repeat" style="width:16px;"></i><span class="bm-right-tab-count">42</span></button>
+              <button class="bm-right-tab" title="Коментарі"><i data-lucide="message-square" style="width:16px;"></i><span class="bm-right-tab-count">18</span></button>
             </div>
             <div class="bm-right-tabs-bottom">
               <button class="bm-right-tab" title="Редагувати"><i data-lucide="feather" style="width:16px;"></i></button>
+              <button class="bm-right-tab active" title="Варіант 1"><span>1 в.</span></button>
+              <button class="bm-right-tab" title="Варіант 2"><span>2 в.</span></button>
               <button class="bm-right-tab" title="Друк"><i data-lucide="printer" style="width:16px;"></i></button>
+              <button class="bm-right-tab" title="Додати варіант"><i data-lucide="plus" style="width:16px;"></i></button>
             </div>
           </aside>
         </div>
