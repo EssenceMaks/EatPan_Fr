@@ -1,37 +1,48 @@
 import Component from '../../core/Component.js';
+import { RecipeService } from '../../core/ApiClient.js';
 import RecipeBookLeftPage from './RecipeBookLeftPage.js';
 import RecipeBookRightPage from './RecipeBookRightPage.js';
 import RecipeBookSideRibbons from './RecipeBookSideRibbons.js';
 
+const CATEGORY_ICON_MAP = {
+  "М'ясні страви": 'drumstick',
+  "М'ясо":        'drumstick',
+  "Птиця":        'drumstick',
+  "Гарніри":      'wheat',
+  "Паста":        'utensils',
+  "Салати":       'salad',
+  "Риба":         'fish',
+  "Морепродукти": 'fish',
+  "Десерти":      'cake-slice',
+  "Напої":        'coffee',
+  "Супи":         'soup',
+  "Випічка":      'croissant',
+  "Сніданки":     'sunrise',
+  "Закуски":      'sandwich',
+};
+
+function getCategoryIcon(name) {
+  if (!name) return 'utensils';
+  for (const [key, icon] of Object.entries(CATEGORY_ICON_MAP)) {
+    if (name.toLowerCase().includes(key.toLowerCase())) return icon;
+  }
+  return 'utensils';
+}
+
 export default class RecipeBook extends Component {
   constructor(props = {}) {
     super(props);
-    this.showingRight = false; // State for mobile view
-    this.activeCategory = null; // Currently selected category from ribbons
-    
-    this.sideRibbons = new RecipeBookSideRibbons({
-      categories: [
-        { id: 'breakfast',   label: 'Breakfast & Brunch', icon: 'sunrise' },
-        { id: 'main',        label: 'Main Courses',       icon: 'utensils' },
-        { id: 'desserts',    label: 'Desserts',           icon: 'cake-slice' },
-        { id: 'beverages',   label: 'Beverages',          icon: 'coffee' },
-        { id: 'salads',      label: 'Salads',             icon: 'salad' },
-        { id: 'soups',       label: 'Soups',              icon: 'soup' },
-      ],
-      healthTabs: [
-        { id: 'fruits',     label: 'Fruits',      icon: 'banana' },
-        { id: 'supplements',label: 'Supplements',  icon: 'pill' },
-        { id: 'first-aid',  label: 'First Aid',    icon: 'circle-plus', color: 'var(--crimson, #8b1a1a)' },
-        { id: 'allergens',  label: 'Allergens',    icon: 'alert-triangle', color: 'var(--crimson, #8b1a1a)' },
-        { id: 'e-additives',label: 'E-Additives',  textLabel: 'E', color: 'var(--crimson, #8b1a1a)' },
-      ],
-      activeId: null,
-      onSelect: (catId) => this.handleCategorySelect(catId),
-    });
+    this.showingRight = false;
+    this.activeCategory = null;
+    this.recipes = [];
+    this.categories = [];
+
+    this.sideRibbons = null;
 
     this.leftPage = new RecipeBookLeftPage({
       onRecipeSelected: (id) => this.handleRecipeSelect(id),
       activeCategory: null,
+      recipes: [],
     });
     
     this.rightPage = new RecipeBookRightPage({
@@ -52,9 +63,12 @@ export default class RecipeBook extends Component {
   }
 
   async onMount() {
-    await this.sideRibbons.render(this.$('#rb-ribbons-mount'), 'innerHTML');
+    // Mount left page and right page immediately with placeholder
     await this.leftPage.render(this.$('#rb-left-mount'), 'innerHTML');
     await this.rightPage.render(this.$('#rb-right-mount'), 'innerHTML');
+
+    // Load recipes from API asynchronously
+    this._loadRecipes();
     
     // Re-instantiate icons
     if (window.lucide) {
@@ -65,7 +79,7 @@ export default class RecipeBook extends Component {
     this._popStateHandler = (e) => {
       const state = e?.state;
       if (state && state.substate === 'recipe_detail') {
-        this._showRightSide(state.recipeId, state.substate);
+        this._showRightSide(state.recipeId);
       } else {
         this._hideRightSide();
       }
@@ -109,6 +123,45 @@ export default class RecipeBook extends Component {
     }
   }
 
+  async _loadRecipes() {
+    console.log('📖 RecipeBook: loading recipes from API...');
+    const data = await RecipeService.fetchAll();
+    this.recipes = Array.isArray(data) ? data : [];
+    console.log(`📖 RecipeBook: loaded ${this.recipes.length} recipes`);
+
+    // Extract unique categories from loaded recipes
+    const catSet = new Map();
+    this.recipes.forEach(r => {
+      const cat = r.data?.category || 'Без категорії';
+      if (!catSet.has(cat)) {
+        catSet.set(cat, { id: cat, label: cat, icon: getCategoryIcon(cat) });
+      }
+    });
+    this.categories = Array.from(catSet.values()).sort((a, b) => a.label.localeCompare(b.label));
+
+    // Create and mount side ribbons with real categories
+    this.sideRibbons = new RecipeBookSideRibbons({
+      categories: this.categories,
+      healthTabs: [
+        { id: 'fruits',     label: 'Фрукти',      icon: 'banana' },
+        { id: 'supplements',label: 'Бади',          icon: 'pill' },
+        { id: 'first-aid',  label: 'Аптечка',       icon: 'circle-plus', color: 'var(--crimson, #8b1a1a)' },
+        { id: 'allergens',  label: 'Алергени',      icon: 'alert-triangle', color: 'var(--crimson, #8b1a1a)' },
+        { id: 'e-additives',label: 'Е-Добавки',     textLabel: 'E', color: 'var(--crimson, #8b1a1a)' },
+      ],
+      activeId: null,
+      onSelect: (catId) => this.handleCategorySelect(catId),
+    });
+    await this.sideRibbons.render(this.$('#rb-ribbons-mount'), 'innerHTML');
+
+    // Update left page with real recipes
+    this.leftPage.setRecipes(this.recipes);
+
+    if (window.lucide) {
+      window.lucide.createIcons({ root: this.element });
+    }
+  }
+
   handleCategorySelect(catId) {
     this.activeCategory = catId;
     this.leftPage.setActiveCategory(catId);
@@ -133,11 +186,11 @@ export default class RecipeBook extends Component {
     history.back();
   }
 
-  _showRightSide(id, substate = 'recipe_detail') {
+  _showRightSide(id) {
     this.showingRight = true;
     const wrapper = this.$('#rb-wrapper');
     if (wrapper) wrapper.classList.add('mobile-show-right');
-    this.rightPage.loadRecipe(id, substate);
+    this.rightPage.loadRecipe(id);
   }
 
   _hideRightSide() {

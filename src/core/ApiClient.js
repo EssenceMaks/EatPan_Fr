@@ -5,9 +5,11 @@
 
 export const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-const API_BASE = IS_LOCAL
-  ? 'http://localhost:6600/api/v1'
-  : 'https://api.eatpan.com/api/v1';
+const LOCAL_API   = 'http://localhost:6600/api/v1';
+const CLOUD_API   = 'https://api.eatpan.com/api/v1';
+const RENDER_API  = 'https://eatpan-back.onrender.com/api/v1';
+
+const API_BASE = IS_LOCAL ? LOCAL_API : CLOUD_API;
 
 function getAuthHeaders(extra = {}) {
   const headers = { ...extra };
@@ -23,22 +25,59 @@ function getAuthHeaders(extra = {}) {
   return headers;
 }
 
-/** Generic fetch wrapper with error handling */
+/** Fetch with failover: try cached base → primary → fallback endpoints */
 async function apiFetch(path, options = {}) {
-  try {
-    const url = `${API_BASE}${path}`;
-    const response = await fetch(url, {
-      cache: 'no-store',
-      ...options,
-      headers: getAuthHeaders(options.headers || {}),
-    });
-    if (response.status === 204) return null;
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
-  } catch (error) {
-    console.error(`API Error [${path}]:`, error);
-    return null;
+  const endpoints = IS_LOCAL
+    ? [LOCAL_API, RENDER_API]
+    : [CLOUD_API, RENDER_API];
+
+  const cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
+
+  const isValid = (r) => {
+    if (r.status === 204) return true;
+    if (!r.ok && (r.status < 400 || r.status >= 500)) return false;
+    const ct = r.headers.get('content-type');
+    return ct && ct.includes('application/json');
+  };
+
+  const doFetch = (base) => fetch(`${base}${path}`, {
+    cache: 'no-store',
+    ...options,
+    headers: getAuthHeaders(options.headers || {}),
+  });
+
+  // Try cached base first
+  if (cachedBase) {
+    try {
+      const r = await doFetch(cachedBase);
+      if (isValid(r)) {
+        if (r.status === 204) return null;
+        return await r.json();
+      }
+    } catch (e) {
+      console.warn(`Cached API ${cachedBase} failed, falling over...`);
+      window._activeApiBase = null;
+    }
   }
+
+  // Failover queue
+  for (const base of endpoints) {
+    if (base === cachedBase) continue;
+    try {
+      const r = await doFetch(base);
+      if (isValid(r)) {
+        window._activeApiBase = base;
+        localStorage.setItem('eatpan_active_api', base);
+        if (r.status === 204) return null;
+        return await r.json();
+      }
+    } catch (e) {
+      console.warn(`Failed to reach ${base}:`, e.message);
+    }
+  }
+
+  console.error(`API Error [${path}]: all endpoints unreachable`);
+  return null;
 }
 
 // ============================================================

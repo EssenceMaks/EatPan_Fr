@@ -18,21 +18,9 @@ export default class RecipeBookSideRibbons extends Component {
   }
 
   async template() {
-    const categories = this.props.categories || [];
-    const healthTabs = this.props.healthTabs || [];
-    const totalItems = categories.length + healthTabs.length + 2; // +1 list-all, +1 spacer
-    const maxRows = Math.max(totalItems, 6);
-
     return `
       <aside class="stb-grid">
-        <div class="stb-grid-inner"
-             id="stb-ribbons-mount"
-             style="
-               grid-template-columns: 52px;
-               grid-template-rows: repeat(${maxRows}, 35px);
-               gap: 6px;
-             ">
-        </div>
+        <div class="stb-grid-inner" id="stb-ribbons-mount"></div>
       </aside>
     `;
   }
@@ -45,49 +33,89 @@ export default class RecipeBookSideRibbons extends Component {
     const healthTabs = this.props.healthTabs || [];
     const activeId = this.props.activeId || null;
 
-    let row = 1;
+    // Calculate layout: how many columns do we need?
+    const healthCount = healthTabs.length + 1; // +1 spacer
+    const MAX_ROWS = 14;
+    const ROW_H = 35;
+    const GAP = 6;
+    const COL_W = 52;
+
+    // Right column shares space: category slots on top, health on bottom
+    const rightColCatSlots = Math.max(MAX_ROWS - healthCount, 3);
+    const catCountWithListTab = categories.length + 1; // +1 for "show all"
+    
+    let numCols = 1;
+    if (catCountWithListTab > rightColCatSlots) {
+      numCols = 2; // Need 2 columns for categories
+    }
+
+    const totalCatSlots = numCols === 2
+      ? rightColCatSlots + MAX_ROWS // left col full + right col partial
+      : rightColCatSlots;
+
+    const maxRows = MAX_ROWS;
+
+    // Apply grid styles
+    mount.style.cssText = `
+      grid-template-columns: repeat(${numCols}, ${COL_W}px);
+      grid-template-rows: repeat(${maxRows}, ${ROW_H}px);
+      gap: ${GAP}px;
+    `;
+
     this._ribbonInstances = [];
 
-    // Render category ribbons
-    for (const cat of categories) {
+    // Place category ribbons: fill rightmost column first, then overflow to left
+    let col = numCols;
+    let row = 1;
+    const visibleCats = categories.slice(0, totalCatSlots - 1); // -1 for list-all tab
+
+    for (const cat of visibleCats) {
+      if (col === numCols && row > rightColCatSlots) {
+        col--;
+        row = 1;
+      } else if (col < numCols && row > maxRows) {
+        break;
+      }
+
       const ribbon = new SideTabRibbon({
         id: cat.id,
         icon: cat.icon || '',
-        textLabel: '',
         active: cat.id === activeId,
         title: cat.label || cat.id,
         variant: 'category',
         onClick: (id) => this._handleSelect(id),
       });
       const el = document.createElement('div');
-      el.style.cssText = `grid-column: 1; grid-row: ${row};`;
+      el.style.cssText = `grid-column: ${col}; grid-row: ${row};`;
       mount.appendChild(el);
       await ribbon.render(el, 'innerHTML');
       this._ribbonInstances.push(ribbon);
       row++;
     }
 
-    // "Show all" list tab
+    // "Show all" list tab — placed after last category
+    if (col === numCols && row > rightColCatSlots) {
+      col--;
+      row = 1;
+    }
     const listAll = new SideTabRibbon({
       id: '__all__',
       icon: 'list',
       active: !activeId || activeId === '__all__',
-      title: 'All Categories',
+      title: 'Усі категорії',
       variant: 'list-all',
       onClick: (id) => this._handleSelect(id),
     });
     const listEl = document.createElement('div');
-    listEl.style.cssText = `grid-column: 1; grid-row: ${row};`;
+    listEl.style.cssText = `grid-column: ${col}; grid-row: ${row};`;
     mount.appendChild(listEl);
     await listAll.render(listEl, 'innerHTML');
     this._ribbonInstances.push(listAll);
-    row++;
 
-    // Spacer row
-    row++;
-
-    // Health tabs
-    for (const ht of healthTabs) {
+    // Health tabs — always in the rightmost column, from the bottom up
+    const healthStartRow = maxRows - healthTabs.length + 1;
+    for (let i = 0; i < healthTabs.length; i++) {
+      const ht = healthTabs[i];
       const ribbon = new SideTabRibbon({
         id: ht.id,
         icon: ht.icon || '',
@@ -99,11 +127,10 @@ export default class RecipeBookSideRibbons extends Component {
         onClick: (id) => this._handleHealthClick(id),
       });
       const el = document.createElement('div');
-      el.style.cssText = `grid-column: 1; grid-row: ${row};`;
+      el.style.cssText = `grid-column: ${numCols}; grid-row: ${healthStartRow + i};`;
       mount.appendChild(el);
       await ribbon.render(el, 'innerHTML');
       this._ribbonInstances.push(ribbon);
-      row++;
     }
 
     if (window.lucide) {
@@ -118,11 +145,10 @@ export default class RecipeBookSideRibbons extends Component {
       const inner = this.$('.stb-grid-inner');
       if (!inner) return;
       const available = this.element.clientHeight;
-      const items = this._ribbonInstances.length + 1; // +1 for spacer
-      let rowH = Math.floor((available - (items - 1) * 6) / items);
-      if (rowH < 24) rowH = 24;
+      let rowH = Math.floor((available - 13 * 6) / 14);
+      if (rowH < 22) rowH = 22;
       if (rowH > 35) rowH = 35;
-      inner.style.gridTemplateRows = `repeat(${items + 1}, ${rowH}px)`;
+      inner.style.gridTemplateRows = `repeat(14, ${rowH}px)`;
     });
     this._resizeObs.observe(this.element);
   }
