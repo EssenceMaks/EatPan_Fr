@@ -248,16 +248,53 @@
   .rb-back-btn {
     display: inline-flex;
   }
+
+  .rb-overlay {
+    display: none;
+  }
 }
 
-/* Left bottom ribbons positioning */
-.rb-left-bottom-ribbons {
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
-  align-self: end;
-  justify-self: end;
+/* -------------------------------------------
+   RIBBON OVERLAYS — absolute within rb-wrapper
+   ------------------------------------------- */
+.rb-overlay {
+  position: absolute;
   z-index: 20;
-  padding-right: 20px;
+  pointer-events: none;
+}
+.rb-overlay > * {
+  pointer-events: auto;
+}
+
+/* Left bottom ribbons — anchored to bottom of left page */
+.rb-overlay--left-bottom {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-70%);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+/* Right bottom ribbons — anchored to bottom-left of right page */
+.rb-overlay--right-bottom {
+  bottom: -8px;
+  right: 50%;
+  transform: translateX(90%);
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+/* Right side interaction tabs — right edge of book */
+.rb-overlay--right-tabs {
+  right: -3px;
+  top: 80px;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 /* NARROW DESKTOP / ALBUM BOOK: 900px - 1199px */

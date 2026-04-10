@@ -54,19 +54,14 @@
 /* ---- LEFT BOTTOM BOOKMARK GROUP ---- */
 .bm-bottom-group-left {
   display: flex;
-  gap: 16px;
+  gap: 10px;
   z-index: 100;
   align-items: flex-end;
-  justify-content: flex-end;
-  align-self: end;
-  padding-right: 40px;
-  margin-bottom: -2.5rem;
-  padding-bottom: 0;
 }
 
 .bm-bottom-left {
-  width: 36px;
-  height: 100px;
+  width: 30px;
+  height: 65px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -82,8 +77,8 @@
   outline: none;
 }
 
-.bm-bottom-left:hover { height: 110px; }
-.bm-bottom-left.active { height: 125px; }
+.bm-bottom-left:hover { height: 72px; }
+.bm-bottom-left.active { height: 80px; }
 
 .bm-bottom-left.bm-fridge {
   background: rgba(var(--ribbon-blue-rgb), 0.5);
@@ -129,18 +124,7 @@
 }
 
 /* ---- RIGHT-SIDE INTERACTION TABS ---- */
-.bm-right-tabs-wrapper {
-  position: absolute;
-  right: -3px;
-  top: 80px;
-  bottom: 100px;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  pointer-events: none;
-  gap: 16px;
-}
+/* Positioning now handled by .rb-overlay--right-tabs in recipe_book.css */
 
 .bm-right-tabs-top,
 .bm-right-tabs-bottom {
@@ -191,10 +175,9 @@
 
 /* ---- RESPONSIVE: small heights ---- */
 @media (max-height: 750px) {
-  .bm-bottom-group-left { gap: 10px; }
-  .bm-bottom-left { width: 30px; height: 70px; padding-top: 14px; }
-  .bm-bottom-left:hover { height: 78px; }
-  .bm-bottom-left.active { height: 88px; }
+  .bm-bottom-left { width: 26px; height: 50px; padding-top: 10px; }
+  .bm-bottom-left:hover { height: 56px; }
+  .bm-bottom-left.active { height: 62px; }
 }
 
 /* ---- RESPONSIVE: mobile ---- */

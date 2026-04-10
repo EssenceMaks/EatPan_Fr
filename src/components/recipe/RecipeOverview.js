@@ -104,15 +104,6 @@ export default class RecipeOverview extends Component {
           </div>
         </div>
 
-        <!-- Bottom Bookmark Ribbons (replace action buttons) -->
-        <div class="bm-bottom-group" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);padding-bottom:0;">
-          <button class="bm-bottom bm-prepared active" onclick="this.classList.toggle('active')">
-            <i data-lucide="soup" style="width:22px;height:22px;"></i>
-          </button>
-          <button class="bm-bottom bm-planned" onclick="this.classList.toggle('active')">
-            <i data-lucide="timer" style="width:22px;height:22px;"></i>
-          </button>
-        </div>
       </div>
     `;
   }
