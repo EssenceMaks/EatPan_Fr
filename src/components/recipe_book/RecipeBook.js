@@ -1,14 +1,37 @@
 import Component from '../../core/Component.js';
 import RecipeBookLeftPage from './RecipeBookLeftPage.js';
 import RecipeBookRightPage from './RecipeBookRightPage.js';
+import RecipeBookSideRibbons from './RecipeBookSideRibbons.js';
 
 export default class RecipeBook extends Component {
   constructor(props = {}) {
     super(props);
     this.showingRight = false; // State for mobile view
+    this.activeCategory = null; // Currently selected category from ribbons
     
+    this.sideRibbons = new RecipeBookSideRibbons({
+      categories: [
+        { id: 'breakfast',   label: 'Breakfast & Brunch', icon: 'sunrise' },
+        { id: 'main',        label: 'Main Courses',       icon: 'utensils' },
+        { id: 'desserts',    label: 'Desserts',           icon: 'cake-slice' },
+        { id: 'beverages',   label: 'Beverages',          icon: 'coffee' },
+        { id: 'salads',      label: 'Salads',             icon: 'salad' },
+        { id: 'soups',       label: 'Soups',              icon: 'soup' },
+      ],
+      healthTabs: [
+        { id: 'fruits',     label: 'Fruits',      icon: 'banana' },
+        { id: 'supplements',label: 'Supplements',  icon: 'pill' },
+        { id: 'first-aid',  label: 'First Aid',    icon: 'circle-plus', color: 'var(--crimson, #8b1a1a)' },
+        { id: 'allergens',  label: 'Allergens',    icon: 'alert-triangle', color: 'var(--crimson, #8b1a1a)' },
+        { id: 'e-additives',label: 'E-Additives',  textLabel: 'E', color: 'var(--crimson, #8b1a1a)' },
+      ],
+      activeId: null,
+      onSelect: (catId) => this.handleCategorySelect(catId),
+    });
+
     this.leftPage = new RecipeBookLeftPage({
-      onRecipeSelected: (id) => this.handleRecipeSelect(id)
+      onRecipeSelected: (id) => this.handleRecipeSelect(id),
+      activeCategory: null,
     });
     
     this.rightPage = new RecipeBookRightPage({
@@ -20,6 +43,7 @@ export default class RecipeBook extends Component {
     return `
       <div class="rb-container">
         <div class="rb-wrapper" id="rb-wrapper">
+          <div id="rb-ribbons-mount" class="rb-side-ribbons"></div>
           <div id="rb-left-mount" class="rb-side rb-left-side"></div>
           <div id="rb-right-mount" class="rb-side rb-right-side"></div>
         </div>
@@ -28,6 +52,7 @@ export default class RecipeBook extends Component {
   }
 
   async onMount() {
+    await this.sideRibbons.render(this.$('#rb-ribbons-mount'), 'innerHTML');
     await this.leftPage.render(this.$('#rb-left-mount'), 'innerHTML');
     await this.rightPage.render(this.$('#rb-right-mount'), 'innerHTML');
     
@@ -82,6 +107,11 @@ export default class RecipeBook extends Component {
     if (this._popStateHandler) {
       window.removeEventListener('popstate', this._popStateHandler);
     }
+  }
+
+  handleCategorySelect(catId) {
+    this.activeCategory = catId;
+    this.leftPage.setActiveCategory(catId);
   }
 
   handleRecipeSelect(id) {

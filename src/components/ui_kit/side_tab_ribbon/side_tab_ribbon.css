@@ -1,0 +1,223 @@
+/* =============================================
+   ARC DESIGN SYSTEM — SideTabRibbon
+   Flag-style side tab / bookmark for the recipe book.
+   Mirrors the main-branch ribbon aesthetic.
+   ============================================= */
+
+/* ---- GRID CONTAINER (placed by parent) ---- */
+.stb-grid {
+  position: relative;
+  align-self: stretch;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.stb-grid-inner {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  justify-content: center;
+  width: max-content;
+  z-index: 5;
+  position: relative;
+}
+
+/* ---- BACKGROUND PAGE-STACK SHEET ---- */
+.stb-bg-sheet {
+  display: none; /* Hidden inside-book mode; not needed */
+}
+
+/* ---- SINGLE RIBBON TAB ---- */
+.stb-ribbon {
+  position: relative;
+  width: 52px;
+  height: 35px;
+  background: var(--parchment-dark, #c4b48e);
+  color: var(--ink, #2c1810);
+  cursor: pointer;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    filter   0.3s ease,
+    background 0.3s ease,
+    color    0.3s ease,
+    box-shadow 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 15% 50%);
+  transform-origin: center center;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  filter: brightness(0.9);
+  border-radius: 0 4px 4px 0;
+}
+
+/* ---- TEXT LABEL INSIDE RIBBON ---- */
+.stb-text-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-family: 'Nunito', 'Rounded Mplus 1c', system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  padding-right: 3px;
+}
+
+/* ---- ANIMATIONS ---- */
+@keyframes stbFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes stbActiveSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(6px);
+  }
+}
+
+.stb-grid-inner .stb-ribbon {
+  animation: stbFadeIn 0.25s ease both;
+}
+
+.stb-grid-inner .stb-ribbon.active {
+  animation: stbActiveSlideIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ---- HOVER ---- */
+.stb-ribbon:hover {
+  transform: translateX(3px);
+  filter: brightness(1.05);
+}
+
+/* ---- ACTIVE STATE ---- */
+.stb-ribbon.active {
+  background: var(--crimson, #8b1a1a);
+  color: white;
+  transform: translateX(6px);
+  filter: brightness(1.1);
+  box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+.stb-ribbon.active .stb-text-label {
+  color: white;
+}
+
+/* ---- DIM OTHERS WHEN ONE IS ACTIVE ---- */
+.stb-grid:has(.stb-ribbon.active) .stb-ribbon:not(.active):not(.stb--clear):not(.stb--list-all) {
+  background: var(--parchment-dark, #c4b48e);
+  color: rgba(44, 24, 16, 0.5);
+  box-shadow: none;
+  filter: grayscale(0.6) brightness(0.85);
+}
+
+/* ---- VARIANT: clear (reset) ---- */
+.stb--clear.active {
+  background: var(--crimson, #8b1a1a);
+  color: white;
+  filter: brightness(1.1);
+  box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.4);
+  transform: translateX(6px);
+}
+
+.stb--clear.active i {
+  color: white !important;
+}
+
+.stb--clear:hover {
+  filter: brightness(1.2);
+}
+
+/* ---- VARIANT: list-all (show all categories) ---- */
+.stb--list-all {
+  background: var(--gold-dark, #8b6914);
+  color: white;
+  filter: brightness(1);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.stb--list-all:hover {
+  filter: brightness(1.15);
+  transform: translateX(4px);
+}
+
+.stb-grid:has(.stb-ribbon.active) .stb--list-all {
+  filter: brightness(0.95);
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* ---- VARIANT: health ---- */
+.stb--health {
+  background: var(--parchment-dark, #c4b48e);
+}
+
+.stb--health.active {
+  background: var(--crimson-light, #b22222);
+}
+
+/* ---- RESPONSIVE: small heights ---- */
+@media (max-height: 650px) {
+  .stb-ribbon {
+    width: 42px;
+    height: 26px;
+  }
+  .stb-ribbon i {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+/* ---- RESPONSIVE: mobile ---- */
+@media (max-width: 899px) {
+  .stb-grid {
+    width: 100%;
+    height: auto;
+    direction: ltr;
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 4px 0;
+    gap: 8px;
+  }
+  .stb-grid::-webkit-scrollbar { display: none; }
+
+  .stb-grid-inner {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    right: auto;
+    top: auto;
+  }
+
+  .stb-bg-sheet {
+    display: none;
+  }
+
+  .stb-ribbon {
+    clip-path: polygon(50% 0%, 0% 20%, 0% 100%, 100% 100%, 100% 20%);
+    width: 44px;
+    height: 48px;
+    padding: 0;
+    padding-top: 12px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .stb-ribbon:hover {
+    transform: translateY(-3px);
+  }
+
+  .stb-ribbon.active {
+    transform: translateY(-6px);
+  }
+}
