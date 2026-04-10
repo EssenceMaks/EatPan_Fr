@@ -6,23 +6,25 @@ export default class Recipe extends Component {
   constructor(props = {}) {
     super(props);
     this.recipeId = props.recipeId || null;
+    this.recipeData = props.recipeData || null;
     
     // Internal state instances
     this.overview = new RecipeOverview({
+      recipeData: this.recipeData,
       onMoreDetails: async (mountContainer) => {
-        // Render instructions dynamically inside the expanded container
         await this.instructions.render(mountContainer, 'innerHTML');
         
         if (window.lucide) {
           window.lucide.createIcons({ root: mountContainer });
         }
         
-        // Scroll the view down slightly to show the beginning of instructions
         mountContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
     
-    this.instructions = new RecipeInstructions({});
+    this.instructions = new RecipeInstructions({
+      recipeData: this.recipeData,
+    });
   }
 
   async template() {

@@ -44,13 +44,43 @@
   padding: 24px;
 }
 
-/* The Left Side (Categories/List) */
+/* The Left Side (Categories/List) — diamond scrollbar on the RIGHT edge */
 .rb-left-side {
   grid-area: left;
   background: linear-gradient(to left, rgba(0,0,0,0.15) 0%, transparent 6%), var(--parchment, #f1eacc);
   border-right: 1px solid rgba(44, 24, 16, 0.2);
   /* Inner spine shadow */
   box-shadow: inset -25px 0 35px -15px rgba(0, 0, 0, 0.3);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 85, 51, 0.5) transparent;
+}
+
+.rb-left-side::-webkit-scrollbar {
+  width: 14px;
+}
+
+.rb-left-side::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.rb-left-side::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" viewBox="0 0 14 20"><path d="M7 4 L12 10 L7 16 L2 10 Z" fill="%23f1eacc" stroke="%23805533" stroke-width="1.5"/></svg>'),
+    linear-gradient(to bottom, rgba(128, 85, 51, 0.5), rgba(128, 85, 51, 0.5));
+  background-repeat: no-repeat, no-repeat;
+  background-position: center center, center center;
+  background-size: 14px 20px, 2px 100%;
+}
+
+.rb-left-side::-webkit-scrollbar-thumb:hover {
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" viewBox="0 0 14 20"><path d="M7 4 L12 10 L7 16 L2 10 Z" fill="%23ffffff" stroke="%23805533" stroke-width="1.5"/></svg>'),
+    linear-gradient(to bottom, rgba(128, 85, 51, 0.9), rgba(128, 85, 51, 0.9));
+  background-repeat: no-repeat, no-repeat;
+  background-position: center center, center center;
+  background-size: 14px 20px, 2px 100%;
 }
 
 /* The Right Side (Recipe Display) */
