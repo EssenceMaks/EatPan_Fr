@@ -1,0 +1,207 @@
+/* =============================================
+   ARC DESIGN SYSTEM — BookmarkRibbon
+   Bottom bookmarks & right-side interaction tabs
+   ============================================= */
+
+/* ---- BOTTOM BOOKMARK GROUP (right page) ---- */
+.bm-bottom-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  z-index: 100;
+  margin-bottom: -20px;
+}
+
+.bm-bottom {
+  width: 36px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  clip-path: polygon(0% 0%, 50% 12%, 100% 0%, 100% 100%, 0% 100%);
+  color: rgba(255,255,255, 0.6);
+  font-family: inherit;
+  border: none;
+  background: rgba(0,0,0, 0.1);
+}
+
+.bm-bottom:hover {
+  transform: translateY(-5px);
+}
+
+.bm-bottom.bm-prepared {
+  padding-top: 20px;
+  background: rgba(var(--ribbon-green-rgb), 0.4);
+}
+.bm-bottom.bm-prepared.active {
+  background: var(--ribbon-green);
+  color: white;
+}
+
+.bm-bottom.bm-planned {
+  padding-top: 20px;
+  background: rgba(var(--crimson-rgb, 139,26,26), 0.4);
+}
+.bm-bottom.bm-planned.active {
+  background: var(--crimson);
+  color: white;
+}
+
+/* ---- LEFT BOTTOM BOOKMARK GROUP ---- */
+.bm-bottom-group-left {
+  display: flex;
+  gap: 16px;
+  z-index: 100;
+  align-items: flex-end;
+  justify-content: flex-end;
+  align-self: end;
+  padding-right: 40px;
+  margin-bottom: -2.5rem;
+  padding-bottom: 0;
+}
+
+.bm-bottom-left {
+  width: 36px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  clip-path: polygon(0% 0%, 50% 12%, 100% 0%, 100% 100%, 0% 100%);
+  color: rgba(255,255,255, 0.6);
+  font-family: inherit;
+  border: none;
+  background: rgba(0,0,0, 0.1);
+  outline: none;
+}
+
+.bm-bottom-left:hover { height: 110px; }
+.bm-bottom-left.active { height: 125px; }
+
+.bm-bottom-left.bm-fridge {
+  background: rgba(var(--ribbon-blue-rgb), 0.5);
+}
+.bm-bottom-left.bm-fridge.active,
+.bm-bottom-left.bm-fridge.has-items {
+  background: var(--ribbon-blue);
+  color: white;
+}
+
+.bm-bottom-left.bm-ingredients {
+  background: rgba(var(--ribbon-purple-rgb), 0.4);
+}
+.bm-bottom-left.bm-ingredients.active,
+.bm-bottom-left.bm-ingredients.has-items {
+  background: var(--ribbon-purple);
+  color: white;
+}
+
+.bm-bottom-left.bm-prepared {
+  background: rgba(var(--ribbon-green-rgb), 0.4);
+}
+.bm-bottom-left.bm-prepared.active,
+.bm-bottom-left.bm-prepared.has-items {
+  background: var(--ribbon-green);
+  color: white;
+}
+
+.bm-bottom-left.bm-planned {
+  background: rgba(var(--crimson-rgb, 139,26,26), 0.4);
+}
+.bm-bottom-left.bm-planned.active {
+  background: var(--crimson);
+  color: white;
+}
+
+.bm-bottom-left.bm-shopping {
+  background: rgba(var(--gold-rgb), 0.4);
+}
+.bm-bottom-left.bm-shopping.active {
+  background: var(--gold);
+  color: white;
+}
+
+/* ---- RIGHT-SIDE INTERACTION TABS ---- */
+.bm-right-tabs-wrapper {
+  position: absolute;
+  right: -3px;
+  top: 80px;
+  bottom: 100px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+  gap: 16px;
+}
+
+.bm-right-tabs-top,
+.bm-right-tabs-bottom {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.bm-right-tab {
+  width: 55px;
+  height: 35px;
+  background: var(--parchment-dark, #c4b48e);
+  color: var(--ink, #2c1810);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  clip-path: polygon(100% 0%, 30% 0%, 0% 50%, 30% 100%, 100% 100%);
+  transition: all 0.2s ease;
+  filter: brightness(0.95);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.bm-right-tab:hover {
+  transform: translateX(4px);
+  filter: brightness(1);
+}
+
+.bm-right-tab.active {
+  background: var(--crimson, #8b1a1a);
+  color: white;
+  filter: brightness(1.1);
+}
+
+.bm-right-tab-count {
+  font-size: 9px;
+  font-weight: 700;
+  margin-top: 2px;
+  opacity: 0.7;
+}
+
+/* ---- RESPONSIVE: small heights ---- */
+@media (max-height: 750px) {
+  .bm-bottom-group-left { gap: 10px; }
+  .bm-bottom-left { width: 30px; height: 70px; padding-top: 14px; }
+  .bm-bottom-left:hover { height: 78px; }
+  .bm-bottom-left.active { height: 88px; }
+}
+
+/* ---- RESPONSIVE: mobile ---- */
+@media (max-width: 899px) {
+  .bm-bottom-group,
+  .bm-bottom-group-left,
+  .bm-right-tabs-wrapper {
+    display: none;
+  }
+}

@@ -55,8 +55,30 @@ export default class RecipeBook extends Component {
       <div class="rb-container">
         <div class="rb-wrapper" id="rb-wrapper">
           <div id="rb-ribbons-mount" class="rb-side-ribbons"></div>
-          <div id="rb-left-mount" class="rb-side rb-left-side"></div>
-          <div id="rb-right-mount" class="rb-side rb-right-side"></div>
+          <div id="rb-left-mount" class="rb-side rb-left-side">
+          </div>
+          <div id="rb-right-mount" class="rb-side rb-right-side" style="position:relative;">
+            <!-- Right-side interaction tabs -->
+            <aside class="bm-right-tabs-wrapper">
+              <div class="bm-right-tabs-top">
+                <button class="bm-right-tab" id="rb-like-btn" title="Вподобати"><i data-lucide="heart" style="width:16px;"></i></button>
+                <button class="bm-right-tab" title="Поділитися"><i data-lucide="send" style="width:16px;"></i></button>
+                <button class="bm-right-tab" title="Зберегти"><i data-lucide="bookmark" style="width:16px;"></i></button>
+              </div>
+              <div class="bm-right-tabs-bottom">
+                <button class="bm-right-tab" title="Редагувати"><i data-lucide="feather" style="width:16px;"></i></button>
+                <button class="bm-right-tab" title="Друк"><i data-lucide="printer" style="width:16px;"></i></button>
+              </div>
+            </aside>
+          </div>
+          <!-- Left bottom ribbons -->
+          <div class="bm-bottom-group-left rb-left-bottom-ribbons">
+            <button class="bm-bottom-left bm-fridge" title="Холодильник"><i data-lucide="refrigerator" style="width:22px;height:22px;"></i></button>
+            <button class="bm-bottom-left bm-ingredients" title="Інгредієнти"><i data-lucide="flask-conical" style="width:22px;height:22px;"></i></button>
+            <button class="bm-bottom-left bm-prepared has-items" title="Приготовлено"><i data-lucide="soup" style="width:22px;height:22px;"></i></button>
+            <button class="bm-bottom-left bm-planned" title="Заплановано"><i data-lucide="timer" style="width:22px;height:22px;"></i></button>
+            <button class="bm-bottom-left bm-shopping active" title="Список покупок"><i data-lucide="shopping-basket" style="width:22px;height:22px;"></i></button>
+          </div>
         </div>
       </div>
     `;

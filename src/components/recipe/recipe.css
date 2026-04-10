@@ -24,8 +24,8 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: 80px;
-  /* Leave space for absolute pinned buttons! */
+  bottom: 40px;
+  /* Leave space for bottom bookmark ribbons */
   overflow-y: auto;
   overflow-x: hidden;
   padding-left: 8px;
@@ -262,7 +262,67 @@
 }
 
 /* -------------------------------------------
-   ACTION BUTTONS
+   PREPARATION STEPS ACCORDION
+   ------------------------------------------- */
+.prep-steps-accordion {
+  margin-top: 16px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  padding-top: 12px;
+}
+
+.prep-steps-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: opacity 0.2s;
+}
+
+.prep-steps-header:hover {
+  opacity: 0.8;
+}
+
+/* Diamond Runic Toggle Button */
+.prep-steps-diamond-btn {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--gold-light, #e8cc6e);
+  background: linear-gradient(to bottom, var(--gold, #c5a044), var(--gold-dark, #8b6914));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  border-radius: 4px;
+  transform: rotate(0deg);
+}
+
+.prep-steps-diamond-btn:hover {
+  border-color: var(--gold, #c5a044);
+  box-shadow:
+    0 3px 10px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* Rotated to diamond when open */
+.prep-steps-diamond-btn.is-open {
+  transform: rotate(45deg);
+  background: linear-gradient(to bottom, #298d9e, #0d3644);
+  border-color: var(--gold-light, #e8cc6e);
+}
+
+.prep-steps-diamond-btn.is-open i {
+  transform: rotate(-45deg);
+}
+
+/* -------------------------------------------
+   ACTION BUTTONS (legacy, kept for compat)
    ------------------------------------------- */
 .recipe-actions-row {
   position: absolute;
@@ -270,7 +330,7 @@
   left: 0;
   right: 0;
   height: 80px;
-  display: flex;
+  display: none; /* Hidden — replaced by bookmark ribbons */
   align-items: center;
   gap: 16px;
   padding: 0 16px;

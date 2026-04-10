@@ -90,19 +90,27 @@ export default class RecipeOverview extends Component {
             </div>
             ` : ''}
 
-            <!-- Dynamic mount point for instructions to "roll down" -->
-            <div id="recipe-instructions-mount" class="collapsed"></div>
+            <!-- Preparation Steps Accordion -->
+            <div class="prep-steps-accordion" id="prep-steps-accordion">
+              <div class="prep-steps-header" id="prep-steps-toggle">
+                <h3 class="steps-main-title" style="margin:0;border:none;padding:0;">Preparation Steps</h3>
+                <button class="prep-steps-diamond-btn" id="diamond-toggle" type="button" title="Розгорнути інструкцію">
+                  <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>
+                </button>
+              </div>
+              <div id="recipe-instructions-mount" class="collapsed"></div>
+            </div>
             
           </div>
         </div>
 
-        <!-- Action Buttons pinned at bottom -->
-        <div class="recipe-actions-row">
-          <button type="button" class="arc-glyph arc-glyph--convex" id="btn-plan-recipe">
-            <i data-lucide="calendar-plus"></i> Запланувати
+        <!-- Bottom Bookmark Ribbons (replace action buttons) -->
+        <div class="bm-bottom-group" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);padding-bottom:0;">
+          <button class="bm-bottom bm-prepared active" onclick="this.classList.toggle('active')">
+            <i data-lucide="soup" style="width:22px;height:22px;"></i>
           </button>
-          <button type="button" class="arc-glyph arc-glyph--convex" id="btn-more-details">
-            <i data-lucide="scroll-text"></i> Детальна Інструкція
+          <button class="bm-bottom bm-planned" onclick="this.classList.toggle('active')">
+            <i data-lucide="timer" style="width:22px;height:22px;"></i>
           </button>
         </div>
       </div>
@@ -110,27 +118,23 @@ export default class RecipeOverview extends Component {
   }
 
   async onMount() {
-    const btn = this.$('#btn-more-details');
-    if (btn) {
-      btn.addEventListener('click', (e) => {
+    const toggle = this.$('#prep-steps-toggle');
+    const diamondBtn = this.$('#diamond-toggle');
+    if (toggle) {
+      toggle.addEventListener('click', (e) => {
         e.preventDefault();
-        // Toggle the internal state instead of calling parent pushed substate
         const mount = this.$('#recipe-instructions-mount');
-        if (mount.classList.contains('collapsed')) {
+        const isCollapsed = mount.classList.contains('collapsed');
+        
+        if (isCollapsed) {
           mount.classList.remove('collapsed');
           mount.classList.add('expanded');
-          btn.classList.remove('arc-glyph--convex');
-          btn.classList.add('arc-glyph--concave');
-          btn.innerHTML = '<i data-lucide="chevron-up"></i> Приховати';
-          if (window.lucide) window.lucide.createIcons({ root: btn });
+          diamondBtn.classList.add('is-open');
           this.onMoreDetails(mount);
         } else {
           mount.classList.remove('expanded');
           mount.classList.add('collapsed');
-          btn.classList.remove('arc-glyph--concave');
-          btn.classList.add('arc-glyph--convex');
-          btn.innerHTML = '<i data-lucide="scroll-text"></i> Детальна Інструкція';
-          if (window.lucide) window.lucide.createIcons({ root: btn });
+          diamondBtn.classList.remove('is-open');
         }
       });
     }

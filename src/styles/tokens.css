@@ -93,6 +93,17 @@
   --card-border: 1px solid var(--frame-inner);
   --card-border-gold: 1px solid rgba(var(--gold-rgb), 0.3);
 
+  /* ---- RIBBON COLORS ---- */
+  --ribbon-red:        var(--crimson);
+  --ribbon-base-bg:    #dbd3bb;
+  --ribbon-base-rgb:   90, 70, 60;
+  --ribbon-green:      #2e603a;
+  --ribbon-green-rgb:  46, 96, 58;
+  --ribbon-blue:       #4a5f70;
+  --ribbon-blue-rgb:   90, 110, 130;
+  --ribbon-purple:     #5d4068;
+  --ribbon-purple-rgb: 110, 80, 120;
+
   /* ---- TRANSITIONS ---- */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);

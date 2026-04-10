@@ -250,6 +250,16 @@
   }
 }
 
+/* Left bottom ribbons positioning */
+.rb-left-bottom-ribbons {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  align-self: end;
+  justify-self: end;
+  z-index: 20;
+  padding-right: 20px;
+}
+
 /* NARROW DESKTOP / ALBUM BOOK: 900px - 1199px */
 @media (min-width: 900px) and (max-width: 1199px) {
   .rb-wrapper {
