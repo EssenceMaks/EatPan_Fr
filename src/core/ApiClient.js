@@ -34,18 +34,11 @@ async function apiFetch(path, options = {}) {
     : [CLOUD_API, RENDER_API];
 
   let cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
-  // Ensure cached base is in our endpoint list
   if (cachedBase && !endpoints.includes(cachedBase)) {
     cachedBase = null;
     window._activeApiBase = null;
+    localStorage.removeItem('eatpan_active_api');
   }
-
-  const isValid = (r) => {
-    if (r.status === 204) return true;
-    if (!r.ok && (r.status < 400 || r.status >= 500)) return false;
-    const ct = r.headers.get('content-type');
-    return ct && ct.includes('application/json');
-  };
 
   const doFetch = (base) => fetch(`${base}${path}`, {
     cache: 'no-store',
@@ -53,37 +46,75 @@ async function apiFetch(path, options = {}) {
     headers: getAuthHeaders(options.headers || {}),
   });
 
+  // Helper: is this a successful usable response?
+  const isSuccess = (r) => {
+    if (r.status === 204) return true;
+    if (r.ok) return true;  // 200-299
+    return false;
+  };
+
+  // Helper: is the server reachable (even if auth fails)?
+  const isReachable = (r) => {
+    return r.status >= 200 && r.status < 500; // Not a server error
+  };
+
   // Try cached base first
   if (cachedBase) {
     try {
       const r = await doFetch(cachedBase);
-      if (isValid(r)) {
+      if (isSuccess(r)) {
+        console.log(`🟢 API [${cachedBase}] ${r.status} (cached)`);
         if (r.status === 204) return null;
         return await r.json();
       }
+      console.warn(`🟡 API [${cachedBase}] ${r.status} — trying next...`);
+      window._activeApiBase = null;
     } catch (e) {
-      console.warn(`Cached API ${cachedBase} failed, falling over...`);
+      console.warn(`🔴 API [${cachedBase}] network error — trying next...`);
       window._activeApiBase = null;
     }
   }
 
-  // Failover queue
+  // Failover queue — try each endpoint
+  let lastResponse = null;
   for (const base of endpoints) {
     if (base === cachedBase) continue;
     try {
       const r = await doFetch(base);
-      if (isValid(r)) {
+      console.log(`🔄 API [${base}] → ${r.status}`);
+
+      if (isSuccess(r)) {
         window._activeApiBase = base;
         localStorage.setItem('eatpan_active_api', base);
         if (r.status === 204) return null;
         return await r.json();
       }
+
+      // Server is reachable but returned an error (401/403/404)
+      // Keep as last resort but continue trying others
+      if (isReachable(r)) {
+        lastResponse = { base, response: r };
+      }
     } catch (e) {
-      console.warn(`Failed to reach ${base}:`, e.message);
+      console.warn(`🔴 API [${base}] failed:`, e.message);
     }
   }
 
-  console.error(`API Error [${path}]: all endpoints unreachable`);
+  // If all endpoints failed with auth errors, use the last reachable response
+  // (so we at least get the error JSON for the UI to handle)
+  if (lastResponse) {
+    const { base, response: r } = lastResponse;
+    window._activeApiBase = base;
+    localStorage.setItem('eatpan_active_api', base);
+    console.warn(`⚠️ API: using ${base} (status ${r.status}) — auth may be required`);
+    try {
+      return await r.json();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  console.error(`❌ API [${path}]: all endpoints unreachable`);
   return null;
 }
 
