@@ -27,10 +27,11 @@ function getAuthHeaders(extra = {}) {
 
 /** Fetch with failover: Cloudflare tunnel → local Docker → Render */
 async function apiFetch(path, options = {}) {
-  // ALWAYS try Cloudflare first (it tunnels to local Docker when available)
-  // Then direct local Docker, then Render as last resort
+  // On localhost: CORS blocks api.eatpan.com (allows only https://eatpan.com)
+  // So we go: local Docker → Render (requires auth token)
+  // On production (eatpan.com): Cloudflare → Render
   const endpoints = IS_LOCAL
-    ? [CLOUD_API, LOCAL_API, RENDER_API]
+    ? [LOCAL_API, RENDER_API]
     : [CLOUD_API, RENDER_API];
 
   let cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
