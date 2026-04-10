@@ -41,34 +41,42 @@ async function apiFetch(path, options = {}) {
     localStorage.removeItem('eatpan_active_api');
   }
 
-  const doFetch = (base) => fetch(`${base}${path}`, {
+  const doFetch = (base, withAuth = true) => fetch(`${base}${path}`, {
     cache: 'no-store',
     ...options,
-    headers: getAuthHeaders(options.headers || {}),
+    headers: withAuth ? getAuthHeaders(options.headers || {}) : (options.headers || {}),
   });
 
-  // Helper: is this a successful usable response?
-  const isSuccess = (r) => {
-    if (r.status === 204) return true;
-    if (r.ok) return true;  // 200-299
-    return false;
-  };
-
-  // Helper: is the server reachable (even if auth fails)?
-  const isReachable = (r) => {
-    return r.status >= 200 && r.status < 500; // Not a server error
+  // Try a single endpoint: with auth → if 401/403 → retry anonymous
+  const tryEndpoint = async (base, label) => {
+    const r = await doFetch(base, true);
+    if (r.ok || r.status === 204) {
+      console.log(`🟢 API [${base}] ${r.status} ${label}`);
+      return r;
+    }
+    // If 401/403 and we sent a token, retry WITHOUT token (anonymous access)
+    if ((r.status === 401 || r.status === 403) && getAuthHeaders()['Authorization']) {
+      console.warn(`🟡 API [${base}] ${r.status} with token — retrying anonymous...`);
+      const r2 = await doFetch(base, false);
+      if (r2.ok || r2.status === 204) {
+        console.log(`🟢 API [${base}] ${r2.status} (anonymous) ${label}`);
+        return r2;
+      }
+      console.warn(`🟡 API [${base}] ${r2.status} anonymous also failed`);
+      return r2; // Return last response for fallback
+    }
+    console.warn(`🟡 API [${base}] ${r.status} ${label} — trying next...`);
+    return r;
   };
 
   // Try cached base first
   if (cachedBase) {
     try {
-      const r = await doFetch(cachedBase);
-      if (isSuccess(r)) {
-        console.log(`🟢 API [${cachedBase}] ${r.status} (cached)`);
+      const r = await tryEndpoint(cachedBase, '(cached)');
+      if (r.ok) {
         if (r.status === 204) return null;
         return await r.json();
       }
-      console.warn(`🟡 API [${cachedBase}] ${r.status} — trying next...`);
       window._activeApiBase = null;
     } catch (e) {
       console.warn(`🔴 API [${cachedBase}] network error — trying next...`);
@@ -76,43 +84,32 @@ async function apiFetch(path, options = {}) {
     }
   }
 
-  // Failover queue — try each endpoint
-  let lastResponse = null;
+  // Failover queue
+  let lastReachable = null;
   for (const base of endpoints) {
     if (base === cachedBase) continue;
     try {
-      const r = await doFetch(base);
-      console.log(`🔄 API [${base}] → ${r.status}`);
-
-      if (isSuccess(r)) {
+      const r = await tryEndpoint(base, '');
+      if (r.ok) {
         window._activeApiBase = base;
         localStorage.setItem('eatpan_active_api', base);
         if (r.status === 204) return null;
         return await r.json();
       }
-
-      // Server is reachable but returned an error (401/403/404)
-      // Keep as last resort but continue trying others
-      if (isReachable(r)) {
-        lastResponse = { base, response: r };
+      if (r.status >= 200 && r.status < 500) {
+        lastReachable = { base, response: r };
       }
     } catch (e) {
       console.warn(`🔴 API [${base}] failed:`, e.message);
     }
   }
 
-  // If all endpoints failed with auth errors, use the last reachable response
-  // (so we at least get the error JSON for the UI to handle)
-  if (lastResponse) {
-    const { base, response: r } = lastResponse;
+  if (lastReachable) {
+    const { base, response: r } = lastReachable;
     window._activeApiBase = base;
     localStorage.setItem('eatpan_active_api', base);
-    console.warn(`⚠️ API: using ${base} (status ${r.status}) — auth may be required`);
-    try {
-      return await r.json();
-    } catch (e) {
-      return null;
-    }
+    console.warn(`⚠️ API fallback: ${base} (${r.status})`);
+    try { return await r.json(); } catch (e) { return null; }
   }
 
   console.error(`❌ API [${path}]: all endpoints unreachable`);
