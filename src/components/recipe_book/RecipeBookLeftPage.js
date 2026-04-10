@@ -21,6 +21,19 @@ export default class RecipeBookLeftPage extends Component {
     const titleText = this.activeCategory || 'Усі рецепти';
     const countText = filtered.length > 0 ? `(${filtered.length})` : '';
 
+    if (this.needsAuth) {
+      return `
+        <div>
+          <h2 class="rb-title">Книга рецептів</h2>
+          <div style="text-align:center;padding:40px 20px;opacity:0.7;">
+            <i data-lucide="lock" style="width:48px;height:48px;margin-bottom:12px;"></i>
+            <p style="font-family:var(--font-title,serif);font-size:1.1rem;margin-bottom:8px;">Потрібна авторизація</p>
+            <p style="font-size:0.85rem;color:#666;">Натисніть на аватарку у хедері, щоб увійти через Google</p>
+          </div>
+        </div>
+      `;
+    }
+
     if (this.recipes.length === 0) {
       return `
         <div>
@@ -113,6 +126,12 @@ export default class RecipeBookLeftPage extends Component {
 
   setRecipes(recipes) {
     this.recipes = recipes || [];
+    this.needsAuth = false;
+    this.update();
+  }
+
+  setAuthMessage(needsAuth) {
+    this.needsAuth = needsAuth;
     this.update();
   }
 }

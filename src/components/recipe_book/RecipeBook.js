@@ -157,6 +157,12 @@ export default class RecipeBook extends Component {
     this.recipes = Array.isArray(data) ? data : [];
     console.log(`📖 RecipeBook: loaded ${this.recipes.length} recipes`);
 
+    if (this.recipes.length === 0) {
+      // Check if it's a 403 auth issue
+      const hasToken = !!localStorage.getItem('eatpan_header_auth_user');
+      this.leftPage.setAuthMessage(!hasToken);
+    }
+
     // Extract unique categories from loaded recipes
     const catSet = new Map();
     this.recipes.forEach(r => {
@@ -167,7 +173,7 @@ export default class RecipeBook extends Component {
     });
     this.categories = Array.from(catSet.values()).sort((a, b) => a.label.localeCompare(b.label));
 
-    // Create and mount side ribbons with real categories
+    // Create and mount side ribbons (even if 0 recipes — show health tabs)
     this.sideRibbons = new RecipeBookSideRibbons({
       categories: this.categories,
       healthTabs: [
