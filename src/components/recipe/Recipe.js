@@ -7,10 +7,12 @@ export default class Recipe extends Component {
     super(props);
     this.recipeId = props.recipeId || null;
     this.recipeData = props.recipeData || null;
+    this.mediaAssets = props.mediaAssets || [];
     
     // Internal state instances
     this.overview = new RecipeOverview({
       recipeData: this.recipeData,
+      mediaAssets: this.mediaAssets,
       onMoreDetails: async (mountContainer) => {
         await this.instructions.render(mountContainer, 'innerHTML');
         

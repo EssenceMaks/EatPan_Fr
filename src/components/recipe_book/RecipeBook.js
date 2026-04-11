@@ -55,9 +55,17 @@ export default class RecipeBook extends Component {
     return `
       <div class="rb-container">
         <div class="rb-wrapper" id="rb-wrapper">
+          <!-- CREATE RECIPE BOOKMARK — top center, only for logged-in users -->
+          <button class="rb-overlay rb-create-bookmark" id="rb-create-btn" style="display:none;"
+                  title="Створити рецепт">
+            <i data-lucide="feather" style="width:28px;height:28px;stroke-width:1.5;margin-bottom:4px;margin-top:16px;"></i>
+            <span class="rb-create-bookmark-text">Створити</span>
+          </button>
+
           <div id="rb-ribbons-mount" class="rb-side-ribbons"></div>
           <div id="rb-left-mount" class="rb-side rb-left-side"></div>
           <div id="rb-right-mount" class="rb-side rb-right-side"></div>
+
 
           <!-- LEFT BOTTOM RIBBONS — absolute over left page area -->
           <div class="rb-overlay rb-overlay--left-bottom">
@@ -120,6 +128,12 @@ export default class RecipeBook extends Component {
     window.addEventListener('popstate', this._popStateHandler);
 
     this._setupSwipeToClose();
+
+    // — CREATE RECIPE BUTTON — show only for authenticated users
+    this._setupCreateButton();
+    this._authListener = supabase.auth.onAuthStateChange((_event, session) => {
+      this._toggleCreateButton(!!session);
+    });
   }
 
   _setupSwipeToClose() {
@@ -153,6 +167,9 @@ export default class RecipeBook extends Component {
   onDestroy() {
     if (this._popStateHandler) {
       window.removeEventListener('popstate', this._popStateHandler);
+    }
+    if (this._authListener?.data?.subscription) {
+      this._authListener.data.subscription.unsubscribe();
     }
   }
 
@@ -236,5 +253,54 @@ export default class RecipeBook extends Component {
     this.showingRight = false;
     const wrapper = this.$('#rb-wrapper');
     if (wrapper) wrapper.classList.remove('mobile-show-right');
+  }
+
+  // ============================================================
+  // CREATE RECIPE
+  // ============================================================
+  async _setupCreateButton() {
+    const btn = this.$('#rb-create-btn');
+    if (!btn) return;
+
+    // Check current session to decide initial visibility
+    const { data: { session } } = await supabase.auth.getSession();
+    this._toggleCreateButton(!!session);
+
+    btn.addEventListener('click', () => this._openCreateForm());
+  }
+
+  _toggleCreateButton(isAuth) {
+    const btn = this.$('#rb-create-btn');
+    if (btn) btn.style.display = isAuth ? '' : 'none';
+  }
+
+  async _openCreateForm() {
+    // Show form on the RIGHT page of the book (not overlay)
+    // On mobile, slide to right side first
+    const wrapper = this.$('#rb-wrapper');
+    if (wrapper) wrapper.classList.add('mobile-show-right');
+    this.showingRight = true;
+
+    await this.rightPage.showCreateForm({
+      onCreated: (result) => this._onRecipeCreated(result),
+      onClose: () => this._closeCreateForm(),
+    });
+  }
+
+  _closeCreateForm() {
+    this.rightPage.closeCreateForm();
+    // On mobile, slide back to left page
+    if (window.innerWidth < 900) {
+      const wrapper = this.$('#rb-wrapper');
+      if (wrapper) wrapper.classList.remove('mobile-show-right');
+      this.showingRight = false;
+    }
+  }
+
+  async _onRecipeCreated(result) {
+    console.log('✅ RecipeBook: recipe created, refreshing list...');
+    this._closeCreateForm();
+    // Reload recipes from API to include the newly created one
+    await this._loadRecipes();
   }
 }

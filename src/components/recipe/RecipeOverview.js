@@ -1,9 +1,11 @@
 import Component from '../../core/Component.js';
+import { IS_LOCAL } from '../../core/ApiClient.js';
 
 export default class RecipeOverview extends Component {
   constructor(props = {}) {
     super(props);
     this.recipeData = props.recipeData || {};
+    this.mediaAssets = props.mediaAssets || [];
     this.onMoreDetails = props.onMoreDetails || (() => {});
   }
 
@@ -25,18 +27,51 @@ export default class RecipeOverview extends Component {
     return 'circle-dot';
   }
 
+  /**
+   * Build main gallery image/placeholder.
+   * Type A: recipe has a photo URL → show <img> with onerror fallback "local machine offline".
+   * Type B: recipe has NO photo → decorative Lucide icon placeholder.
+   */
+  _buildMainImage(imageUrl, title) {
+    if (imageUrl) {
+      // Has image URL — show it; if local machine is offline the image fails to load
+      return `<img src="${imageUrl}" alt="${title}"
+        style="width:100%;height:100%;object-fit:cover;"
+        onerror="this.parentElement.innerHTML='<div class=\\'gallery-placeholder gallery-placeholder--offline\\'><i data-lucide=\\'server-off\\' style=\\'width:36px;height:36px;opacity:0.5;\\'></i><span>Локальна машина<br>не в мережі</span></div>';if(window.lucide)lucide.createIcons({root:this.parentElement.parentElement});">`;
+    }
+    // No image URL — recipe has no photo
+    return `<div class="gallery-placeholder gallery-placeholder--no-photo">
+      <i data-lucide="image-off" style="width:40px;height:40px;opacity:0.35;"></i>
+      <span>Без фото</span>
+    </div>`;
+  }
+
   async template() {
     const d = this.recipeData || {};
     const title = d.title || 'Без назви';
     const subtitle = d.description || d.subtitle || '';
     const category = d.category || '';
-    const imageUrl = d.image_url || '';
+    const imageUrl = d.image_url || d.photo_url || '';
     const ingredients = d.ingredients || [];
 
-    // Gallery: main image + 2 side placeholders
-    const mainImg = imageUrl
-      ? `<img src="${imageUrl}" alt="${title}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;background:#a16e45;display:grid;place-items:center;color:white;font-family:var(--font-title)\\'>No Photo</div>'">`
-      : `<div style="width:100%;height:100%;background:#a16e45;display:grid;place-items:center;color:white;font-family:var(--font-title);">No Photo</div>`;
+    // Resolve image URL from media_assets using UUID in data.media.images
+    let resolvedImageUrl = imageUrl;
+    if (!resolvedImageUrl && this.mediaAssets.length > 0) {
+      // Try to find the first image asset
+      const mediaRef = d.media?.images?.[0]; // UUID reference
+      if (mediaRef) {
+        const asset = this.mediaAssets.find(a => a.uuid === mediaRef);
+        if (asset?.url) resolvedImageUrl = asset.url;
+      }
+      // Fallback: just use the first image-type asset
+      if (!resolvedImageUrl) {
+        const firstImage = this.mediaAssets.find(a => a.kind === 'image');
+        if (firstImage?.url) resolvedImageUrl = firstImage.url;
+      }
+    }
+
+    // Gallery: main image with smart fallback
+    const mainImg = this._buildMainImage(resolvedImageUrl, title);
 
     // Ingredients HTML
     const ingredientsHtml = ingredients.map(ing => {
