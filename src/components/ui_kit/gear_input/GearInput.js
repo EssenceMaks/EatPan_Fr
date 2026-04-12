@@ -8,7 +8,7 @@ export default class GearInput extends Component {
 
   async template() {
     const type = this.props.type || 'text';
-    const placeholder = this.props.placeholder || 'Введите текст...';
+    const placeholder = this.props.placeholder || 'Введіть текст...';
     const value = this.props.value || '';
 
     return `<input type="${type}" class="arc-gear-input" placeholder="${placeholder}" value="${value}">`;

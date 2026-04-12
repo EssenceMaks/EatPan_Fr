@@ -7,11 +7,11 @@ export default class ArcDialog extends Component {
   }
 
   async template() {
-    const title = this.props.title || 'ВНИМАНИЕ, ПУТНИК!';
-    const text = this.props.text || 'Ваш путь предопределён. Выберите действие.';
+    const title = this.props.title || 'УВАГА, МАНДРІВНИКУ!';
+    const text = this.props.text || 'Ваш шлях визначено. Оберіть дію.';
     const buttons = this.props.buttons || [
-      { label: 'ПРИНЯТЬ ЗАДАНИЕ', variant: 'concave' },
-      { label: 'ОТКЛОНИТЬ', variant: 'convex' },
+      { label: 'ПРИЙНЯТИ ЗАВДАННЯ', variant: 'concave' },
+      { label: 'ВІДХИЛИТИ', variant: 'convex' },
     ];
 
     const buttonsHtml = buttons.map(b =>

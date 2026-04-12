@@ -40,13 +40,13 @@ async function renderDividers() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ДЕКОРАТИВНЫЕ ЭЛЕМЕНТЫ' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ДЕКОРАТИВНІ ЕЛЕМЕНТИ' }).render(sec, 'appendChild');
   await new EdgeDivider().render(sec, 'appendChild');
-  await new RuneTitle({ text: 'УМЕНЬШЕННЫЙ ЗАГОЛОВОК', size: 'sm' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ЗМЕНШЕНИЙ ЗАГОЛОВОК', size: 'sm' }).render(sec, 'appendChild');
   await new EdgeDivider().render(sec, 'appendChild');
 
   // EdgeGaltel variants
-  await new RuneTitle({ text: 'ГАЛЬТЕЛИ (EDGE GALTEL)', size: 'sm' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ГАЛТЕЛІ (EDGE GALTEL)', size: 'sm' }).render(sec, 'appendChild');
   const galtelWrap = document.createElement('div');
   galtelWrap.style.cssText = 'display:flex; flex-direction:column; gap:8px;';
   sec.appendChild(galtelWrap);
@@ -65,18 +65,18 @@ async function renderGlyphButtons() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ОБЪЁМНЫЕ КНОПКИ (GLYPH)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ОБ\'ЄМНІ КНОПКИ (GLYPH)' }).render(sec, 'appendChild');
 
   const wrap = document.createElement('div');
   wrap.style.cssText = 'display:flex; flex-direction:column; gap:12px;';
   sec.appendChild(wrap);
 
   for (const v of [
-    { variant: 'concave', label: 'ВПУКЛАЯ (CONCAVE)' },
-    { variant: 'convex', label: 'ВЫПУКЛАЯ (CONVEX)' },
-    { variant: 'radial', label: 'РАДИАЛЬНАЯ (RADIAL)' },
+    { variant: 'concave', label: 'УВІГНУТА (CONCAVE)' },
+    { variant: 'convex', label: 'ОПУКЛА (CONVEX)' },
+    { variant: 'radial', label: 'РАДІАЛЬНА (RADIAL)' },
     { variant: 'pill', label: 'КАПСУЛА (PILL)' },
-    { variant: 'ingot', label: 'СЛИТОК (INGOT)' },
+    { variant: 'ingot', label: 'ЗЛИТОК (INGOT)' },
   ]) {
     await new GlyphButton(v).render(wrap, 'appendChild');
   }
@@ -91,10 +91,10 @@ async function renderGlyphRunic() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'РУНИЧЕСКИЕ КНОПКИ (GLYPH RUNIC)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'РУНІЧНІ КНОПКИ (GLYPH RUNIC)' }).render(sec, 'appendChild');
 
   const shapes = ['single', 'dside', 'dfull'];
-  const labels = { single: 'ОДИНАРНЫЙ', dside: 'ДВОЙНОЙ БОКОВОГО', dfull: 'ДВОЙНОЙ ПОЛНЫЙ' };
+  const labels = { single: 'ОДИНАРНИЙ', dside: 'ПОДВІЙНИЙ БІЧНИЙ', dfull: 'ПОДВІЙНИЙ ПОВНИЙ' };
 
   for (const shape of shapes) {
     await new RuneTitle({ text: labels[shape], size: 'sm' }).render(sec, 'appendChild');
@@ -116,7 +116,7 @@ async function renderGlyphCombo() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'СОСТАВНЫЕ КНОПКИ (GLYPH COMBO)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'СКЛАДЕНІ КНОПКИ (GLYPH COMBO)' }).render(sec, 'appendChild');
   await new GlyphCombo({ label: 'CENTER GRADIENT', icon: 'sword', variant: 'center' }).render(sec, 'appendChild');
   const sp1 = document.createElement('div'); sp1.style.height = '10px'; sec.appendChild(sp1);
   await new GlyphCombo({ label: 'LTR GRADIENT', icon: 'shield', variant: 'ltr' }).render(sec, 'appendChild');
@@ -131,7 +131,7 @@ async function renderSigils() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ЩИТЫ И РОМБЫ (SIGILS)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ЩИТИ ТА РОМБИ (SIGILS)' }).render(sec, 'appendChild');
 
   // Shields
   const shieldRow = document.createElement('div');
@@ -143,7 +143,7 @@ async function renderSigils() {
   await new SigilShield({ icon: 'crown', variant: 'double' }).render(shieldRow, 'appendChild');
 
   // Diamonds
-  await new RuneTitle({ text: 'РОМБОВИДНЫЕ ИКОНКИ', size: 'sm' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'РОМБОПОДІБНІ ІКОНКИ', size: 'sm' }).render(sec, 'appendChild');
   const diamondRow = document.createElement('div');
   diamondRow.style.cssText = 'display:flex; justify-content:center; flex-wrap:wrap; gap:20px; padding:15px;';
   sec.appendChild(diamondRow);
@@ -161,15 +161,15 @@ async function renderFluxBars() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'СТАТ БАРЫ (FLUX STAT)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'СТАТ БАРИ (FLUX STAT)' }).render(sec, 'appendChild');
 
-  await new FluxStatBar({ label: 'СТАМИНА', value: 80, max: 100, type: 'stamina' }).render(sec, 'appendChild');
-  await new FluxStatBar({ label: 'ОПЫТ', value: 350, max: 1000, type: 'exp' }).render(sec, 'appendChild');
-  await new FluxStatBar({ label: 'ЗДОРОВЬЕ', value: 65, max: 100, type: 'health' }).render(sec, 'appendChild');
+  await new FluxStatBar({ label: 'ВИТРИВАЛІСТЬ', value: 80, max: 100, type: 'stamina' }).render(sec, 'appendChild');
+  await new FluxStatBar({ label: 'ДОСВІД', value: 350, max: 1000, type: 'exp' }).render(sec, 'appendChild');
+  await new FluxStatBar({ label: 'ЗДОРОВ\'Я', value: 65, max: 100, type: 'health' }).render(sec, 'appendChild');
   await new FluxStatBar({ label: 'МАНА', value: 40, max: 100, type: 'mana' }).render(sec, 'appendChild');
 
   // Segment bars
-  await new RuneTitle({ text: 'СЕГМЕНТЫ (FLUX SEGMENT)', size: 'sm' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'СЕГМЕНТИ (FLUX SEGMENT)', size: 'sm' }).render(sec, 'appendChild');
   await new FluxSegmentBar({ total: 10, filled: 7, variant: 'gold' }).render(sec, 'appendChild');
   const sp = document.createElement('div'); sp.style.height = '6px'; sec.appendChild(sp);
   await new FluxSegmentBar({ total: 10, filled: 4, variant: 'theme' }).render(sec, 'appendChild');
@@ -185,7 +185,7 @@ async function renderFluxProgress() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ПРОГРЕСС БАРЫ (FLUX)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ПРОГРЕС БАРИ (FLUX)' }).render(sec, 'appendChild');
 
   for (const v of [
     { variant: 'solid', label: 'SOLID FILL', value: 70 },
@@ -206,7 +206,7 @@ async function renderGear() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ЭЛЕМЕНТЫ ВВОДА (GEAR)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ЕЛЕМЕНТИ ВВОДУ (GEAR)' }).render(sec, 'appendChild');
 
   // Sliders
   for (const v of [
@@ -220,13 +220,13 @@ async function renderGear() {
   }
 
   // Input
-  await new RuneTitle({ text: 'ПОЛЕ ВВОДА', size: 'sm' }).render(sec, 'appendChild');
-  await new GearInput({ placeholder: 'Введи имя героя...' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ПОЛЕ ВВОДУ', size: 'sm' }).render(sec, 'appendChild');
+  await new GearInput({ placeholder: 'Введіть ім\'я героя...' }).render(sec, 'appendChild');
   const sp = document.createElement('div'); sp.style.height = '8px'; sec.appendChild(sp);
 
   // Dropdown
-  await new RuneTitle({ text: 'ВЫПАДАЮЩИЙ СПИСОК', size: 'sm' }).render(sec, 'appendChild');
-  await new GearDropdown({ placeholder: 'Выбрать класс...', options: ['Воин', 'Маг', 'Разбойник', 'Лучник'] }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ВИПАДНИЙ СПИСОК', size: 'sm' }).render(sec, 'appendChild');
+  await new GearDropdown({ placeholder: 'Обрати клас...', options: ['Воїн', 'Маг', 'Розбійник', 'Лучник'] }).render(sec, 'appendChild');
 
   await new EdgeDivider().render(sec, 'appendChild');
 }
@@ -239,13 +239,13 @@ async function renderSparkRibbons() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'УВЕДОМЛЕНИЯ (SPARK RIBBON)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'СПОВІЩЕННЯ (SPARK RIBBON)' }).render(sec, 'appendChild');
 
-  await new SparkRibbon({ title: 'Задание выполнено!', desc: 'Получена награда: 150 XP', type: 'success', clip: 'inward', dir: 'ltr', iconStyle: 'icon', icon: 'check' }).render(sec, 'appendChild');
-  await new SparkRibbon({ title: 'Внимание!', desc: 'Осталось мало здоровья', type: 'warning', clip: 'outward', dir: 'ltr', iconStyle: 'seal', icon: 'alert-triangle' }).render(sec, 'appendChild');
-  await new SparkRibbon({ title: 'Критическая ошибка', desc: 'Связь с сервером потеряна', type: 'error', clip: 'inward', dir: 'ltr', iconStyle: 'square-seal', icon: 'x' }).render(sec, 'appendChild');
+  await new SparkRibbon({ title: 'Завдання виконано!', desc: 'Отримано нагороду: 150 XP', type: 'success', clip: 'inward', dir: 'ltr', iconStyle: 'icon', icon: 'check' }).render(sec, 'appendChild');
+  await new SparkRibbon({ title: 'Увага!', desc: 'Залишилось мало здоров\'я', type: 'warning', clip: 'outward', dir: 'ltr', iconStyle: 'seal', icon: 'alert-triangle' }).render(sec, 'appendChild');
+  await new SparkRibbon({ title: 'Критична помилка', desc: 'Зв\'язок із сервером втрачено', type: 'error', clip: 'inward', dir: 'ltr', iconStyle: 'square-seal', icon: 'x' }).render(sec, 'appendChild');
 
-  await new RuneTitle({ text: 'RTL ВАРИАНТЫ', size: 'sm' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'RTL ВАРІАНТИ', size: 'sm' }).render(sec, 'appendChild');
   await new SparkRibbon({ title: 'Quest Complete!', desc: 'Reward: 150 XP', type: 'success', clip: 'inward', dir: 'rtl', iconStyle: 'icon', icon: 'check' }).render(sec, 'appendChild');
   await new SparkRibbon({ title: 'Warning!', desc: 'Low health', type: 'warning', clip: 'outward', dir: 'rtl', iconStyle: 'seal', icon: 'alert-triangle' }).render(sec, 'appendChild');
   await new SparkRibbon({ title: 'Critical Error', desc: 'Connection lost', type: 'error', clip: 'inward', dir: 'rtl', iconStyle: 'square-seal', icon: 'x' }).render(sec, 'appendChild');
@@ -261,16 +261,16 @@ async function renderArcSlips() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'БУМАЖНЫЕ ЗАПИСИ (ARC SLIP)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ПАПЕРОВІ ЗАПИСИ (ARC SLIP)' }).render(sec, 'appendChild');
 
   // Board wrapper
   const board = document.createElement('div');
   board.style.cssText = 'background:#4a3525; background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px); border:3px solid #2a1b10; border-radius:6px; padding:12px; box-shadow:inset 0 0 30px rgba(0,0,0,0.9),0 5px 15px rgba(0,0,0,0.8); display:flex; flex-direction:column; gap:10px;';
   sec.appendChild(board);
 
-  await new ArcSlip({ text: 'Заказ на мясо свиньи', icon: 'scroll', showSeal: true }).render(board, 'appendChild');
-  await new ArcSlip({ text: 'Рецепт зелья маны', icon: 'flame', showSeal: true }).render(board, 'appendChild');
-  await new ArcSlip({ text: 'Письмо от кузнеца', icon: 'mail', showSeal: false }).render(board, 'appendChild');
+  await new ArcSlip({ text: 'Замовлення на м\'ясо свині', icon: 'scroll', showSeal: true }).render(board, 'appendChild');
+  await new ArcSlip({ text: 'Рецепт зілля мани', icon: 'flame', showSeal: true }).render(board, 'appendChild');
+  await new ArcSlip({ text: 'Лист від коваля', icon: 'mail', showSeal: false }).render(board, 'appendChild');
 
   await new EdgeDivider().render(sec, 'appendChild');
 }
@@ -283,7 +283,7 @@ async function renderCoreAvatars() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'АВАТАРЫ (CORE AVATAR)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'АВАТАРИ (CORE AVATAR)' }).render(sec, 'appendChild');
 
   const row = document.createElement('div');
   row.style.cssText = 'display:flex; justify-content:center; gap:15px; align-items:end;';
@@ -305,15 +305,15 @@ async function renderGlyphNav() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'НАВИГАЦИЯ (GLYPH NAV)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'НАВІГАЦІЯ (GLYPH NAV)' }).render(sec, 'appendChild');
 
   await new GlyphNav({
     items: [
-      { icon: 'home', label: 'Дом', active: true },
+      { icon: 'home', label: 'Дім', active: true },
       { icon: 'map', label: 'Карта' },
       { icon: 'backpack', label: 'Сумка' },
       { icon: 'user', label: 'Герой' },
-      { icon: 'settings', label: 'Настр.' },
+      { icon: 'settings', label: 'Налашт.' },
     ]
   }).render(sec, 'appendChild');
 
@@ -359,7 +359,7 @@ async function renderTopBarParchment() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ВЕРХНЯЯ ПАНЕЛЬ ПЕРГАМЕНТ (ARC TOPBAR)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ВЕРХНЯ ПАНЕЛЬ ПЕРГАМЕНТ (ARC TOPBAR)' }).render(sec, 'appendChild');
 
   await new ArcTopBarParchment({
     name: 'IRON CHEF',
@@ -380,7 +380,7 @@ async function renderTopBarCompact() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ВЕРХНЯЯ ПАНЕЛЬ КОМПАКТ (ARC TOPBAR V2)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ВЕРХНЯ ПАНЕЛЬ КОМПАКТ (ARC TOPBAR V2)' }).render(sec, 'appendChild');
 
   await new ArcTopBarCompact({
     name: 'DARK KNIGHT',
@@ -401,14 +401,14 @@ async function renderDialog() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ПЕРГАМЕНТНЫЙ ДИАЛОГ (ARC DIALOG)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ПЕРГАМЕНТНИЙ ДІАЛОГ (ARC DIALOG)' }).render(sec, 'appendChild');
 
   await new ArcDialog({
-    title: 'ПОРУЧЕНИЕ ОТ КОРОЛЯ',
-    text: 'Путник, твоя помощь нужна. Драконы нападают на деревню. Отправишься ли ты на битву?',
+    title: 'ДОРУЧЕННЯ ВІД КОРОЛЯ',
+    text: 'Мандрівнику, твоя допомога потрібна. Дракони нападають на село. Вирушиш ти на битву?',
     buttons: [
-      { label: 'ПРИНЯТЬ ЗАДАНИЕ', variant: 'concave' },
-      { label: 'ОТКЛОНИТЬ', variant: 'convex' },
+      { label: 'ПРИЙНЯТИ ЗАВДАННЯ', variant: 'concave' },
+      { label: 'ВІДХИЛИТИ', variant: 'convex' },
     ]
   }).render(sec, 'appendChild');
 
@@ -423,14 +423,14 @@ async function renderPaperBoard() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ДОСКА ОБЪЯВЛЕНИЙ (ARC PAPER BOARD)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ДОШКА ОГОЛОШЕНЬ (ARC PAPER BOARD)' }).render(sec, 'appendChild');
 
   await new ArcPaperBoard({
     slips: [
-      { text: 'Охота на кабана — 50 золотых', icon: 'scroll', showSeal: true },
-      { text: 'Рецепт зелья исцеления', icon: 'flame', showSeal: true },
-      { text: 'Письмо из гильдии кузнецов', icon: 'mail', showSeal: false },
-      { text: 'Карта подземелья — СЕКРЕТНО', icon: 'map', showSeal: true },
+      { text: 'Полювання на кабана — 50 золотих', icon: 'scroll', showSeal: true },
+      { text: 'Рецепт зілля зцілення', icon: 'flame', showSeal: true },
+      { text: 'Лист з гільдії ковалів', icon: 'mail', showSeal: false },
+      { text: 'Карта підземелья — СЕКРЕТНО', icon: 'map', showSeal: true },
     ]
   }).render(sec, 'appendChild');
 
@@ -445,14 +445,14 @@ async function renderPopup() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ВСПЛЫВАЮЩЕЕ ОКНО (ARC POPUP)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ВСПЛИВАЮЧЕ ВІКНО (ARC POPUP)' }).render(sec, 'appendChild');
 
   await new ArcPopup({
-    title: 'Подтверждение покупки',
-    body: 'Купить Меч Огня за 500 золотых?',
+    title: 'Підтвердження покупки',
+    body: 'Придбати Меч Вогню за 500 золотих?',
     buttons: [
-      { label: 'КУПИТЬ', variant: 'concave' },
-      { label: 'ОТМЕНА', variant: 'convex' },
+      { label: 'ПРИДБАТИ', variant: 'concave' },
+      { label: 'СКАСУВАТИ', variant: 'convex' },
     ]
   }).render(sec, 'appendChild');
 
@@ -467,7 +467,7 @@ async function renderBentoHeaderFull() {
   if (!container) return;
   const sec = makeSection(container);
 
-  await new RuneTitle({ text: 'ПОЛНЫЙ BENTO ХЕДЕР (USER REF V3)' }).render(sec, 'appendChild');
+  await new RuneTitle({ text: 'ПОВНИЙ BENTO ХЕДЕР (USER REF V3)' }).render(sec, 'appendChild');
 
   await new ArcBentoHeaderFull({
     name: 'SIR GALAHAD',

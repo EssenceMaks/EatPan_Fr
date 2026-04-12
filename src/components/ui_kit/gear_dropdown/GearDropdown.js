@@ -7,8 +7,8 @@ export default class GearDropdown extends Component {
   }
 
   async template() {
-    const placeholder = this.props.placeholder || 'Выберите...';
-    const options = this.props.options || ['Вариант 1', 'Вариант 2', 'Вариант 3'];
+    const placeholder = this.props.placeholder || 'Оберіть...';
+    const options = this.props.options || ['Варіант 1', 'Варіант 2', 'Варіант 3'];
 
     const optionsHtml = options.map(opt => 
       `<div class="arc-gear-dropdown__item">${opt}</div>`

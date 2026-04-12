@@ -7,11 +7,11 @@ export default class ArcPopup extends Component {
   }
 
   async template() {
-    const title = this.props.title || 'Подтверждение';
-    const body = this.props.body || 'Вы уверены, что хотите продолжить?';
+    const title = this.props.title || 'Підтвердження';
+    const body = this.props.body || 'Ви впевнені, що хочете продовжити?';
     const buttons = this.props.buttons || [
-      { label: 'ДА', variant: 'concave' },
-      { label: 'НЕТ', variant: 'convex' },
+      { label: 'ТАК', variant: 'concave' },
+      { label: 'НІ', variant: 'convex' },
     ];
 
     const buttonsHtml = buttons.map(b =>

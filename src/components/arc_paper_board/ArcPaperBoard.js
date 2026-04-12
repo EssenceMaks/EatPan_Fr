@@ -8,9 +8,9 @@ export default class ArcPaperBoard extends Component {
 
   async template() {
     const slips = this.props.slips || [
-      { text: 'Заказ на мясо свиньи', icon: 'scroll', showSeal: true },
-      { text: 'Рецепт зелья маны', icon: 'flame', showSeal: true },
-      { text: 'Письмо от кузнеца', icon: 'mail', showSeal: false },
+      { text: 'Замовлення на м\'ясо свині', icon: 'scroll', showSeal: true },
+      { text: 'Рецепт зілля мани', icon: 'flame', showSeal: true },
+      { text: 'Лист від коваля', icon: 'mail', showSeal: false },
     ];
 
     const slipsHtml = slips.map(s => {

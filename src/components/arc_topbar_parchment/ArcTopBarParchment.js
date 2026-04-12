@@ -24,14 +24,14 @@ export default class ArcTopBarParchment extends Component {
           <div class="arc-topbar-parchment__stats">
             <!-- Stat bars using atomic FluxStatBar patterns -->
             <div class="arc-flux-stat">
-              <span class="arc-flux-stat__label">СТАМИНА</span>
+              <span class="arc-flux-stat__label">ВИТРИВАЛІСТЬ</span>
               <div class="arc-flux-stat__track">
                 <div class="arc-flux-stat__fill arc-flux-stat__fill--stamina" style="width:${staminaPct}%"></div>
               </div>
               <span class="arc-flux-stat__value">${stamina.value}/${stamina.max}</span>
             </div>
             <div class="arc-flux-stat">
-              <span class="arc-flux-stat__label">ОПЫТ</span>
+              <span class="arc-flux-stat__label">ДОСВІД</span>
               <div class="arc-flux-stat__track">
                 <div class="arc-flux-stat__fill arc-flux-stat__fill--exp" style="width:${expPct}%"></div>
               </div>

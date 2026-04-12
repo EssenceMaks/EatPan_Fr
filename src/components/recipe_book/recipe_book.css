@@ -299,7 +299,7 @@
 /* Left bottom ribbons — anchored to bottom of left page */
 .rb-overlay--left-bottom {
   bottom: -8px;
-  left: 50%;
+  left: 48%;
   transform: translateX(-70%);
   display: flex;
   gap: 10px;
