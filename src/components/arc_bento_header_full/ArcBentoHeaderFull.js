@@ -106,6 +106,29 @@ export default class ArcBentoHeaderFull extends Component {
   }
 
   async onMount() {
-    if (window.lucide) lucide.createIcons({ root: this.element });
+    // Use MutationObserver to modify icon sizes after lucide creates them
+    const observer = new MutationObserver((mutations) => {
+      const badgeIcons = this.element.querySelectorAll('.arc-bento-full__badge svg');
+      badgeIcons.forEach(svg => {
+        svg.setAttribute('width', '14');
+        svg.setAttribute('height', '14');
+        svg.style.width = '14px';
+        svg.style.height = '14px';
+      });
+    });
+
+    observer.observe(this.element, {
+      childList: true,
+      subtree: true
+    });
+
+    // Initial check in case icons already exist
+    const badgeIcons = this.element.querySelectorAll('.arc-bento-full__badge svg');
+    badgeIcons.forEach(svg => {
+      svg.setAttribute('width', '14');
+      svg.setAttribute('height', '14');
+      svg.style.width = '14px';
+      svg.style.height = '14px';
+    });
   }
 }

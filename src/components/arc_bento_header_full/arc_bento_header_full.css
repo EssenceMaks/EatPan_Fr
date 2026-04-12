@@ -278,13 +278,18 @@
 }
 
 .arc-bento-full__name-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
   align-items: center;
   margin-bottom: 2px;
+  gap: 10px;
 }
 
 .arc-bento-full__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: 'Cinzel', serif;
   font-size: 16px;
   font-weight: bold;
@@ -294,26 +299,46 @@
 }
 
 .arc-bento-full__badges {
-  display: grid;
-  grid-auto-flow: column;
+  display: flex;
   gap: 5px;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .arc-bento-full__badge {
   width: 20px;
   height: 20px;
+  max-width: 20px;
+  max-height: 20px;
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid var(--gold-dark);
   border-radius: 4px;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--gold-light);
   box-shadow: inset 0 0 5px #000;
+  overflow: hidden;
+  position: relative;
 }
 
 .arc-bento-full__badge i {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arc-bento-full__badge svg,
+.arc-bento-full__badge i svg,
+.arc-bento-full__badge svg[data-lucide],
+.arc-bento-full__badge svg.lucide {
+  width: 14px !important;
+  height: 14px !important;
+  max-width: 14px !important;
+  max-height: 14px !important;
 }
 
 /* HP / MP Bars */
