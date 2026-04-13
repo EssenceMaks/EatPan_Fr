@@ -40,10 +40,10 @@ export default class ArcBentoHeader extends Component {
             <div class="arc-bento-full__hex-outer">
               <div class="arc-bento-full__hex-gap">
                 <div class="arc-bento-full__hex-avatar" style="overflow: hidden;">
-                  ${userStats.avatarUrl 
-                    ? `<img src="${userStats.avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar" referrerpolicy="no-referrer" />` 
-                    : `<i data-lucide="user" style="width:35px;height:35px; stroke-width: 1.5; color: var(--text-accent);"></i>`
-                  }
+                  ${userStats.avatarUrl
+          ? `<img src="${userStats.avatarUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="Avatar" referrerpolicy="no-referrer" />`
+          : `<i data-lucide="user" style="width:35px;height:35px; stroke-width: 1.5; color: var(--text-accent);"></i>`
+        }
                 </div>
               </div>
             </div>
@@ -56,8 +56,8 @@ export default class ArcBentoHeader extends Component {
             <div class="arc-bento-full__name-row">
               <span class="arc-bento-full__name">${name}</span>
               <div class="arc-bento-full__badges">
-                <div class="arc-bento-full__badge"><i data-lucide="crown"></i></div>
-                <div class="arc-bento-full__badge" style="border-color:#52c2d6;color:#52c2d6;"><i data-lucide="gem"></i></div>
+                <div class="arc-bento-full__badge"><i data-lucide="crown" width="14" height="14"></i></div>
+                <div class="arc-bento-full__badge" style="border-color:#52c2d6;color:#52c2d6;"><i data-lucide="gem" width="14" height="14"></i></div>
               </div>
             </div>
             
@@ -121,24 +121,24 @@ export default class ArcBentoHeader extends Component {
     const leftBtn = this.$('#bh-left-btn');
     if (leftBtn) {
       leftBtn.addEventListener('click', () => {
-         if (this.props.onLoginClick) this.props.onLoginClick();
+        if (this.props.onLoginClick) this.props.onLoginClick();
       });
     }
-    
+
     this.$('#bh-clock-btn').addEventListener('click', () => {
-       if (this.props.onClockClick) this.props.onClockClick();
+      if (this.props.onClockClick) this.props.onClockClick();
     });
-    
+
     this.$('#bh-menu-btn-container').addEventListener('click', (e) => {
-       e.stopPropagation();
-       if (this.props.onMenuClick) this.props.onMenuClick();
+      e.stopPropagation();
+      if (this.props.onMenuClick) this.props.onMenuClick();
     });
-    
+
     const backBtn = this.$('#bh-back-btn-container');
     if (backBtn) {
       backBtn.addEventListener('click', (e) => {
-         e.stopPropagation();
-         if (this.props.onBackClick) this.props.onBackClick();
+        e.stopPropagation();
+        if (this.props.onBackClick) this.props.onBackClick();
       });
     }
 

@@ -23,9 +23,11 @@ export default class RecipeBookLeftPage extends Component {
 
     if (this.needsAuth) {
       return `
-        <div>
-          <h2 class="rb-title">Книга рецептів</h2>
-          <div style="text-align:center;padding:40px 20px;opacity:0.7;">
+        <div class="book-page-container">
+          <div class="book-page-header">
+            <h2 class="rb-title">Книга рецептів</h2>
+          </div>
+          <div class="book-page-scroll" style="display:flex;flex-direction:column;align-items:center;padding-top:40px;opacity:0.7;">
             <i data-lucide="lock" style="width:48px;height:48px;margin-bottom:12px;"></i>
             <p style="font-family:var(--font-title,serif);font-size:1.1rem;margin-bottom:8px;">Потрібна авторизація</p>
             <p style="font-size:0.85rem;color:#666;">Натисніть на аватарку у хедері, щоб увійти через Google</p>
@@ -36,9 +38,11 @@ export default class RecipeBookLeftPage extends Component {
 
     if (this.recipes.length === 0) {
       return `
-        <div>
-          <h2 class="rb-title">Книга рецептів</h2>
-          <div class="rb-loading" style="text-align:center;padding:40px 0;opacity:0.5;">
+        <div class="book-page-container">
+          <div class="book-page-header">
+            <h2 class="rb-title">Книга рецептів</h2>
+          </div>
+          <div class="book-page-scroll" style="display:flex;flex-direction:column;align-items:center;padding-top:40px;opacity:0.5;">
             <i data-lucide="loader" style="width:32px;height:32px;animation:spin 1s linear infinite;"></i>
             <p style="margin-top:12px;font-family:var(--font-title,serif);font-style:italic;">Завантаження рецептів...</p>
           </div>
@@ -84,10 +88,14 @@ export default class RecipeBookLeftPage extends Component {
     }
 
     return `
-      <div>
-        <h2 class="rb-title">${titleText} ${countText}</h2>
-        <div class="rb-mock-list">
-          ${contentHtml}
+      <div class="book-page-container">
+        <div class="book-page-header">
+          <h2 class="rb-title">${titleText} ${countText}</h2>
+        </div>
+        <div class="book-page-scroll">
+          <div class="rb-mock-list">
+            ${contentHtml}
+          </div>
         </div>
       </div>
     `;

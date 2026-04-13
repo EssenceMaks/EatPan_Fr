@@ -6,7 +6,7 @@ export default class RecipeOverview extends Component {
     super(props);
     this.recipeData = props.recipeData || {};
     this.mediaAssets = props.mediaAssets || [];
-    this.onMoreDetails = props.onMoreDetails || (() => {});
+    this.onMoreDetails = props.onMoreDetails || (() => { });
   }
 
   _getIngredientIcon(name) {
@@ -92,14 +92,19 @@ export default class RecipeOverview extends Component {
     }).join('');
 
     return `
-      <div class="recipe-view-container">
-        <div class="recipe-scroll-area">
+      <div class="recipe-view-container book-page-container">
+        <!-- New sticky header -->
+        <div class="book-page-header">
+          <h2 class="rb-title">${title}</h2>
+        </div>
+
+        <div class="book-page-scroll-spine-left">
           <div class="recipe-inner-wrap">
             
-            <div class="recipe-header-nav" style="flex-direction: column; text-align: center; border: none; padding-top: 16px;">
-              <h2 style="font-family: var(--font-title, serif); font-size: 2.2rem; color: var(--ink);">${title}</h2>
-              ${subtitle ? `<p style="font-size: 0.95rem; color: #666; font-style: italic;">${subtitle}</p>` : ''}
-              ${category ? `<p style="font-size: 0.75rem; color: var(--crimson, #8b1a1a); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;">${category}</p>` : ''}
+            <!-- Sticky header extracted, subtitles inside scroll -->
+            <div class="recipe-sub-header" style="text-align: center; margin-bottom: 16px;">
+              ${subtitle ? `<p style="font-size: 0.95rem; color: #666; font-style: italic; margin-top: 0; margin-bottom: 4px;">${subtitle}</p>` : ''}
+              ${category ? `<p style="font-size: 0.75rem; color: var(--crimson, #8b1a1a); text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">${category}</p>` : ''}
             </div>
 
             <!-- Centaur Style Photo Gallery -->
@@ -151,7 +156,7 @@ export default class RecipeOverview extends Component {
         e.preventDefault();
         const mount = this.$('#recipe-instructions-mount');
         const isCollapsed = mount.classList.contains('collapsed');
-        
+
         if (isCollapsed) {
           mount.classList.remove('collapsed');
           mount.classList.add('expanded');

@@ -93,7 +93,7 @@ export default class AppShell extends Component {
         name: session.user.user_metadata?.name || session.user.user_metadata?.full_name || 'HERO',
         avatarUrl: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || null,
         level: 1,
-        hp: { value: 3450, max: 4000 },
+        hp: { value: 3000, max: 4000 },
         mp: { value: 1200, max: 2500 },
         stamina: { filled: 5, total: 8 }
       };
@@ -168,7 +168,7 @@ export default class AppShell extends Component {
         name: session?.user?.user_metadata?.name || session?.user?.user_metadata?.full_name || 'HERO',
         avatarUrl: session?.user?.user_metadata?.avatar_url || session?.user?.user_metadata?.picture || null,
         level: 1,
-        hp: { value: 3450, max: 4000 },
+        hp: { value: 3000, max: 4000 },
         mp: { value: 1200, max: 2500 },
         stamina: { filled: 5, total: 8 }
       };

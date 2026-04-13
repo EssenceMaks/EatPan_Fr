@@ -323,8 +323,8 @@
 }
 
 .arc-bento-full__badge i {
-  width: 14px;
-  height: 14px;
+  width: 14px !important;
+  height: 14px !important;
   overflow: hidden;
   display: flex;
   align-items: center;

@@ -41,32 +41,72 @@
 /* Base side styles */
 .rb-side {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Shared Book Page Structure */
+.book-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  padding: 0 12px;
+}
+
+.book-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 24px;
+  border-bottom: 2px solid var(--crimson, #8b1a1a);
+  flex-shrink: 0;
+  min-height: 64px;
+}
+
+.book-page-scroll {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 24px;
+  margin-right: 2px;
+  padding: 16px 16px 40px 24px;
 }
 
-/* The Left Side (Categories/List) — diamond scrollbar on the RIGHT edge */
-.rb-left-side {
-  grid-area: left;
-  background: linear-gradient(to left, rgba(0, 0, 0, 0.15) 0%, transparent 6%), var(--parchment, #f1eacc);
-  border-right: 1px solid rgba(44, 24, 16, 0.2);
-  /* Inner spine shadow */
-  box-shadow: inset -25px 0 35px -15px rgba(0, 0, 0, 0.3);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(128, 85, 51, 0.5) transparent;
+.book-page-scroll-spine-left {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-left: 2px;
+  padding-left: 8px;
+  /* For scrollbar hack */
+  transform: scaleX(-1);
 }
 
-.rb-left-side::-webkit-scrollbar {
+.book-page-scroll-spine-left>* {
+  transform: scaleX(-1);
+  padding: 16px 32px 40px 12px;
+}
+
+/* Shared scrollbar mixin */
+.book-page-scroll::-webkit-scrollbar,
+.book-page-scroll-spine-left::-webkit-scrollbar {
   width: 14px;
 }
 
-.rb-left-side::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
+.book-page-scroll::-webkit-scrollbar-track,
+.book-page-scroll-spine-left::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
+  margin: 8px 0;
 }
 
-.rb-left-side::-webkit-scrollbar-thumb {
+.book-page-scroll::-webkit-scrollbar-thumb,
+.book-page-scroll-spine-left::-webkit-scrollbar-thumb {
   background-color: transparent;
   background-image:
     url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" viewBox="0 0 14 20"><path d="M7 4 L12 10 L7 16 L2 10 Z" fill="%23f1eacc" stroke="%23805533" stroke-width="1.5"/></svg>'),
@@ -76,14 +116,23 @@
   background-size: 14px 20px, 2px 100%;
 }
 
-.rb-left-side::-webkit-scrollbar-thumb:hover {
+.book-page-scroll::-webkit-scrollbar-thumb:hover,
+.book-page-scroll-spine-left::-webkit-scrollbar-thumb:hover {
   background-image:
     url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" viewBox="0 0 14 20"><path d="M7 4 L12 10 L7 16 L2 10 Z" fill="%23ffffff" stroke="%23805533" stroke-width="1.5"/></svg>'),
     linear-gradient(to bottom, rgba(128, 85, 51, 0.9), rgba(128, 85, 51, 0.9));
-  background-repeat: no-repeat, no-repeat;
-  background-position: center center, center center;
-  background-size: 14px 20px, 2px 100%;
 }
+
+/* The Left Side (Categories/List) — diamond scrollbar on the RIGHT edge */
+.rb-left-side {
+  grid-area: left;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.15) 0%, transparent 6%), var(--parchment, #f1eacc);
+  border-right: 1px solid rgba(44, 24, 16, 0.2);
+  /* Inner spine shadow */
+  box-shadow: inset -25px 0 35px -15px rgba(0, 0, 0, 0.3);
+}
+
+
 
 /* The Right Side (Recipe Display) */
 .rb-right-side {
@@ -99,7 +148,7 @@
   font-family: var(--font-title, 'Noto Serif', serif);
   color: var(--brand-red, #6b0d12);
   text-align: center;
-  margin-bottom: 24px;
+  margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 700;
@@ -298,7 +347,7 @@
 
 /* Left bottom ribbons — anchored to bottom of left page */
 .rb-overlay--left-bottom {
-  bottom: -8px;
+  bottom: -1px;
   left: 48%;
   transform: translateX(-70%);
   display: flex;
@@ -312,7 +361,7 @@
   right: 10%;
   transform: translateX(90%);
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: flex-end;
 }
 
@@ -347,7 +396,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 12px;
+  padding-top: 2px;
   cursor: pointer;
 
   /* Ribbon clip-path: inverted V at the bottom */
@@ -379,10 +428,11 @@
 }
 
 .rb-create-bookmark-text {
-  font-size: 0.55rem;
+  font-size: 0.5rem;
   margin-top: 2px;
   opacity: 0.85;
   letter-spacing: 0.1em;
+  font-weight: 700;
 }
 
 /* NARROW DESKTOP / ALBUM BOOK: 900px - 1199px */

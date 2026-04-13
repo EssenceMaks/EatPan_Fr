@@ -21,13 +21,13 @@ export default class ArcBentoHeaderFull extends Component {
   }
 
   async template() {
-    const name    = this.props.name    || 'SIR GALAHAD';
-    const level   = this.props.level   ?? 42;
-    const hp      = this.props.hp      || { value: 3450, max: 4000 };
-    const mp      = this.props.mp      || { value: 1200, max: 2500 };
+    const name = this.props.name || 'SIR GALAHAD';
+    const level = this.props.level ?? 42;
+    const hp = this.props.hp || { value: 3000, max: 4000 };
+    const mp = this.props.mp || { value: 1200, max: 2500 };
     const stamina = this.props.stamina || { filled: 5, total: 8 };
-    const hpPct   = Math.round((hp.value / hp.max) * 100);
-    const mpPct   = Math.round((mp.value / mp.max) * 100);
+    const hpPct = Math.round((hp.value / hp.max) * 100);
+    const mpPct = Math.round((mp.value / mp.max) * 100);
 
     // Stamina segments
     const segments = Array.from({ length: stamina.total }, (_, i) =>

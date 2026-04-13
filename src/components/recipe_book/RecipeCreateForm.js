@@ -5,8 +5,8 @@ import { supabase } from '../../core/supabaseClient.js';
 export default class RecipeCreateForm extends Component {
   constructor(props = {}) {
     super(props);
-    this.onCreated = props.onCreated || (() => {});
-    this.onClose = props.onClose || (() => {});
+    this.onCreated = props.onCreated || (() => { });
+    this.onClose = props.onClose || (() => { });
     this.selectedCategory = '';
     this.selectedIcon = 'help-circle';
   }
@@ -30,13 +30,13 @@ export default class RecipeCreateForm extends Component {
     ).join('');
 
     return `
-      <div class="rcf-right-page">
-        <div class="rcf-header">
+      <div class="rcf-right-page book-page-container">
+        <div class="book-page-header" style="justify-content: space-between;">
           <h2 class="rcf-title"><i data-lucide="feather" style="width:18px;margin-right:6px;"></i>Новий рецепт</h2>
           <button class="rcf-close" id="rcf-close" type="button"><i data-lucide="x" style="width:18px;"></i></button>
         </div>
 
-        <div class="rcf-scroll">
+        <div class="book-page-scroll-spine-left">
           <div class="rcf-form">
 
             <!-- Photo upload area -->

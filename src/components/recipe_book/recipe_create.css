@@ -8,17 +8,7 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  /*background: var(--parchment, #e8dcc0); */
   border-radius: 0 8px 8px 0;
-}
-
-.rcf-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  border-bottom: 2px solid var(--crimson, #8b1a1a);
-  flex-shrink: 0;
 }
 
 .rcf-title {
@@ -44,14 +34,6 @@
 
 .rcf-close:hover {
   background: rgba(0, 0, 0, 0.08);
-}
-
-.rcf-scroll {
-  flex: 1;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(139, 26, 26, 0.3) transparent;
-  padding: 16px 20px 32px;
 }
 
 .rcf-form {

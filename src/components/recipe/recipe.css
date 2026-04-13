@@ -10,63 +10,7 @@
   /* bounds absolutely positioned children */
 }
 
-.recipe-header-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 12px;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-  margin-bottom: 16px;
-}
 
-.recipe-scroll-area {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 40px;
-  /* Leave space for bottom bookmark ribbons */
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-left: 8px;
-  /* spacing for inner content */
-  /* ScaleX hack to reliably mirror the scrollbar to the left edge! */
-  transform: scaleX(-1);
-}
-
-.recipe-scroll-area>* {
-  /* ScaleX back to read normally */
-  transform: scaleX(-1);
-}
-
-/* Custom Scrollbar for Recipe */
-.recipe-scroll-area::-webkit-scrollbar {
-  width: 14px;
-}
-
-.recipe-scroll-area::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-}
-
-.recipe-scroll-area::-webkit-scrollbar-thumb {
-  background-color: transparent;
-  background-image:
-    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" viewBox="0 0 14 20"><path d="M7 4 L12 10 L7 16 L2 10 Z" fill="%23f1eacc" stroke="%23805533" stroke-width="1.5"/></svg>'),
-    linear-gradient(to bottom, rgba(128, 85, 51, 0.5), rgba(128, 85, 51, 0.5));
-  background-repeat: no-repeat, no-repeat;
-  background-position: center center, center center;
-  background-size: 14px 20px, 2px 100%;
-}
-
-.recipe-scroll-area::-webkit-scrollbar-thumb:hover {
-  background-image:
-    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" viewBox="0 0 14 20"><path d="M7 4 L12 10 L7 16 L2 10 Z" fill="%23ffffff" stroke="%23805533" stroke-width="1.5"/></svg>'),
-    linear-gradient(to bottom, rgba(128, 85, 51, 0.9), rgba(128, 85, 51, 0.9));
-  background-repeat: no-repeat, no-repeat;
-  background-position: center center, center center;
-  background-size: 14px 20px, 2px 100%;
-}
 
 /* -------------------------------------------
    CENTAUR GALLERY (2/5 Height)
