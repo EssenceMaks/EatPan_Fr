@@ -331,16 +331,6 @@
   justify-content: center;
 }
 
-.arc-bento-full__badge svg,
-.arc-bento-full__badge i svg,
-.arc-bento-full__badge svg[data-lucide],
-.arc-bento-full__badge svg.lucide {
-  width: 14px !important;
-  height: 14px !important;
-  max-width: 14px !important;
-  max-height: 14px !important;
-}
-
 /* HP / MP Bars */
 .arc-bento-full__bar {
   position: relative;

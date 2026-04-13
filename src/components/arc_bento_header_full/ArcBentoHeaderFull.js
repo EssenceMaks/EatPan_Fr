@@ -64,10 +64,10 @@ export default class ArcBentoHeaderFull extends Component {
               <span class="arc-bento-full__name">${name}</span>
               <div class="arc-bento-full__badges">
                 <div class="arc-bento-full__badge">
-                  <i data-lucide="crown"></i>
+                  <i data-lucide="crown" width="14" height="14"></i>
                 </div>
                 <div class="arc-bento-full__badge" style="border-color:#52c2d6;color:#52c2d6;">
-                  <i data-lucide="gem"></i>
+                  <i data-lucide="gem" width="14" height="14"></i>
                 </div>
               </div>
             </div>
@@ -106,29 +106,6 @@ export default class ArcBentoHeaderFull extends Component {
   }
 
   async onMount() {
-    // Use MutationObserver to modify icon sizes after lucide creates them
-    const observer = new MutationObserver((mutations) => {
-      const badgeIcons = this.element.querySelectorAll('.arc-bento-full__badge svg');
-      badgeIcons.forEach(svg => {
-        svg.setAttribute('width', '14');
-        svg.setAttribute('height', '14');
-        svg.style.width = '14px';
-        svg.style.height = '14px';
-      });
-    });
-
-    observer.observe(this.element, {
-      childList: true,
-      subtree: true
-    });
-
-    // Initial check in case icons already exist
-    const badgeIcons = this.element.querySelectorAll('.arc-bento-full__badge svg');
-    badgeIcons.forEach(svg => {
-      svg.setAttribute('width', '14');
-      svg.setAttribute('height', '14');
-      svg.style.width = '14px';
-      svg.style.height = '14px';
-    });
+    if (window.lucide) lucide.createIcons({ root: this.element });
   }
 }
