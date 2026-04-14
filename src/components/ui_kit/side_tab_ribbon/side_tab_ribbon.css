@@ -19,6 +19,7 @@
 .stb-grid-inner {
   display: grid;
   gap: 6px;
+  margin-top: 22px;
   align-content: start;
   justify-content: center;
   width: max-content;
@@ -28,7 +29,8 @@
 
 /* ---- BACKGROUND PAGE-STACK SHEET ---- */
 .stb-bg-sheet {
-  display: none; /* Hidden inside-book mode; not needed */
+  display: none;
+  /* Hidden inside-book mode; not needed */
 }
 
 /* ---- SINGLE RIBBON TAB ---- */
@@ -41,9 +43,9 @@
   cursor: pointer;
   transition:
     transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    filter   0.3s ease,
+    filter 0.3s ease,
     background 0.3s ease,
-    color    0.3s ease,
+    color 0.3s ease,
     box-shadow 0.3s ease;
   display: flex;
   align-items: center;
@@ -71,8 +73,13 @@
 
 /* ---- ANIMATIONS ---- */
 @keyframes stbFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes stbActiveSlideIn {
@@ -80,6 +87,7 @@
     opacity: 0;
     transform: translateX(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateX(6px);
@@ -171,6 +179,7 @@
     width: 42px;
     height: 26px;
   }
+
   .stb-ribbon i {
     width: 14px !important;
     height: 14px !important;
@@ -189,7 +198,10 @@
     padding: 4px 0;
     gap: 8px;
   }
-  .stb-grid::-webkit-scrollbar { display: none; }
+
+  .stb-grid::-webkit-scrollbar {
+    display: none;
+  }
 
   .stb-grid-inner {
     position: relative;

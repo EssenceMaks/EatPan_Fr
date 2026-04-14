@@ -62,6 +62,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px 24px;
+  margin-top: 20px;
   border-bottom: 2px solid var(--crimson, #8b1a1a);
   flex-shrink: 0;
   min-height: 64px;
@@ -273,7 +274,7 @@
   .rb-side {
     width: 100%;
     height: 100%;
-    padding: 16px;
+    padding: 0;
     background: var(--parchment, #f1eacc);
   }
 
@@ -314,7 +315,7 @@
   /* On mobile, create bookmark becomes a fixed top-right fab */
   .rb-create-bookmark {
     top: auto !important;
-    bottom: 16px !important;
+    bottom: 50px !important;
     left: auto !important;
     right: 16px !important;
     transform: none !important;
@@ -391,12 +392,12 @@
 
   /* Shape: ribbon hanging down from top */
   width: 56px;
-  height: 90px;
+  height: 78px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  padding-top: 2px;
+  justify-content: center;
+  padding-bottom: 8px;
   cursor: pointer;
 
   /* Ribbon clip-path: inverted V at the bottom */

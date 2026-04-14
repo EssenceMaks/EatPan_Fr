@@ -7,19 +7,19 @@ import RecipeBookSideRibbons from './RecipeBookSideRibbons.js';
 
 const CATEGORY_ICON_MAP = {
   "М'ясні страви": 'drumstick',
-  "М'ясо":        'drumstick',
-  "Птиця":        'drumstick',
-  "Гарніри":      'wheat',
-  "Паста":        'utensils',
-  "Салати":       'salad',
-  "Риба":         'fish',
+  "М'ясо": 'drumstick',
+  "Птиця": 'drumstick',
+  "Гарніри": 'wheat',
+  "Паста": 'utensils',
+  "Салати": 'salad',
+  "Риба": 'fish',
   "Морепродукти": 'fish',
-  "Десерти":      'cake-slice',
-  "Напої":        'coffee',
-  "Супи":         'soup',
-  "Випічка":      'croissant',
-  "Сніданки":     'sunrise',
-  "Закуски":      'sandwich',
+  "Десерти": 'cake-slice',
+  "Напої": 'coffee',
+  "Супи": 'soup',
+  "Випічка": 'croissant',
+  "Сніданки": 'sunrise',
+  "Закуски": 'sandwich',
 };
 
 function getCategoryIcon(name) {
@@ -45,7 +45,7 @@ export default class RecipeBook extends Component {
       activeCategory: null,
       recipes: [],
     });
-    
+
     this.rightPage = new RecipeBookRightPage({
       onBack: () => this.handleBack()
     });
@@ -58,7 +58,7 @@ export default class RecipeBook extends Component {
           <!-- CREATE RECIPE BOOKMARK — top center, only for logged-in users -->
           <button class="rb-overlay rb-create-bookmark" id="rb-create-btn" style="display:none;"
                   title="Створити рецепт">
-            <i data-lucide="feather" style="width:28px;height:28px;stroke-width:1.5;margin-bottom:4px;margin-top:16px;"></i>
+            <i data-lucide="feather" style="width:28px;height:28px;stroke-width:1.5;"></i>
             <span class="rb-create-bookmark-text">Створити</span>
           </button>
 
@@ -110,7 +110,7 @@ export default class RecipeBook extends Component {
 
     // Load recipes from API asynchronously
     this._loadRecipes();
-    
+
     // Re-instantiate icons
     if (window.lucide) {
       window.lucide.createIcons({ root: this.element });
@@ -153,7 +153,7 @@ export default class RecipeBook extends Component {
       if (!this.showingRight || window.innerWidth > 899) return;
       const endX = e.changedTouches[0].clientX;
       const endY = e.changedTouches[0].clientY;
-      
+
       const dx = endX - startX;
       const dy = endY - startY;
 
@@ -199,11 +199,11 @@ export default class RecipeBook extends Component {
     this.sideRibbons = new RecipeBookSideRibbons({
       categories: this.categories,
       healthTabs: [
-        { id: 'fruits',     label: 'Фрукти',      icon: 'banana' },
-        { id: 'supplements',label: 'Бади',          icon: 'pill' },
-        { id: 'first-aid',  label: 'Аптечка',       icon: 'circle-plus', color: 'var(--crimson, #8b1a1a)' },
-        { id: 'allergens',  label: 'Алергени',      icon: 'alert-triangle', color: 'var(--crimson, #8b1a1a)' },
-        { id: 'e-additives',label: 'Е-Добавки',     textLabel: 'E', color: 'var(--crimson, #8b1a1a)' },
+        { id: 'fruits', label: 'Фрукти', icon: 'banana' },
+        { id: 'supplements', label: 'Бади', icon: 'pill' },
+        { id: 'first-aid', label: 'Аптечка', icon: 'circle-plus', color: 'var(--crimson, #8b1a1a)' },
+        { id: 'allergens', label: 'Алергени', icon: 'alert-triangle', color: 'var(--crimson, #8b1a1a)' },
+        { id: 'e-additives', label: 'Е-Добавки', textLabel: 'E', color: 'var(--crimson, #8b1a1a)' },
       ],
       activeId: null,
       onSelect: (catId) => this.handleCategorySelect(catId),
@@ -225,13 +225,13 @@ export default class RecipeBook extends Component {
 
   handleRecipeSelect(id) {
     const parentIndex = history.state?.index || '4'; // Maintain Sector Carousel state
-    
+
     // Push our detailed state to browser history!
-    history.pushState({ 
-      type: 'block', 
-      index: parentIndex, 
-      substate: 'recipe_detail', 
-      recipeId: id 
+    history.pushState({
+      type: 'block',
+      index: parentIndex,
+      substate: 'recipe_detail',
+      recipeId: id
     }, null, '');
 
     this._showRightSide(id);
