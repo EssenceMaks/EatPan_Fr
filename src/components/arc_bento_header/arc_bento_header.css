@@ -1,4 +1,4 @@
-/* =============================================
+/* =========================================
    ARC DESIGN SYSTEM — ArcBentoHeader
    Integrated Header with Auth/Guest Dynamic State
    Uses the beautiful galtel corners and accurate styling 
@@ -53,7 +53,7 @@
   align-items: start;
   gap: 15px;
   border-radius: 0 0 40px 0;
-  min-height: 85px;
+  min-height: 78px;
   overflow: visible;
 }
 
@@ -322,6 +322,86 @@ body.active-mode #bh-back-btn-container {
 }
 
 /* =========================================
+   COMPACT RESPONSIVE: Short screens & Tablets/Mobile
+   Shrinks height by ~50%, hides names & bar values
+   ========================================= */
+@media (max-height: 750px),
+(max-width: 899px) {
+  .arc-bento-full__panel {
+    padding: 8px;
+  }
+
+  /* .arc-bento-full__left { min-height: 45px; gap: 10px; } */
+  .arc-bento-full__left {
+    height: 70px;
+    gap: 10px;
+  }
+
+  .arc-bento-full__avatar-zone {
+    transform: scale(0.6);
+    transform-origin: top center;
+    top: 0;
+  }
+
+  .arc-bento-full__stats {
+    gap: 4px;
+    top: 0px;
+    padding-right: 15px;
+  }
+
+  .arc-bento-full__name-row {
+    margin-bottom: 0;
+    justify-content: flex-start;
+  }
+
+  /* .arc-bento-full__name { display: none; } */
+  .arc-bento-full__name {
+    font: 12px;
+  }
+
+  .arc-bento-full__badges {
+    transform: scale(0.85);
+    transform-origin: left center;
+  }
+
+  .arc-bento-full__bar {
+    height: 8px;
+  }
+
+  .arc-bento-full__bar-text {
+    display: none;
+  }
+
+  .arc-bento-full__segments {
+    height: 6px;
+    margin-top: 0;
+  }
+
+  .arc-bento-full__right {
+    min-height: 75px;
+    min-width: 36px;
+    gap: 5px;
+    padding: 8px 16px;
+  }
+
+  .arc-bento-full__menu-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .arc-bento-full__menu-btn i {
+    width: 22px;
+    height: 22px;
+  }
+
+  .arc-bento-header__center {
+    font-size: 1.1rem;
+    padding: 4px 10px;
+  }
+}
+
+/* =========================================
    MOBILE RESPONSIVE
    ========================================= */
 @media (max-width: 768px) {
@@ -332,19 +412,19 @@ body.active-mode #bh-back-btn-container {
   /* RIGHT PANEL flies to bottom right, anchored seamlessly */
   .arc-bento-full__right {
     position: fixed;
-    bottom: -2px;
+    bottom: -4px;
     /* hide bottom border */
-    right: -2px;
+    right: -4px;
     /* hide right border */
     border-radius: 40px 0 0 0;
     /* Inward curve on top-left */
     margin-left: 0;
-    padding: 15px;
+    padding: 18px;
     z-index: 1000;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: 2px;
     /* keep 10px consistent with right margin */
 
     /* Custom borders flush against the screen */
@@ -382,8 +462,8 @@ body.active-mode #bh-back-btn-container {
   .arc-flare-left::before {
     content: '';
     position: absolute;
-    top: -32px;
-    left: -32px;
+    top: -28px;
+    left: -28px;
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -401,8 +481,8 @@ body.active-mode #bh-back-btn-container {
   .arc-flare-top::before {
     content: '';
     position: absolute;
-    top: -32px;
-    left: -32px;
+    top: -28px;
+    left: -28px;
     width: 60px;
     height: 60px;
     border-radius: 50%;
