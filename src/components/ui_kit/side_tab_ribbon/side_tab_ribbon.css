@@ -190,13 +190,17 @@
 @media (max-width: 899px) {
   .stb-grid {
     width: 100%;
-    height: auto;
-    direction: ltr;
+    height: 100%;
     display: flex;
     overflow-x: auto;
+    overflow-y: hidden;
     scrollbar-width: none;
-    padding: 4px 0;
-    gap: 8px;
+    padding: 4px 12px;
+    gap: 0;
+    justify-content: flex-start;
+    align-items: flex-start;
+    scroll-padding: 0;
+    scroll-behavior: smooth;
   }
 
   .stb-grid::-webkit-scrollbar {
@@ -210,6 +214,7 @@
     gap: 8px;
     right: auto;
     top: auto;
+    min-width: max-content;
   }
 
   .stb-bg-sheet {
@@ -225,6 +230,8 @@
     padding-bottom: 6px;
     justify-content: center;
     align-items: center;
+    /* Prevent shrinking for horizontal scroll */
+    flex-shrink: 0;
     /* Round top corners (bottom is clipped by polygon) */
     border-radius: 4px 4px 0 0;
     transition:

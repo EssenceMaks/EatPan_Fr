@@ -39,6 +39,58 @@ export default class RecipeBookSideRibbons extends Component {
     const healthTabs = this.props.healthTabs || [];
     const activeId = this.props.activeId || null;
 
+    // Mobile detection: window width < 900px
+    const isMobile = window.innerWidth < 900;
+
+    // In mobile: show all categories in horizontal scroll, no grid limits
+    if (isMobile) {
+      mount.style.cssText = '';
+      this._ribbonInstances = [];
+
+      // All categories
+      for (const cat of categories) {
+        const ribbon = new SideTabRibbon({
+          id: cat.id, icon: cat.icon || '', active: cat.id === activeId,
+          title: cat.label || cat.id, variant: 'category',
+          onClick: (id) => this._handleSelect(id),
+        });
+        const el = document.createElement('div');
+        mount.appendChild(el);
+        await ribbon.render(el, 'innerHTML');
+        this._ribbonInstances.push(ribbon);
+      }
+
+      // "Show all" list tab
+      const listAll = new SideTabRibbon({
+        id: '__all__', icon: 'list',
+        active: !activeId || activeId === '__all__',
+        title: 'Усі категорії', variant: 'list-all',
+        onClick: (id) => this._handleSelect(id),
+      });
+      const listEl = document.createElement('div');
+      mount.appendChild(listEl);
+      await listAll.render(listEl, 'innerHTML');
+      this._ribbonInstances.push(listAll);
+
+      // Health tabs
+      for (const ht of healthTabs) {
+        const ribbon = new SideTabRibbon({
+          id: ht.id, icon: ht.icon || '', textLabel: ht.textLabel || '',
+          color: ht.color || '', active: false,
+          title: ht.label || ht.id, variant: 'health',
+          onClick: (id) => this._handleHealthClick(id),
+        });
+        const el = document.createElement('div');
+        mount.appendChild(el);
+        await ribbon.render(el, 'innerHTML');
+        this._ribbonInstances.push(ribbon);
+      }
+
+      if (window.lucide) window.lucide.createIcons({ root: this.element });
+      return;
+    }
+
+    // Desktop: grid-based layout with limited slots
     const ROW_H = 35;
     const GAP = 6;
     const COL_W = 52;
@@ -147,10 +199,16 @@ export default class RecipeBookSideRibbons extends Component {
 
   _setupResizeObserver() {
     let lastH = 0;
+    let lastW = window.innerWidth;
     this._resizeObs = new ResizeObserver(() => {
       const h = this.element.clientHeight;
-      if (Math.abs(h - lastH) > 30) {
+      const w = window.innerWidth;
+      const isMobileNow = w < 900;
+      const wasMobile = lastW < 900;
+      // Rebuild on height change OR when crossing mobile/desktop breakpoint
+      if (Math.abs(h - lastH) > 30 || isMobileNow !== wasMobile) {
         lastH = h;
+        lastW = w;
         this._buildRibbons();
       }
     });
@@ -161,6 +219,8 @@ export default class RecipeBookSideRibbons extends Component {
     if (this.props.onSelect) {
       this.props.onSelect(id === '__all__' ? null : id);
     }
+    // Update props so active state is preserved during resize rebuilds
+    this.props.activeId = id;
     this._updateActive(id);
   }
 
