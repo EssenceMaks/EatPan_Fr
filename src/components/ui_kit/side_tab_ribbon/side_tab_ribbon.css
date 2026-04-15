@@ -19,7 +19,7 @@
 .stb-grid-inner {
   display: grid;
   gap: 6px;
-  margin-top: 22px;
+  margin-top: 28px;
   align-content: start;
   justify-content: center;
   width: max-content;
@@ -121,6 +121,24 @@
   color: white;
 }
 
+/* ---- Desktop: allow vertical scroll when many categories ---- */
+@media (min-width: 900px) {
+  .stb-grid {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent, #805533) transparent;
+  }
+
+  .stb-grid::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .stb-grid::-webkit-scrollbar-thumb {
+    background: var(--accent, #805533);
+    border-radius: 2px;
+  }
+}
+
 /* ---- DIM OTHERS WHEN ONE IS ACTIVE ---- */
 .stb-grid:has(.stb-ribbon.active) .stb-ribbon:not(.active):not(.stb--clear):not(.stb--list-all) {
   background: var(--parchment-dark, #c4b48e);
@@ -188,33 +206,65 @@
 
 /* ---- RESPONSIVE: mobile ---- */
 @media (max-width: 899px) {
-  .stb-grid {
+  /* Mobile wrapper: holds scrollable grid + fixed pinned container */
+  .stb-mobile-wrapper {
+    display: flex;
+    flex-direction: row;
     width: 100%;
     height: 100%;
+    padding: 4px 8px;
+    overflow: hidden;
+    align-items: center;
+  }
+
+  /* Scrollable grid: categories + health tabs */
+  .stb-mobile-wrapper .stb-grid {
+    flex: 1;
+    min-width: 0; /* Critical: allows flex item to shrink below content size */
+    height: 100%;
     display: flex;
+    justify-content: flex-start; /* Align content to left for proper scroll */
+    align-items: flex-start;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
-    padding: 4px 12px;
-    gap: 0;
-    justify-content: flex-start;
-    align-items: flex-start;
-    scroll-padding: 0;
     scroll-behavior: smooth;
+    padding: 0;
+    gap: 0;
   }
 
-  .stb-grid::-webkit-scrollbar {
+  .stb-mobile-wrapper .stb-grid::-webkit-scrollbar {
     display: none;
   }
 
-  .stb-grid-inner {
-    position: relative;
+  .stb-mobile-wrapper .stb-grid-inner {
     display: flex;
     flex-direction: row;
     gap: 8px;
-    right: auto;
-    top: auto;
-    min-width: max-content;
+    min-width: max-content; /* Ensures content defines width for scrolling */
+    /* No padding here - it breaks scroll calculation */
+  }
+
+  /* Add margin to first and last items for scrollable padding effect */
+  .stb-mobile-wrapper .stb-grid-inner > div:first-child {
+    margin-left: 8px;
+  }
+
+  .stb-mobile-wrapper .stb-grid-inner > div:last-child {
+    margin-right: 8px;
+  }
+
+  /* Pinned container: outside of scroll, to the right, vertically centered */
+  .stb-pinned-container {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    height: auto;
+    align-items: center;
+    /* Visual separator */
+    padding-left: 8px;
+    border-left: 1px solid var(--crimson, #8b1a1a);
   }
 
   .stb-bg-sheet {

@@ -19,9 +19,12 @@ export default class RecipeBookSideRibbons extends Component {
 
   async template() {
     return `
-      <aside class="stb-grid">
-        <div class="stb-grid-inner" id="stb-ribbons-mount"></div>
-      </aside>
+      <div class="stb-mobile-wrapper">
+        <aside class="stb-grid">
+          <div class="stb-grid-inner" id="stb-ribbons-mount"></div>
+        </aside>
+        <div class="stb-pinned-container" id="stb-pinned-mount"></div>
+      </div>
     `;
   }
 
@@ -31,9 +34,18 @@ export default class RecipeBookSideRibbons extends Component {
   }
 
   async _buildRibbons() {
+    // Prevent recursive calls from resize observer during rebuild
+    if (this._isRebuilding) return;
+    this._isRebuilding = true;
+
     const mount = this.$('#stb-ribbons-mount');
-    if (!mount) return;
+    const pinnedMount = this.$('#stb-pinned-mount');
+    if (!mount) {
+      this._isRebuilding = false;
+      return;
+    }
     mount.innerHTML = '';
+    if (pinnedMount) pinnedMount.innerHTML = '';
 
     const categories = this.props.categories || [];
     const healthTabs = this.props.healthTabs || [];
@@ -42,15 +54,21 @@ export default class RecipeBookSideRibbons extends Component {
     // Mobile detection: window width < 900px
     const isMobile = window.innerWidth < 900;
 
-    // In mobile: show all categories in horizontal scroll, no grid limits
+    // In mobile: scrollable categories in grid, pinned items in separate container
     if (isMobile) {
       mount.style.cssText = '';
+      mount.className = 'stb-grid-inner';
+
       this._ribbonInstances = [];
 
-      // All categories
-      for (const cat of categories) {
+      // Scrollable: non-active categories + health tabs
+      const scrollCats = activeId && activeId !== '__all__'
+        ? categories.filter(c => c.id !== activeId)
+        : categories;
+
+      for (const cat of scrollCats) {
         const ribbon = new SideTabRibbon({
-          id: cat.id, icon: cat.icon || '', active: cat.id === activeId,
+          id: cat.id, icon: cat.icon || '', active: false,
           title: cat.label || cat.id, variant: 'category',
           onClick: (id) => this._handleSelect(id),
         });
@@ -60,19 +78,7 @@ export default class RecipeBookSideRibbons extends Component {
         this._ribbonInstances.push(ribbon);
       }
 
-      // "Show all" list tab
-      const listAll = new SideTabRibbon({
-        id: '__all__', icon: 'list',
-        active: !activeId || activeId === '__all__',
-        title: 'Усі категорії', variant: 'list-all',
-        onClick: (id) => this._handleSelect(id),
-      });
-      const listEl = document.createElement('div');
-      mount.appendChild(listEl);
-      await listAll.render(listEl, 'innerHTML');
-      this._ribbonInstances.push(listAll);
-
-      // Health tabs
+      // Health tabs in scrollable area
       for (const ht of healthTabs) {
         const ribbon = new SideTabRibbon({
           id: ht.id, icon: ht.icon || '', textLabel: ht.textLabel || '',
@@ -86,51 +92,75 @@ export default class RecipeBookSideRibbons extends Component {
         this._ribbonInstances.push(ribbon);
       }
 
+      // Pinned container: active (if any) + "All categories" only
+      if (pinnedMount) {
+        // Active category
+        if (activeId && activeId !== '__all__') {
+          const activeCat = categories.find(c => c.id === activeId);
+          if (activeCat) {
+            const ribbon = new SideTabRibbon({
+              id: activeCat.id, icon: activeCat.icon || '', active: true,
+              title: activeCat.label || activeCat.id, variant: 'category',
+              onClick: (id) => this._handleSelect(id),
+            });
+            const el = document.createElement('div');
+            pinnedMount.appendChild(el);
+            await ribbon.render(el, 'innerHTML');
+            this._ribbonInstances.push(ribbon);
+          }
+        }
+
+        // "All categories" always visible in pinned
+        const listAll = new SideTabRibbon({
+          id: '__all__', icon: 'list',
+          active: !activeId || activeId === '__all__',
+          title: 'Усі категорії', variant: 'list-all',
+          onClick: (id) => this._handleSelect(id),
+        });
+        const listEl = document.createElement('div');
+        pinnedMount.appendChild(listEl);
+        await listAll.render(listEl, 'innerHTML');
+        this._ribbonInstances.push(listAll);
+      }
+
       if (window.lucide) window.lucide.createIcons({ root: this.element });
+      this._isRebuilding = false;
       return;
     }
 
-    // Desktop: grid-based layout with limited slots
+    // Desktop: grid-based layout showing ALL categories
     const ROW_H = 35;
     const GAP = 6;
     const COL_W = 52;
-
-    // Calculate available rows from container height
-    const availableH = this.element.clientHeight || 500;
-    let maxRows = Math.floor((availableH + GAP) / (ROW_H + GAP));
-    if (maxRows < 5) maxRows = 5;
 
     // Health tabs always anchor at bottom of rightmost column
     const healthCount = healthTabs.length;
     const healthWithSpacer = healthCount + 1; // +1 invisible spacer
 
-    // Category slots in right column (above health)
-    const rightColCatSlots = Math.max(maxRows - healthWithSpacer, 2);
+    // Show ALL categories on desktop
+    const visibleCats = categories.slice();
+    const catCount = visibleCats.length;
 
-    // Total category items: categories + 1 list-all tab
-    const catCountWithList = categories.length + 1;
+    // Calculate rows needed to fit all categories + list-all + health tabs
+    // Right column: health tabs at bottom, categories above
+    // Left column: overflow categories if needed
+    const totalCatItems = catCount + 1; // +1 for list-all
+    const minRowsForRightCol = healthWithSpacer + 1; // at least 1 category slot
 
-    // Determine columns
+    // Determine columns: use 2 columns if categories don't fit in right column alone
     let numCols = 1;
-    if (catCountWithList > rightColCatSlots) {
+    let rightColCatSlots = 8; // default slots in right column
+    let maxRows = minRowsForRightCol;
+
+    if (totalCatItems > rightColCatSlots) {
       numCols = 2;
-    }
-
-    // Total available slots for categories
-    const totalCatSlots = numCols === 2
-      ? rightColCatSlots + maxRows
-      : rightColCatSlots;
-
-    // Limit visible categories (always keep 1 slot for list-all)
-    const visibleLimit = totalCatSlots - 1;
-    const visibleCats = categories.slice(0, visibleLimit);
-
-    // If active category is hidden, swap it in
-    if (activeId && !visibleCats.find(c => c.id === activeId)) {
-      const hidden = categories.find(c => c.id === activeId);
-      if (hidden && visibleCats.length > 0) {
-        visibleCats[visibleCats.length - 1] = hidden;
-      }
+      // Distribute categories across 2 columns
+      rightColCatSlots = Math.ceil(totalCatItems / 2);
+      maxRows = Math.max(rightColCatSlots + healthWithSpacer, 8);
+    } else {
+      // All categories fit in right column
+      rightColCatSlots = totalCatItems;
+      maxRows = Math.max(rightColCatSlots + healthWithSpacer, 5);
     }
 
     // Apply grid
@@ -148,7 +178,7 @@ export default class RecipeBookSideRibbons extends Component {
 
     for (const cat of visibleCats) {
       if (col === numCols && row > rightColCatSlots) { col--; row = 1; }
-      else if (col < numCols && row > maxRows) break;
+      // Note: no break here — we calculate maxRows to fit ALL categories
 
       const ribbon = new SideTabRibbon({
         id: cat.id, icon: cat.icon || '', active: cat.id === activeId,
@@ -195,33 +225,50 @@ export default class RecipeBookSideRibbons extends Component {
     }
 
     if (window.lucide) window.lucide.createIcons({ root: this.element });
+    this._isRebuilding = false;
   }
 
   _setupResizeObserver() {
     let lastH = 0;
     let lastW = window.innerWidth;
+    let resizeTimeout = null;
+
     this._resizeObs = new ResizeObserver(() => {
-      const h = this.element.clientHeight;
-      const w = window.innerWidth;
-      const isMobileNow = w < 900;
-      const wasMobile = lastW < 900;
-      // Rebuild on height change OR when crossing mobile/desktop breakpoint
-      if (Math.abs(h - lastH) > 30 || isMobileNow !== wasMobile) {
-        lastH = h;
-        lastW = w;
-        this._buildRibbons();
-      }
+      // Debounce resize events
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const h = this.element.clientHeight;
+        const w = window.innerWidth;
+        const isMobileNow = w < 900;
+        const wasMobile = lastW < 900;
+        // Rebuild on significant height change OR when crossing mobile/desktop breakpoint
+        if (Math.abs(h - lastH) > 50 || isMobileNow !== wasMobile) {
+          lastH = h;
+          lastW = w;
+          this._buildRibbons();
+        }
+      }, 100);
     });
     this._resizeObs.observe(this.element);
   }
 
   _handleSelect(id) {
+    const currentActive = this.props.activeId;
+    // If clicking the same category, deselect it (toggle off)
+    const newId = (id === currentActive) ? '__all__' : id;
+
     if (this.props.onSelect) {
-      this.props.onSelect(id === '__all__' ? null : id);
+      this.props.onSelect(newId === '__all__' ? null : newId);
     }
     // Update props so active state is preserved during resize rebuilds
-    this.props.activeId = id;
-    this._updateActive(id);
+    this.props.activeId = newId;
+
+    // On mobile, rebuild to move active category to pinned-right
+    if (window.innerWidth < 900) {
+      this._buildRibbons();
+    } else {
+      this._updateActive(newId);
+    }
   }
 
   _handleHealthClick(id) {

@@ -307,7 +307,8 @@
   }
 
   .rb-back-btn {
-    display: inline-flex;
+    /* display: inline-flex; */
+    display: none;
   }
 
   .rb-overlay:not(.rb-create-bookmark) {
