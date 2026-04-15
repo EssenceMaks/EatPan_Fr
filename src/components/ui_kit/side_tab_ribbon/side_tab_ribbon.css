@@ -217,20 +217,36 @@
   }
 
   .stb-ribbon {
-    clip-path: polygon(50% 0%, 0% 20%, 0% 100%, 100% 100%, 100% 20%);
+    /* Flag shape with point facing DOWN (like rb-create-bookmark) */
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 75%, 0% 100%);
     width: 44px;
     height: 48px;
     padding: 0;
-    padding-top: 12px;
+    padding-bottom: 6px;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+    /* Round top corners (bottom is clipped by polygon) */
+    border-radius: 4px 4px 0 0;
+    transition:
+      height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      filter 0.3s ease,
+      background 0.3s ease,
+      color 0.3s ease,
+      box-shadow 0.3s ease;
   }
 
+  /* Hover extends ribbon DOWN - no horizontal shift */
   .stb-ribbon:hover {
-    transform: translateY(-3px);
+    height: 64px;
+    filter: brightness(1.05);
+    transform: none !important;
   }
 
+  /* Active state keeps ribbon extended DOWN - no horizontal shift */
   .stb-ribbon.active {
-    transform: translateY(-6px);
+    height: 68px;
+    filter: brightness(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    transform: none !important;
   }
 }
