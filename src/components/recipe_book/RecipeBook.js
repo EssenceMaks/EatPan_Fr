@@ -245,14 +245,20 @@ export default class RecipeBook extends Component {
   _showRightSide(id) {
     this.showingRight = true;
     const wrapper = this.$('#rb-wrapper');
-    if (wrapper) wrapper.classList.add('mobile-show-right');
+    if (wrapper) {
+      wrapper.classList.add('mobile-show-right');
+      wrapper.classList.remove('mode-create'); // Remove create mode when showing recipe
+    }
     this.rightPage.loadRecipe(id);
   }
 
   _hideRightSide() {
     this.showingRight = false;
     const wrapper = this.$('#rb-wrapper');
-    if (wrapper) wrapper.classList.remove('mobile-show-right');
+    if (wrapper) {
+      wrapper.classList.remove('mobile-show-right');
+      wrapper.classList.remove('mode-create');
+    }
   }
 
   // ============================================================
@@ -278,7 +284,10 @@ export default class RecipeBook extends Component {
     // Show form on the RIGHT page of the book (not overlay)
     // On mobile, slide to right side first
     const wrapper = this.$('#rb-wrapper');
-    if (wrapper) wrapper.classList.add('mobile-show-right');
+    if (wrapper) {
+      wrapper.classList.add('mobile-show-right');
+      wrapper.classList.add('mode-create');
+    }
     this.showingRight = true;
 
     await this.rightPage.showCreateForm({
@@ -292,7 +301,10 @@ export default class RecipeBook extends Component {
     // On mobile, slide back to left page
     if (window.innerWidth < 900) {
       const wrapper = this.$('#rb-wrapper');
-      if (wrapper) wrapper.classList.remove('mobile-show-right');
+      if (wrapper) {
+        wrapper.classList.remove('mobile-show-right');
+        wrapper.classList.remove('mode-create');
+      }
       this.showingRight = false;
     }
   }

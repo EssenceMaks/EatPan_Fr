@@ -334,6 +334,11 @@
   .rb-create-bookmark .rb-create-bookmark-text {
     display: none;
   }
+
+  /* Hide create button when in create form mode */
+  .rb-wrapper.mode-create .rb-create-bookmark {
+    display: none !important;
+  }
 }
 
 /* -------------------------------------------
