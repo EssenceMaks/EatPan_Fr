@@ -74,7 +74,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   margin-right: 2px;
-  padding: 16px 16px 40px 24px;
+  padding: 16px 24px 40px 32px;
 }
 
 .book-page-scroll-spine-left {
@@ -385,6 +385,15 @@
   gap: 16px;
 }
 
+/* Hide overlays in create and placeholder mode across all screens */
+.rb-wrapper.mode-create .rb-overlay--right-tabs,
+.rb-wrapper.mode-create .rb-overlay--right-bottom,
+.rb-wrapper.mode-placeholder .rb-overlay--right-tabs,
+.rb-wrapper.mode-placeholder .rb-overlay--right-bottom {
+  display: none !important;
+}
+
+
 /* -------------------------------------------
    CREATE RECIPE BOOKMARK — top-center ribbon
    ------------------------------------------- */
@@ -462,4 +471,96 @@
     width: 100%;
     grid-template-columns: max-content 1fr 1fr;
   }
+}
+
+/* -------------------------------------------
+   MOBILE ACTION TABS (RecipeOverview)
+   ------------------------------------------- */
+.rb-mobile-action-tabs {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .rb-mobile-action-tabs {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+    padding-bottom: 4px;
+    background: transparent;
+    border-bottom: 1px solid rgba(139, 26, 26, 0.15);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-shrink: 0;
+    margin: 0 40px;
+  }
+
+  .rb-mobile-action-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bm-mobile-cluster {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .bm-mobile-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    background: var(--parchment-dark, #c4b48e);
+    border: none;
+    color: var(--ink, #2c1810);
+    padding: 6px 4px 6px 4px;
+    width: 38px;
+    height: 48px;
+    font-family: var(--font-body, 'Work Sans', sans-serif);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 10px), 50% 100%, 0% calc(100% - 10px));
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+  }
+
+  .bm-mobile-tab svg {
+    width: 16px !important;
+    height: 16px !important;
+    min-height: 16px;
+    min-width: 16px;
+    flex-shrink: 0;
+    stroke-width: 2;
+  }
+
+  .bm-mobile-tab:hover {
+    clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 13px), 50% calc(100% - 3px), 0% calc(100% - 13px));
+  }
+
+  .bm-mobile-tab.active {
+    background: var(--crimson, #8b1a1a);
+    color: white;
+    clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 15px), 50% calc(100% - 5px), 0% calc(100% - 15px));
+  }
+}
+
+/* -------------------------------------------
+   INLINE CREATE LINK
+   ------------------------------------------- */
+.rb-inline-link {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: rgba(139, 26, 26, 0.8);
+  text-underline-offset: 4px;
+  cursor: pointer;
+  color: var(--ink, #2c1810);
+  transition: text-decoration-color 0.3s ease;
+}
+
+.rb-inline-link:hover {
+  text-decoration-color: transparent;
 }

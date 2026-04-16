@@ -98,6 +98,24 @@ export default class RecipeOverview extends Component {
           <h2 class="rb-title">${title}</h2>
         </div>
 
+        <!-- Mobile Interaction Tabs (visible only on mobile) -->
+        <div class="rb-mobile-action-tabs">
+          <div class="bm-mobile-cluster">
+            <button class="bm-mobile-tab" title="Вподобати"><i data-lucide="heart"></i><span>0</span></button>
+            <button class="bm-mobile-tab" title="Поділитися"><i data-lucide="send"></i></button>
+            <button class="bm-mobile-tab" title="Репости"><i data-lucide="repeat"></i><span>42</span></button>
+            <button class="bm-mobile-tab" title="Коментарі"><i data-lucide="message-square"></i><span>18</span></button>
+          </div>
+          
+          <div class="bm-mobile-cluster">
+            <button class="bm-mobile-tab" title="Редагувати"><i data-lucide="feather"></i></button>
+            <button class="bm-mobile-tab active" title="Варіант 1"><span>1 в.</span></button>
+            <button class="bm-mobile-tab" title="Варіант 2"><span>2 в.</span></button>
+            <button class="bm-mobile-tab" title="Друк"><i data-lucide="printer"></i></button>
+            <button class="bm-mobile-tab" title="Додати варіант"><i data-lucide="plus"></i></button>
+          </div>
+        </div>
+
         <div class="book-page-scroll-spine-left">
           <div class="recipe-inner-wrap">
             

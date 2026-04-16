@@ -24,7 +24,7 @@ export default class RecipeBookRightPage extends Component {
           <div class="rb-right-content" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 0.5;">
             <i data-lucide="chef-hat" style="width: 64px; height: 64px; margin-bottom: 16px;"></i>
             <h2 style="font-family: var(--font-title); font-size: 1.4rem;">Оберіть рецепт зі списку</h2>
-            <p style="font-style: italic; margin-top: 8px;">або створіть новий</p>
+            <p style="font-style: italic; margin-top: 8px;">або <span id="rb-inline-create" class="rb-inline-link">створіть новий</span></p>
           </div>
         </div>
       </div>
@@ -36,12 +36,30 @@ export default class RecipeBookRightPage extends Component {
     if (backBtn) {
       backBtn.addEventListener('click', () => this.onBack());
     }
+
+    const wrapper = document.getElementById('rb-wrapper');
+    if (wrapper && this._mode === 'placeholder') {
+      wrapper.classList.add('mode-placeholder');
+    }
+
+    const mountContainer = this.$('#recipe-mount-point');
+    if (mountContainer) {
+      mountContainer.addEventListener('click', (e) => {
+        if (e.target.closest('#rb-inline-create')) {
+          const btn = document.getElementById('rb-create-btn');
+          if (btn) btn.click();
+        }
+      });
+    }
   }
 
   // ------ RECIPE VIEW ------
   async loadRecipe(id) {
     this._destroyCreateForm();
     this._mode = 'recipe';
+    
+    const wrapper = document.getElementById('rb-wrapper');
+    if (wrapper) wrapper.classList.remove('mode-placeholder');
 
     const mountContainer = this.$('#recipe-mount-point');
     if (!mountContainer) return;
@@ -83,6 +101,9 @@ export default class RecipeBookRightPage extends Component {
     this._mode = 'create';
     this.currentRecipeId = null;
 
+    const wrapper = document.getElementById('rb-wrapper');
+    if (wrapper) wrapper.classList.remove('mode-placeholder');
+
     const mountContainer = this.$('#recipe-mount-point');
     if (!mountContainer) return;
 
@@ -114,6 +135,9 @@ export default class RecipeBookRightPage extends Component {
     this._mode = 'placeholder';
     this.currentRecipeId = null;
 
+    const wrapper = document.getElementById('rb-wrapper');
+    if (wrapper) wrapper.classList.add('mode-placeholder');
+
     const backBtn = this.$('#rb-back-trigger');
     if (backBtn) backBtn.style.display = 'none';
 
@@ -124,7 +148,7 @@ export default class RecipeBookRightPage extends Component {
       <div class="rb-right-content" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 0.5;">
         <i data-lucide="chef-hat" style="width: 64px; height: 64px; margin-bottom: 16px;"></i>
         <h2 style="font-family: var(--font-title); font-size: 1.4rem;">Оберіть рецепт зі списку</h2>
-        <p style="font-style: italic; margin-top: 8px;">або створіть новий</p>
+        <p style="font-style: italic; margin-top: 8px;">або <span id="rb-inline-create" class="rb-inline-link">створіть новий</span></p>
       </div>
     `;
     if (window.lucide) window.lucide.createIcons({ root: mountContainer });

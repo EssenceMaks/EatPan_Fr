@@ -190,11 +190,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   cursor: pointer;
-  padding: 8px 16px;
+  padding: 0;
   background: radial-gradient(circle at 50% 50%, #17110b, #000);
   border: 2px solid var(--gold-dark);
-  border-radius: 8px;
+  border-radius: 50%;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(232, 208, 88, 0.2);
   color: var(--gold-light);
   font-family: 'Cinzel', serif;
@@ -203,6 +204,8 @@
   letter-spacing: 2px;
   margin: 0 auto;
   transition: transform 0.2s ease;
+  width: 90px;
+  height: 70px;
 }
 
 .bh-mini-clock {
@@ -211,7 +214,8 @@
   border: 1px solid var(--gold-light);
   border-radius: 50%;
   position: relative;
-  margin-right: 8px;
+  margin-right: 0;
+  margin-bottom: 2px;
   box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
   background: radial-gradient(circle, #332 0%, #000 100%);
 }
@@ -397,7 +401,7 @@ body.active-mode #bh-back-btn-container {
 
   .arc-bento-header__center {
     font-size: 1.1rem;
-    padding: 4px 10px;
+    transform: scale(0.85);
   }
 }
 
@@ -491,19 +495,9 @@ body.active-mode #bh-back-btn-container {
   }
 
   .arc-bento-header__center {
-    width: 90px;
-    height: 70px;
-    border-radius: 50%;
     top: 5px;
     position: relative;
-    flex-direction: column;
-    padding: 0;
     z-index: 20;
-  }
-
-  .bh-mini-clock {
-    margin-right: 0;
-    margin-bottom: 2px;
   }
 }
 
