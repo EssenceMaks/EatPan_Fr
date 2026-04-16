@@ -128,39 +128,47 @@ export default class RecipeBookSideRibbons extends Component {
       return;
     }
 
-    // Desktop: grid-based layout showing ALL categories
+    // Desktop: grid-based layout — original calculation from before version
     const ROW_H = 35;
     const GAP = 6;
     const COL_W = 52;
 
+    // Calculate available rows from container height (original formula)
+    const availableH = this.element.clientHeight || 500;
+    let maxRows = Math.floor((availableH + GAP) / (ROW_H + GAP));
+    if (maxRows < 5) maxRows = 5;
+
     // Health tabs always anchor at bottom of rightmost column
     const healthCount = healthTabs.length;
-    const healthWithSpacer = healthCount + 1; // +1 invisible spacer
+    const healthWithSpacer = healthCount + 1; // +1 invisible spacer below health tabs
 
-    // Show ALL categories on desktop
-    const visibleCats = categories.slice();
-    const catCount = visibleCats.length;
+    // Category slots in right column (above health tabs)
+    const rightColCatSlots = Math.max(maxRows - healthWithSpacer, 3);
 
-    // Calculate rows needed to fit all categories + list-all + health tabs
-    // Right column: health tabs at bottom, categories above
-    // Left column: overflow categories if needed
-    const totalCatItems = catCount + 1; // +1 for list-all
-    const minRowsForRightCol = healthWithSpacer + 1; // at least 1 category slot
+    // Total category items: categories + 1 list-all tab
+    const catCountWithList = categories.length + 1;
 
-    // Determine columns: use 2 columns if categories don't fit in right column alone
+    // Determine columns: use 2 if categories don't fit in right column
     let numCols = 1;
-    let rightColCatSlots = 8; // default slots in right column
-    let maxRows = minRowsForRightCol;
-
-    if (totalCatItems > rightColCatSlots) {
+    if (catCountWithList > rightColCatSlots) {
       numCols = 2;
-      // Distribute categories across 2 columns
-      rightColCatSlots = Math.ceil(totalCatItems / 2);
-      maxRows = Math.max(rightColCatSlots + healthWithSpacer, 8);
-    } else {
-      // All categories fit in right column
-      rightColCatSlots = totalCatItems;
-      maxRows = Math.max(rightColCatSlots + healthWithSpacer, 5);
+    }
+
+    // Total available slots for categories
+    const totalCatSlots = numCols === 2
+      ? rightColCatSlots + maxRows
+      : rightColCatSlots;
+
+    // Limit visible categories (always keep 1 slot for list-all)
+    const visibleLimit = totalCatSlots - 1;
+    const visibleCats = categories.slice(0, visibleLimit);
+
+    // If active category is hidden, swap it in
+    if (activeId && !visibleCats.find(c => c.id === activeId)) {
+      const hidden = categories.find(c => c.id === activeId);
+      if (hidden && visibleCats.length > 0) {
+        visibleCats[visibleCats.length - 1] = hidden;
+      }
     }
 
     // Apply grid
@@ -172,42 +180,7 @@ export default class RecipeBookSideRibbons extends Component {
 
     this._ribbonInstances = [];
 
-    // Place category ribbons: rightmost col first, then overflow left
-    let col = numCols;
-    let row = 1;
-
-    for (const cat of visibleCats) {
-      if (col === numCols && row > rightColCatSlots) { col--; row = 1; }
-      // Note: no break here — we calculate maxRows to fit ALL categories
-
-      const ribbon = new SideTabRibbon({
-        id: cat.id, icon: cat.icon || '', active: cat.id === activeId,
-        title: cat.label || cat.id, variant: 'category',
-        onClick: (id) => this._handleSelect(id),
-      });
-      const el = document.createElement('div');
-      el.style.cssText = `grid-column:${col};grid-row:${row};`;
-      mount.appendChild(el);
-      await ribbon.render(el, 'innerHTML');
-      this._ribbonInstances.push(ribbon);
-      row++;
-    }
-
-    // "Show all" list tab — always placed after last visible category
-    if (col === numCols && row > rightColCatSlots) { col--; row = 1; }
-    const listAll = new SideTabRibbon({
-      id: '__all__', icon: 'list',
-      active: !activeId || activeId === '__all__',
-      title: 'Усі категорії', variant: 'list-all',
-      onClick: (id) => this._handleSelect(id),
-    });
-    const listEl = document.createElement('div');
-    listEl.style.cssText = `grid-column:${col};grid-row:${row};`;
-    mount.appendChild(listEl);
-    await listAll.render(listEl, 'innerHTML');
-    this._ribbonInstances.push(listAll);
-
-    // Health tabs — anchored at bottom of rightmost column
+    // First: place health tabs at bottom of rightmost column (reserved positions)
     const healthStartRow = maxRows - healthCount + 1;
     for (let i = 0; i < healthCount; i++) {
       const ht = healthTabs[i];
@@ -223,6 +196,55 @@ export default class RecipeBookSideRibbons extends Component {
       await ribbon.render(el, 'innerHTML');
       this._ribbonInstances.push(ribbon);
     }
+
+    // Then: place category ribbons from top
+    // Right column: rows 1 to rightColCatSlots (above health tabs)
+    // Left column: rows 1 to maxRows (full height)
+    let col = numCols;
+    let row = 1;
+
+    for (const cat of visibleCats) {
+      // In right column: stop when reaching health tabs area
+      if (col === numCols && row > rightColCatSlots) {
+        col--; // Move to left column
+        row = 1; // Start from top of left column
+      }
+      // In left column: fill all available rows
+      if (col < numCols && row > maxRows) break;
+
+      const ribbon = new SideTabRibbon({
+        id: cat.id, icon: cat.icon || '', active: cat.id === activeId,
+        title: cat.label || cat.id, variant: 'category',
+        onClick: (id) => this._handleSelect(id),
+      });
+      const el = document.createElement('div');
+      el.style.cssText = `grid-column:${col};grid-row:${row};`;
+      mount.appendChild(el);
+      await ribbon.render(el, 'innerHTML');
+      this._ribbonInstances.push(ribbon);
+      row++;
+    }
+
+    // "Show all" list tab — placed after last visible category
+    if (col === numCols && row > rightColCatSlots) {
+      col--; // Move to left column if right is full
+      row = 1;
+      // Find first empty row in left column
+      while (row <= maxRows && visibleCats.length >= (numCols === 2 ? rightColCatSlots + row : rightColCatSlots)) {
+        row++;
+      }
+    }
+    const listAll = new SideTabRibbon({
+      id: '__all__', icon: 'list',
+      active: !activeId || activeId === '__all__',
+      title: 'Усі категорії', variant: 'list-all',
+      onClick: (id) => this._handleSelect(id),
+    });
+    const listEl = document.createElement('div');
+    listEl.style.cssText = `grid-column:${col};grid-row:${row};`;
+    mount.appendChild(listEl);
+    await listAll.render(listEl, 'innerHTML');
+    this._ribbonInstances.push(listAll);
 
     if (window.lucide) window.lucide.createIcons({ root: this.element });
     this._isRebuilding = false;

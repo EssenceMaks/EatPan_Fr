@@ -121,21 +121,29 @@
   color: white;
 }
 
-/* ---- Desktop: allow vertical scroll when many categories ---- */
+/* ---- Desktop: no scroll, limited categories shown ---- */
 @media (min-width: 900px) {
+  .stb-mobile-wrapper {
+    height: 100%;
+    overflow: hidden;
+  }
+
   .stb-grid {
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--accent, #805533) transparent;
+    height: 100%;
+    overflow: hidden;
   }
 
-  .stb-grid::-webkit-scrollbar {
-    width: 4px;
+  .stb-grid-inner {
+    max-height: 100%;
+    overflow: visible;
+    /* Prevent creating extra implicit rows */
+    grid-auto-rows: 0;
+    grid-auto-columns: 0;
   }
 
-  .stb-grid::-webkit-scrollbar-thumb {
-    background: var(--accent, #805533);
-    border-radius: 2px;
+  /* Hide any ribbons that overflow the grid */
+  .stb-grid-inner > div {
+    max-height: 35px;
   }
 }
 
