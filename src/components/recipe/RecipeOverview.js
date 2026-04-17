@@ -227,14 +227,36 @@ export default class RecipeOverview extends Component {
             <!-- Preparation Steps Accordion -->
             <div class="prep-steps-accordion" id="prep-steps-accordion">
               <div class="prep-steps-header" id="prep-steps-toggle">
-                <h3 class="steps-main-title" style="margin:0;border:none;padding:0;">Preparation Steps</h3>
+                <h3 class="steps-main-title" style="margin:0;border:none;padding:0;">Процес приготування</h3>
                 <button class="prep-steps-diamond-btn" id="diamond-toggle" type="button" title="Розгорнути інструкцію">
                   <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>
                 </button>
               </div>
               <div id="recipe-instructions-mount" class="collapsed"></div>
             </div>
-            
+
+            <!-- Chef's Secret -->
+            <div class="recipe-extra-section recipe-secret-section">
+              <div class="recipe-extra-header">
+                <div class="recipe-extra-icon">
+                  <i data-lucide="sparkles" style="width:18px;height:18px;"></i>
+                </div>
+                <h4 class="recipe-extra-title">Секрет шефа</h4>
+              </div>
+              <p class="recipe-extra-text">${(d.secret && d.secret.trim()) ? d.secret : '<em style="opacity:0.6;">Немає секрету</em>'}</p>
+            </div>
+
+            <!-- Serving Suggestions -->
+            <div class="recipe-extra-section recipe-serving-section">
+              <div class="recipe-extra-header">
+                <div class="recipe-extra-icon">
+                  <i data-lucide="utensils-crossed" style="width:18px;height:18px;"></i>
+                </div>
+                <h4 class="recipe-extra-title">Подача</h4>
+              </div>
+              <p class="recipe-extra-text">${(d.serving && d.serving.trim()) ? d.serving : '<em style="opacity:0.6;">Немає рекомендацій</em>'}</p>
+            </div>
+
           </div>
         </div>
 

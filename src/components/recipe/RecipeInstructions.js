@@ -13,7 +13,6 @@ export default class RecipeInstructions extends Component {
     if (!Array.isArray(steps) || steps.length === 0) {
       return `
         <div class="recipe-instructions-inner">
-          <h3 class="steps-main-title">Інструкція</h3>
           <p style="text-align:center;opacity:0.5;font-style:italic;padding:20px;">Інструкція ще не додана</p>
         </div>
       `;
@@ -36,7 +35,6 @@ export default class RecipeInstructions extends Component {
 
     return `
       <div class="recipe-instructions-inner">
-        <h3 class="steps-main-title">Інструкція</h3>
         <div class="steps-list">
           ${stepsHtml}
         </div>
