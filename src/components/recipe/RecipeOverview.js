@@ -74,10 +74,27 @@ export default class RecipeOverview extends Component {
     const mainImg = this._buildMainImage(resolvedImageUrl, title);
 
     // Ingredients HTML
-    const ingredientsHtml = ingredients.map(ing => {
+    const ingredientsHtml = ingredients.map((ing, i) => {
       const name = typeof ing === 'string' ? ing : (ing.name || ing.title || '');
       const amount = typeof ing === 'string' ? '' : (ing.amount || ing.quantity || '');
       const icon = this._getIngredientIcon(name);
+
+      // Temporary mock logic to show the fresh UI design states if no data provided
+      let stockStr = typeof ing === 'object' ? ing.stock : null;
+      let statusClass = typeof ing === 'object' ? ing.statusClass : null;
+      let statusIcon = typeof ing === 'object' ? ing.statusIcon : null;
+
+      if (!stockStr) {
+        // Cycle through the UI states to showcase the design
+        if (i % 3 === 0) {
+           stockStr = "5/50"; statusClass = "status-ok"; statusIcon = "check";
+        } else if (i % 3 === 1) {
+           stockStr = "4/2"; statusClass = "status-missing warning"; statusIcon = "alert-circle";
+        } else {
+           stockStr = "1/0"; statusClass = "status-missing"; statusIcon = "circle";
+        }
+      }
+
       return `
         <div class="ing-card">
           <div class="ing-icon-wrapper">
@@ -85,7 +102,10 @@ export default class RecipeOverview extends Component {
           </div>
           <div class="ing-name" title="${name}">${name}</div>
           <div class="ing-amounts">
-            <span class="ing-required-amount">${amount}</span>
+            <span class="ing-required-amount">${amount} ${amount ? '<span class="separator">|</span>' : ''}</span>
+            <span class="${statusClass}">
+              ${stockStr} <i data-lucide="${statusIcon}" style="width: 16px; height: 16px;"></i>
+            </span>
           </div>
         </div>
       `;
