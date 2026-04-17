@@ -87,7 +87,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   text-align: center;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+  /* border-bottom: 1px dashed rgba(0, 0, 0, 0.1); */
   padding-bottom: 8px;
 }
 
@@ -309,7 +309,7 @@
 #recipe-instructions-mount.expanded {
   max-height: 2000px;
   opacity: 1;
-  padding-top: 24px;
+  padding-top: 0px;
   margin-top: 24px;
 }
 
@@ -335,23 +335,30 @@
 .preparation-step-ribbon {
   margin-bottom: 2px;
   cursor: default;
-  /* Not clickable usually */
+  display: block;
+  padding: 12px 15px;
 }
 
 .preparation-step-ribbon:active {
   transform: none;
-  /* Removed the default click scale from Spark ribbon */
 }
 
 .arc-spark-ribbon.arc-spark-ribbon--outward.preparation-step-ribbon {
   clip-path: none;
 }
 
+.preparation-step-ribbon::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 .step-number-seal {
   background: radial-gradient(circle, var(--wood-medium, #5c3c1e), var(--wood-dark, #2e1e0f)) !important;
   transform: rotate(45deg);
   border-radius: 2px !important;
-  /* Slight rounding for the diamond points */
+  float: left;
+  margin: 0 12px 4px 0;
 }
 
 .step-number-text {
@@ -366,9 +373,9 @@
   font-size: 0.95rem;
   line-height: 1.4;
   color: var(--ink, #2c1810);
-  padding-right: 28px;
-  /* buffer to keep text from touching arrow cutout */
-  justify-content: center;
+  display: block !important;
+  overflow: visible;
+  padding-right: 0;
 }
 
 /* -------------------------------------------

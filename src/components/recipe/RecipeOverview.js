@@ -151,7 +151,7 @@ export default class RecipeOverview extends Component {
             <!-- Preparation Steps Accordion -->
             <div class="prep-steps-accordion" id="prep-steps-accordion">
               <div class="prep-steps-header" id="prep-steps-toggle">
-                <h3 class="steps-main-title" style="margin:0;border:none;padding:0;">Preparation Steps</h3>
+                <h3 class="steps-main-title" style="margin:0;border:none;padding:0;">Процес приготування</h3>
                 <button class="prep-steps-diamond-btn" id="diamond-toggle" type="button" title="Розгорнути інструкцію">
                   <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>
                 </button>
