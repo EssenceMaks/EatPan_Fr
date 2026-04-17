@@ -1,5 +1,6 @@
 import Component from '../../core/Component.js';
 import { IS_LOCAL } from '../../core/ApiClient.js';
+import { resolveMediaUrl } from '../../core/mediaResolver.js';
 
 export default class RecipeOverview extends Component {
   constructor(props = {}) {
@@ -37,7 +38,7 @@ export default class RecipeOverview extends Component {
       // Has image URL — show it; if local machine is offline the image fails to load
       return `<img src="${imageUrl}" alt="${title}"
         style="width:100%;height:100%;object-fit:cover;"
-        onerror="this.parentElement.innerHTML='<div class=\\'gallery-placeholder gallery-placeholder--offline\\'><i data-lucide=\\'server-off\\' style=\\'width:36px;height:36px;opacity:0.5;\\'></i><span>Локальна машина<br>не в мережі</span></div>';if(window.lucide)lucide.createIcons({root:this.parentElement.parentElement});">`;
+        onerror="const p = this.parentElement; p.innerHTML='<div class=\\'gallery-placeholder gallery-placeholder--offline\\'><i data-lucide=\\'server-off\\' style=\\'width:36px;height:36px;opacity:0.5;\\'></i><span>Локальна машина<br>не в мережі</span></div>';if(window.lucide)lucide.createIcons({root:p.parentElement || p});">`;
     }
     // No image URL — recipe has no photo
     return `<div class="gallery-placeholder gallery-placeholder--no-photo">
@@ -69,6 +70,8 @@ export default class RecipeOverview extends Component {
         if (firstImage?.url) resolvedImageUrl = firstImage.url;
       }
     }
+    // Apply URL rewriting: cloud Supabase → local Docker storage
+    resolvedImageUrl = resolveMediaUrl(resolvedImageUrl) || '';
 
     // Gallery: main image with smart fallback
     const mainImg = this._buildMainImage(resolvedImageUrl, title);
@@ -88,67 +91,67 @@ export default class RecipeOverview extends Component {
       if (!stockStr) {
         let reqNumStr = '';
         let unit = '';
-        
+
         if (amount) {
           const lowerAmount = amount.toLowerCase();
           if (!lowerAmount.includes('taste') && !lowerAmount.includes('смаком')) {
             const match = amount.match(/^([\d\s½¼¾\.\,\/]*)(.*)$/);
             if (match) {
-                reqNumStr = match[1].trim();
-                unit = match[2].trim();
+              reqNumStr = match[1].trim();
+              unit = match[2].trim();
             } else {
-                unit = amount.trim();
+              unit = amount.trim();
             }
           }
         }
-        
+
         if (!reqNumStr) reqNumStr = '1';
 
         let reqNumLogic = parseFloat(String(reqNumStr).replace(',', '.'));
         if (isNaN(reqNumLogic) || reqNumLogic <= 0) reqNumLogic = 1;
 
         if (i % 3 === 0) { // OK
-           let avail = reqNumLogic >= 10 ? Math.round(reqNumLogic * 1.5) : 50;
-           if (avail <= reqNumLogic) avail = reqNumLogic + 5;
-           stockStr = `${reqNumStr}/${avail}`;
-           statusClass = "status-ok"; 
-           statusIcon = "check";
+          let avail = reqNumLogic >= 10 ? Math.round(reqNumLogic * 1.5) : 50;
+          if (avail <= reqNumLogic) avail = reqNumLogic + 5;
+          stockStr = `${reqNumStr}/${avail}`;
+          statusClass = "status-ok";
+          statusIcon = "check";
         } else if (i % 3 === 1) { // Partial
-           let avail = Math.max(1, Math.floor(reqNumLogic / 2));
-           stockStr = `${reqNumStr}/${avail}`; 
-           statusClass = "status-missing warning"; 
-           statusIcon = "alert-circle"; // Orange exclamation pattern
+          let avail = Math.max(1, Math.floor(reqNumLogic / 2));
+          stockStr = `${reqNumStr}/${avail}`;
+          statusClass = "status-missing warning";
+          statusIcon = "alert-circle"; // Orange exclamation pattern
         } else { // Empty
-           stockStr = `${reqNumStr}/0`; 
-           statusClass = "status-missing"; 
-           statusIcon = "circle-dashed"; // Purely missing zero state
+          stockStr = `${reqNumStr}/0`;
+          statusClass = "status-missing";
+          statusIcon = "circle-dashed"; // Purely missing zero state
         }
-        
+
         if (unit) {
-           const cleaned = unit.toLowerCase().replace(/[^a-zа-яёіїєґ]/g, '');
-           const validUnits = ['g', 'kg', 'mg', 'ml', 'l', 'oz', 'lb', 'tbsp', 'tbs', 'tsp', 'cup', 'cups', 'г', 'кг', 'мл', 'л', 'шт', 'pcs'];
-           if (!validUnits.includes(cleaned)) unit = '';
+          const cleaned = unit.toLowerCase().replace(/[^a-zа-яёіїєґ]/g, '');
+          const validUnits = ['g', 'kg', 'mg', 'ml', 'l', 'oz', 'lb', 'tbsp', 'tbs', 'tsp', 'cup', 'cups', 'г', 'кг', 'мл', 'л', 'шт', 'pcs'];
+          if (!validUnits.includes(cleaned)) unit = '';
         }
-        
+
         displayStock = unit ? `${stockStr} ${unit}` : stockStr;
       } else {
         // Fallback for actual data provided to append units
         let unit = '';
         if (amount) {
-           const lowerAmount = amount.toLowerCase();
-           if (!lowerAmount.includes('taste') && !lowerAmount.includes('смаком')) {
-             unit = amount.replace(/^[\d\s½¼¾\.\,\/]+/, '').trim();
-           }
+          const lowerAmount = amount.toLowerCase();
+          if (!lowerAmount.includes('taste') && !lowerAmount.includes('смаком')) {
+            unit = amount.replace(/^[\d\s½¼¾\.\,\/]+/, '').trim();
+          }
         }
         if (unit) {
-           const cleaned = unit.toLowerCase().replace(/[^a-zа-яёіїєґ]/g, '');
-           const validUnits = ['g', 'kg', 'mg', 'ml', 'l', 'oz', 'lb', 'tbsp', 'tbs', 'tsp', 'cup', 'cups', 'г', 'кг', 'мл', 'л', 'шт', 'pcs'];
-           if (!validUnits.includes(cleaned)) unit = '';
+          const cleaned = unit.toLowerCase().replace(/[^a-zа-яёіїєґ]/g, '');
+          const validUnits = ['g', 'kg', 'mg', 'ml', 'l', 'oz', 'lb', 'tbsp', 'tbs', 'tsp', 'cup', 'cups', 'г', 'кг', 'мл', 'л', 'шт', 'pcs'];
+          if (!validUnits.includes(cleaned)) unit = '';
         }
 
-        displayStock = unit && typeof stockStr === 'string' && !stockStr.includes(unit) 
-            ? `${stockStr} ${unit}` 
-            : stockStr;
+        displayStock = unit && typeof stockStr === 'string' && !stockStr.includes(unit)
+          ? `${stockStr} ${unit}`
+          : stockStr;
       }
 
       return `
@@ -172,14 +175,14 @@ export default class RecipeOverview extends Component {
     if (d.secrets && Array.isArray(d.secrets)) secretsArr = d.secrets;
     else if (d.secret && Array.isArray(d.secret)) secretsArr = d.secret;
     else if (d.secret && typeof d.secret === 'string' && d.secret.trim()) secretsArr = [d.secret];
-    
+
     let secretsHtml = secretsArr.length > 0
       ? secretsArr.map((s, i) => {
-          let t = typeof s === 'string' ? s : (s.text || s.description || '');
-          let mb = i < secretsArr.length - 1 ? 'margin-bottom: 12px;' : '';
-          return `<p class="recipe-extra-text" style="${mb}">${t}</p>`;
-        }).join('')
-      : '<p class="recipe-extra-text"><em style="opacity:0.6;">Додайте свій секрет шефа</em></p>';
+        let t = typeof s === 'string' ? s : (s.text || s.description || '');
+        let mb = i < secretsArr.length - 1 ? 'margin-bottom: 12px;' : '';
+        return `<p class="recipe-extra-text" style="${mb}">${t}</p>`;
+      }).join('')
+      : '<p class="recipe-extra-text"><em style="opacity:0.6;">Додайте свій секрет Шефа</em></p>';
 
     // Parse Utensils (formerly Serving)
     let servingArr = [];
@@ -191,10 +194,10 @@ export default class RecipeOverview extends Component {
 
     let servingHtml = servingArr.length > 0
       ? servingArr.map((s, i) => {
-          let t = typeof s === 'string' ? s : (s.text || s.description || '');
-          let mb = i < servingArr.length - 1 ? 'margin-bottom: 12px;' : '';
-          return `<p class="recipe-extra-text" style="${mb}">${t}</p>`;
-        }).join('')
+        let t = typeof s === 'string' ? s : (s.text || s.description || '');
+        let mb = i < servingArr.length - 1 ? 'margin-bottom: 12px;' : '';
+        return `<p class="recipe-extra-text" style="${mb}">${t}</p>`;
+      }).join('')
       : '<p class="recipe-extra-text"><em style="opacity:0.6;">Додайте необхідне приладдя</em></p>';
 
     return `

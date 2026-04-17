@@ -1,7 +1,7 @@
 import Component from '../../core/Component.js';
 import { RecipeService } from '../../core/ApiClient.js';
 import { supabase } from '../../core/supabaseClient.js';
-import RecipeBookLeftPage from './RecipeBookLeftPage.js';
+import RecipeBookLeftPage from './left_page/RecipeBookLeftPage.js';
 import RecipeBookRightPage from './RecipeBookRightPage.js';
 import RecipeBookSideRibbons from './RecipeBookSideRibbons.js';
 

@@ -182,34 +182,7 @@
   border-color: var(--accent, #805533);
 }
 
-/* Category groups on left page */
-.rb-category-group {
-  margin-bottom: 8px;
-}
 
-.rb-category-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 16px;
-  font-family: var(--font-title, 'Noto Serif', serif);
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--ink, #2c1810);
-  border-bottom: 1px solid rgba(128, 85, 51, 0.15);
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.rb-category-header:hover {
-  background: rgba(128, 85, 51, 0.06);
-}
-
-.rb-category-items {
-  display: grid;
-  gap: 6px;
-  padding: 8px 0 4px;
-}
 
 @keyframes spin {
   from {

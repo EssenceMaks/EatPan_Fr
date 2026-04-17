@@ -23,8 +23,8 @@
   align-items: start;
   width: 100%;
   pointer-events: none;
-  padding: 15px;
-  gap: 15px;
+  padding: 2px;
+  gap: 2px;
   box-sizing: border-box;
 }
 
@@ -416,9 +416,9 @@ body.active-mode #bh-back-btn-container {
   /* RIGHT PANEL flies to bottom right, anchored seamlessly */
   .arc-bento-full__right {
     position: fixed;
-    bottom: -4px;
+    bottom: 1px;
     /* hide bottom border */
-    right: -4px;
+    right: 1px;
     /* hide right border */
     border-radius: 40px 0 0 0;
     /* Inward curve on top-left */
@@ -434,6 +434,8 @@ body.active-mode #bh-back-btn-container {
     /* Custom borders flush against the screen */
     border: none;
     border-top: 2px solid var(--gold-dark);
+    border-right: 2px solid var(--gold-dark);
+    border-bottom: 2px solid var(--gold-dark);
     border-left: 2px solid var(--gold-dark);
 
     background: var(--bg-arc-panel, #080605);
@@ -458,7 +460,7 @@ body.active-mode #bh-back-btn-container {
 
   /* LEFT FLARE: Sweeps to the bottom edge */
   .arc-flare-left {
-    bottom: 0;
+    bottom: -2px;
     left: -32px;
     border-bottom: 2px solid var(--gold-dark);
   }
@@ -478,7 +480,7 @@ body.active-mode #bh-back-btn-container {
   /* TOP FLARE: Sweeps to the right edge */
   .arc-flare-top {
     top: -32px;
-    right: 0;
+    right: -2px;
     border-right: 2px solid var(--gold-dark);
   }
 

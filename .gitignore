@@ -29,3 +29,10 @@ docs/changelogs/figma_validation.md
 
 # Secure config
 src/core/config.js
+
+# Test Scripts
+*_test_*.py
+*_debug_*.py
+scratch_*.js
+scratch_*.css
+recipe_sample.json
