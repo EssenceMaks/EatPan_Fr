@@ -9,21 +9,21 @@
 
 ## Architecture
 ```
-index.html   ← SPA shell (только скелет, без логики)
-main.js      ← SPA router + все глобальные JS (DOMContentLoaded)
+index.html   ← SPA shell (только базовая разметка #app-root)
+main.js      ← Инициализация приложения, монтирование AppShell
 src/
-  core/      ← Component.js (base class), EventBus.js
-  api/       ← RecipeService.js (Django API layer)
-  modules/   ← изолированные модули (recipe-book, ...)
-  styles/    ← global.css only
+  core/        ← Базовые классы (Component.js) и утилиты (ApiClient.js)
+  components/  ← Переиспользуемые UI компоненты. Каждый в своей папке со своим `.js` и `.css`. (напр. app_shell, menu, user_profile)
+  modules/     ← Бизнес-фичи (напр. clock, main_menu)
+  styles/      ← Глобальные токены и стили (tokens.css, themes.css, layout.css)
 ```
 
 ## Key Conventions
-- Все компоненты наследуются от `Component` (`src/core/Component.js`)
-- `render()` — async, возвращает DOM-элемент
-- Глобальные JS-функции (вызываемые из inline HTML onclick) — **обязательно** регистрировать как `window.functionName`
-- CSS-переменные определены в `global.css → :root`
-- Никаких inline `<style>` блоков — всё в CSS-файлах
+- Все UI элементы наследуются от `Component` (`src/core/Component.js`).
+- `render()` — возвращает DOM-элемент или строку разметки.
+- Каждый компонент инкапсулирует свои стили в одноименном `.css` внутри папки компонента.
+- Глобальные CSS переменные (токены дизайна) лежат в `src/styles/tokens.css` и `themes.css`.
+- Никаких inline `<style>` блоков.
 
 ## CSS Variables (Design Tokens)
 ```css
@@ -35,20 +35,36 @@ src/
 --font-body: 'Work Sans', sans-serif;
 ```
 
-## Module: recipe-book
-- Entry: `BookModule.js` → `Book.js` → `PageLeft.js` + `PageRight.js`
-- Монтируется в `#cookbook-section` (section_block data-index="2")
-- Стили: `book.css`, `ribbons.css`, `media.css`
+## Adaptivity
+Все медиа-запросы заложены в `src/styles/responsive.css`. 
+Используйте строго эти брейкпоинты для консистентности UI:
 
-## Adaptivity (6 states)
-Media breakpoints defined in `media.css`:
-320-480px portrait/landscape → 481-700 → 701-900 → 901-1200 → 1201-1400 → 1401+
+**Меню снизу (Mobile/Tablet)**
+- `@media (max-width: 479px) and (orientation: portrait)`
+- `@media (max-width: 479px) and (orientation: landscape)`
+- `@media (min-width: 480px) and (max-width: 767px) and (orientation: portrait)`
+- `@media (min-width: 480px) and (max-width: 767px) and (orientation: landscape)`
+- `@media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait)`
+- `@media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape)`
+
+**Меню сверху (Desktop / Large Screens)**
+- `@media (min-width: 1024px) and (max-width: 1199px) and (orientation: portrait)`
+- `@media (min-width: 1024px) and (max-width: 1199px) and (orientation: landscape)`
+- `@media (min-width: 1200px) and (max-width: 1439px)`
+- `@media (min-width: 1440px) and (max-width: 1919px)`
+- `@media (min-width: 1920px)`
+*(Для очень узких по высоте экранов также есть правила с `max-height` внутри `responsive.css`)*
 
 ## DO NOT
-- Не трогать логику infinite-scroll и clock animation без necessity
-- Не добавлять `<script>` блоки в `index.html`
-- Не ломать `grid-template-rows: auto auto 1fr auto` на `.page--left`
+- Не добавлять `<script>` модули напрямую в `index.html`.
+- Не нарушать изоляцию: каждый UI-компонент должен сам управлять своим состоянием.
+- Не использовать inline-стили (все через CSS-переменные и классы).
 
 ## Figma Integration
 - **Обязательно:** Перед внесением изменений в UI или добавлением новых модулей, сверяйтесь с макетом Figma через MCP сервер (см. `sync_with_figma.md`).
 - **Файл Figma:** `lWzzBp0TFIsbeypUlRMSxu`
+
+## API Endpoints Synchronization
+- **Обязательно:** Любые изменения API (добавление, удаление, изменение параметров) должны сопровождаться обновлением файла `API_ENDPOINTS.md`.
+- Файл `API_ENDPOINTS.md` должен быть всегда консистентным во всех проектах: `EatPan_Production`, `EatPan_Fr`, `EatPan_Back`, `EatPan_Supabase`.
+- При обновлении `API_ENDPOINTS.md` копируйте его во все эти репозитории.

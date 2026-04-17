@@ -1,0 +1,193 @@
+/* =============================================
+   ARC DESIGN SYSTEM — BookmarkRibbon
+   Bottom bookmarks & right-side interaction tabs
+   ============================================= */
+
+/* ---- BOTTOM BOOKMARK GROUP (right page) ---- */
+.bm-bottom-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 100;
+}
+
+.bm-bottom {
+  width: 30px;
+  height: 65px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  clip-path: polygon(0% 0%, 50% 12%, 100% 0%, 100% 100%, 0% 100%);
+  color: rgba(255,255,255, 0.6);
+  font-family: inherit;
+  border: none;
+  background: rgba(0,0,0, 0.1);
+  outline: none;
+}
+
+.bm-bottom:hover {
+  height: 72px;
+  transform: none;
+}
+
+.bm-bottom.active {
+  height: 80px;
+}
+
+.bm-bottom.bm-prepared {
+  background: rgba(var(--ribbon-green-rgb), 0.4);
+}
+.bm-bottom.bm-prepared.active {
+  background: var(--ribbon-green);
+  color: white;
+}
+
+.bm-bottom.bm-planned {
+  background: rgba(var(--crimson-rgb, 139,26,26), 0.4);
+}
+.bm-bottom.bm-planned.active {
+  background: var(--crimson);
+  color: white;
+}
+
+/* ---- LEFT BOTTOM BOOKMARK GROUP ---- */
+.bm-bottom-group-left {
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+  align-items: flex-end;
+}
+
+.bm-bottom-left {
+  width: 30px;
+  height: 65px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  clip-path: polygon(0% 0%, 50% 12%, 100% 0%, 100% 100%, 0% 100%);
+  color: rgba(255,255,255, 0.6);
+  font-family: inherit;
+  border: none;
+  background: rgba(0,0,0, 0.1);
+  outline: none;
+}
+
+.bm-bottom-left:hover { height: 72px; }
+.bm-bottom-left.active { height: 80px; }
+
+.bm-bottom-left.bm-fridge {
+  background: rgba(var(--ribbon-blue-rgb), 0.5);
+}
+.bm-bottom-left.bm-fridge.active,
+.bm-bottom-left.bm-fridge.has-items {
+  background: var(--ribbon-blue);
+  color: white;
+}
+
+.bm-bottom-left.bm-ingredients {
+  background: rgba(var(--ribbon-purple-rgb), 0.4);
+}
+.bm-bottom-left.bm-ingredients.active,
+.bm-bottom-left.bm-ingredients.has-items {
+  background: var(--ribbon-purple);
+  color: white;
+}
+
+.bm-bottom-left.bm-prepared {
+  background: rgba(var(--ribbon-green-rgb), 0.4);
+}
+.bm-bottom-left.bm-prepared.active,
+.bm-bottom-left.bm-prepared.has-items {
+  background: var(--ribbon-green);
+  color: white;
+}
+
+.bm-bottom-left.bm-planned {
+  background: rgba(var(--crimson-rgb, 139,26,26), 0.4);
+}
+.bm-bottom-left.bm-planned.active {
+  background: var(--crimson);
+  color: white;
+}
+
+.bm-bottom-left.bm-shopping {
+  background: rgba(var(--gold-rgb), 0.4);
+}
+.bm-bottom-left.bm-shopping.active {
+  background: var(--gold);
+  color: white;
+}
+
+/* ---- RIGHT-SIDE INTERACTION TABS ---- */
+/* Positioning now handled by .rb-overlay--right-tabs in recipe_book.css */
+
+.bm-right-tabs-top,
+.bm-right-tabs-bottom {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.bm-right-tab {
+  width: 55px;
+  height: 35px;
+  background: var(--parchment-dark, #c4b48e);
+  color: var(--ink, #2c1810);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  clip-path: polygon(100% 0%, 30% 0%, 0% 50%, 30% 100%, 100% 100%);
+  transition: all 0.2s ease;
+  filter: brightness(0.95);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.bm-right-tab:hover {
+  transform: translateX(4px);
+  filter: brightness(1);
+}
+
+.bm-right-tab.active {
+  background: var(--crimson, #8b1a1a);
+  color: white;
+  filter: brightness(1.1);
+}
+
+.bm-right-tab-count {
+  font-size: 9px;
+  font-weight: 700;
+  margin-top: 2px;
+  opacity: 0.7;
+}
+
+/* ---- RESPONSIVE: small heights ---- */
+@media (max-height: 750px) {
+  .bm-bottom-left, .bm-bottom { width: 26px; height: 50px; padding-top: 10px; }
+  .bm-bottom-left:hover, .bm-bottom:hover { height: 56px; }
+  .bm-bottom-left.active, .bm-bottom.active { height: 62px; }
+}
+
+/* ---- RESPONSIVE: mobile ---- */
+@media (max-width: 899px) {
+  .bm-bottom-group,
+  .bm-bottom-group-left,
+  .bm-right-tabs-wrapper {
+    display: none;
+  }
+}

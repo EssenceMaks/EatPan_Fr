@@ -1,0 +1,43 @@
+/* =============================================
+   UI KIT: Arc Tab Group
+   ============================================= */
+
+.arc-tab-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.arc-tab-button {
+  background: transparent;
+  border: none;
+  font-family: var(--font-title, 'Noto Serif', serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink, #2c1810);
+  text-transform: uppercase;
+  padding: 4px 8px;
+  position: relative;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.arc-tab-button:hover {
+  color: var(--brand-red, #8b1a1a);
+}
+
+.arc-tab-button.active {
+  color: var(--brand-red, #8b1a1a);
+}
+
+.arc-tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--brand-red, #8b1a1a);
+  border-radius: 2px;
+}

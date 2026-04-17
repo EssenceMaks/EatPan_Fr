@@ -1,0 +1,35 @@
+/* =============================================
+   ARC DESIGN SYSTEM — SigilDiamond
+   Rotated diamond icon: hollow, filled
+   ============================================= */
+
+.arc-sigil-diamond {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #4a3525, #2a1b10);
+  border: 2px solid var(--gold-dark);
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.arc-sigil-diamond svg {
+  transform: rotate(-45deg);
+  color: var(--gold-base);
+  transition: all 0.2s;
+}
+
+.arc-sigil-diamond--filled svg {
+  fill: var(--gold-light);
+  stroke: none;
+  transform: rotate(-45deg) scale(1.6) translateY(-2px);
+  filter: drop-shadow(0px 5px 0px var(--gold-dark)) drop-shadow(0px 8px 4px rgba(0, 0, 0, 0.8));
+}
+
+.arc-sigil-diamond:active {
+  transform: rotate(45deg) scale(0.95);
+}

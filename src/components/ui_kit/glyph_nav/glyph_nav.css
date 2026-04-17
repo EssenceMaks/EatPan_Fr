@@ -1,0 +1,42 @@
+/* =============================================
+   ARC DESIGN SYSTEM — GlyphNav
+   Navigation button row (bottom nav style)
+   ============================================= */
+
+.arc-glyph-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: linear-gradient(to bottom, #3a2212, #1f1108);
+  border: 2px solid var(--gold-dark);
+  border-radius: 6px;
+  padding: 8px 6px;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.arc-glyph-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.1s;
+  color: var(--gold-base);
+  padding: 4px 8px;
+}
+
+.arc-glyph-nav__item:active {
+  transform: scale(0.9);
+}
+
+.arc-glyph-nav__item--active {
+  color: var(--gold-light);
+}
+
+.arc-glyph-nav__label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

@@ -1,0 +1,5 @@
+export const APP_CONFIG = {
+  SUPABASE_URL: '',
+  SUPABASE_ANON_KEY: '',
+  GOOGLE_CLIENT_ID: ''
+};

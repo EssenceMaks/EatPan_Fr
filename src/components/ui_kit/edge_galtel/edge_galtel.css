@@ -1,0 +1,24 @@
+/* =============================================
+   ARC DESIGN SYSTEM — EdgeGaltel
+   Decorative horizontal bar separator
+   Variants: gold, parchment, theme
+   ============================================= */
+
+.arc-edge-galtel {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.arc-edge-galtel--gold {
+  background: linear-gradient(to right, var(--gold-dark), var(--gold-light), var(--gold-dark));
+}
+
+.arc-edge-galtel--parchment {
+  background: linear-gradient(to right, var(--parchment-dark), var(--parchment-light), var(--parchment-dark));
+}
+
+.arc-edge-galtel--theme {
+  background: linear-gradient(to right, var(--t-color-bottom, #0d3644), var(--t-color-glare, #298d9e), var(--t-color-bottom, #0d3644));
+}

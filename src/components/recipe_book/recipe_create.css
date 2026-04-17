@@ -1,0 +1,353 @@
+/* =============================================
+   RECIPE CREATE FORM — Right Page Content
+   ============================================= */
+
+/* Container — fills the right page, no overlay/absolute */
+.rcf-right-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.rcf-title {
+  font-family: var(--font-title, serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--crimson, #8b1a1a);
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.rcf-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--ink, #2c1810);
+  transition: background 0.2s;
+}
+
+.rcf-close:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.rcf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Photo upload area (placeholder) */
+.rcf-photo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px 12px;
+  border: 2px dashed rgba(128, 85, 51, 0.25);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  margin-bottom: 8px;
+}
+
+.rcf-photo-area:hover {
+  opacity: 0.9;
+}
+
+.rcf-photo-label {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink, #2c1810);
+}
+
+.rcf-photo-hint {
+  font-size: 0.7rem;
+  color: var(--ink, #2c1810);
+  opacity: 0.5;
+  font-style: italic;
+}
+
+/* Inputs */
+.rcf-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(128, 85, 51, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.85rem;
+  color: var(--ink, #2c1810);
+  transition: border-color 0.2s;
+}
+
+.rcf-input:focus {
+  outline: none;
+  border-color: var(--crimson, #8b1a1a);
+}
+
+.rcf-input--title {
+  font-family: var(--font-title, serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Section titles */
+.rcf-section-title {
+  font-family: var(--font-title, serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink, #2c1810);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 12px;
+  margin-bottom: 2px;
+}
+
+/* Category grid */
+.rcf-cat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rcf-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink, #2c1810);
+  background: rgba(128, 85, 51, 0.06);
+  border: 1px solid rgba(128, 85, 51, 0.15);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.rcf-cat-btn:hover {
+  background: rgba(128, 85, 51, 0.12);
+}
+
+.rcf-cat-btn.active {
+  background: var(--crimson, #8b1a1a);
+  color: white;
+  border-color: var(--crimson, #8b1a1a);
+}
+
+/* Stats row */
+.rcf-stats-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.rcf-stat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink, #2c1810);
+}
+
+.rcf-stat input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid rgba(128, 85, 51, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+
+.rcf-stat input:focus {
+  outline: none;
+  border-color: var(--crimson);
+}
+
+/* Ingredient rows */
+.rcf-ing-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.rcf-ing-name {
+  flex: 2;
+  padding: 6px 8px;
+  border: 1px solid rgba(128, 85, 51, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+
+.rcf-ing-amount {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid rgba(128, 85, 51, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+
+.rcf-ing-name:focus,
+.rcf-ing-amount:focus {
+  outline: none;
+  border-color: var(--crimson);
+}
+
+.rcf-remove-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--crimson, #8b1a1a);
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.rcf-remove-btn:hover {
+  opacity: 1;
+}
+
+.rcf-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--crimson, #8b1a1a);
+  padding: 4px 0;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.rcf-add-btn:hover {
+  opacity: 0.7;
+}
+
+/* Step rows */
+.rcf-step-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.rcf-step-num {
+  font-family: var(--font-title, serif);
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--crimson, #8b1a1a);
+  opacity: 0.2;
+  line-height: 1;
+  min-width: 24px;
+  padding-top: 4px;
+}
+
+.rcf-step-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rcf-step-fields input,
+.rcf-step-fields textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid rgba(128, 85, 51, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  color: var(--ink);
+  font-family: var(--font-body, sans-serif);
+  resize: vertical;
+}
+
+.rcf-step-fields input:focus,
+.rcf-step-fields textarea:focus {
+  outline: none;
+  border-color: var(--crimson);
+}
+
+.rcf-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(128, 85, 51, 0.2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  color: var(--ink);
+  font-family: var(--font-body, sans-serif);
+  resize: vertical;
+}
+
+.rcf-textarea:focus {
+  outline: none;
+  border-color: var(--crimson);
+}
+
+/* Actions row */
+.rcf-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.rcf-cancel-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink, #2c1810);
+  background: rgba(128, 85, 51, 0.08);
+  border: 1px solid rgba(128, 85, 51, 0.15);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rcf-cancel-btn:hover {
+  background: rgba(128, 85, 51, 0.15);
+}
+
+.rcf-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Spin animation for loader icon */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

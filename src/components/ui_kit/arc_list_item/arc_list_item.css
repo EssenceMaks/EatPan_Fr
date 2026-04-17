@@ -1,0 +1,74 @@
+/* =============================================
+   UI KIT: Arc List Item (Accordion Flat Lists)
+   ============================================= */
+
+.arc-list-group {
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(var(--wood-dark-rgb, 26, 21, 16), 0.1);
+}
+
+.arc-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 8px;
+  font-family: var(--font-title, 'Noto Serif', serif);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ink, #2c1810);
+  cursor: pointer;
+  transition: background 0.2s;
+  user-select: none;
+}
+
+.arc-list-header:hover {
+  background: rgba(var(--wood-dark-rgb, 26, 21, 16), 0.05);
+}
+
+.arc-list-header-chevron {
+  opacity: 0.5;
+  transition: transform 0.3s;
+}
+
+.arc-list-header.open .arc-list-header-chevron {
+  transform: rotate(180deg);
+}
+
+.arc-list-items {
+  display: grid;
+  padding: 8px 0 16px;
+  /* Hide by default using standard display toggle in JS */
+}
+
+.arc-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-body, 'Work Sans', sans-serif);
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--ink, #2c1810);
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+}
+
+.arc-list-item:hover {
+  background: rgba(var(--wood-dark-rgb, 26, 21, 16), 0.04);
+  transform: translateX(4px);
+  border-left-color: var(--brand-red, #8b1a1a);
+}
+
+.arc-list-item-bullet {
+  color: var(--brand-red, #8b1a1a);
+  margin-right: 12px;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.arc-list-item-text {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

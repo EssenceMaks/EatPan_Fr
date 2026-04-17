@@ -1,0 +1,378 @@
+/* =============================================
+   EATPAN FRONTEND v2 — LAYOUT
+   Grid structure, layers, sector cards
+   Header always visible, footer mobile-only
+   ============================================= */
+
+/* ---- APP SHELL ---- */
+#app {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  display: grid;
+  /* Default: header + content + footer (footer hidden on desktop via responsive) */
+  grid-template-rows: var(--header-height) 1fr auto;
+}
+
+/* ---- HEADER BAR (always visible) ---- */
+#app-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0 12px;
+  z-index: 200;
+  position: relative;
+  min-height: var(--header-height);
+}
+
+#app-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#app-header .header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#app-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Clock in header — centered */
+.header-clock-display {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--text-accent);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  user-select: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: background var(--transition-fast);
+}
+
+.header-clock-display:hover {
+  background: rgba(var(--gold-rgb), 0.08);
+}
+
+/* ---- MAIN CONTENT ---- */
+#main-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* ---- FOOTER BAR (mobile only — hidden on desktop via responsive) ---- */
+#app-footer {
+  z-index: 200;
+  position: relative;
+  padding: 6px 12px;
+  min-height: 0;
+}
+
+.footer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* FAB (floating action button) style */
+.footer-fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  color: var(--text-on-dark);
+  transition: transform var(--transition-fast), opacity var(--transition-fast), background var(--transition-fast);
+  box-shadow: var(--emboss-border);
+  background: rgba(var(--gold-rgb), 0.15);
+  border: 1px solid rgba(var(--gold-rgb), 0.2);
+}
+
+.footer-fab:hover {
+  background: rgba(var(--gold-rgb), 0.25);
+  transform: scale(1.05);
+}
+
+.footer-fab:active {
+  transform: scale(0.95);
+}
+
+/* Back button transition — starts collapsed */
+.fab-back {
+  width: 0 !important;
+  opacity: 0;
+  padding: 0 !important;
+  border: none !important;
+  margin-left: 0;
+  transform: translateX(20px) scale(0.8);
+  pointer-events: none;
+  overflow: hidden;
+  transition: all 0.3s var(--ease-out-expo);
+}
+
+body.active-mode .fab-back {
+  width: 40px !important;
+  opacity: 1;
+  border: 1px solid rgba(var(--gold-rgb), 0.2) !important;
+  margin-left: 8px;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
+}
+
+/* header icons are 36px and borderless */
+body.active-mode .header-icon-btn.fab-back {
+  width: 36px !important;
+  border: none !important;
+  opacity: 0.7 !important;
+  background: transparent !important;
+}
+body.active-mode .header-icon-btn.fab-back:hover {
+  opacity: 1 !important;
+  background: rgba(var(--gold-rgb), 0.1) !important;
+}
+
+/* ---- DESKTOP ONLY utility ---- */
+.desktop-only { display: none; }
+
+/* ---- SECTOR CAROUSEL ---- */
+#sector-carousel {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+  padding: 8px;
+  gap: 8px;
+  scroll-behavior: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+#sector-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+#sector-carousel.snapping {
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+
+/* ---- SECTOR CARD ---- */
+.sector-card {
+  flex: 0 0 calc(100% - 44px);
+  max-width: calc(100% - 44px);
+  height: 100%;
+  border-radius: var(--sector-border-radius);
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.4s var(--ease-out-expo);
+  cursor: pointer;
+
+  /* RPG Card styling */
+  background: var(--bg-sector-card);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+/* Preview state (carousel view) */
+.sector-card .sector-preview,
+.wedge-block .sector-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+
+.sector-card .sector-preview .sector-icon {
+  font-size: 2.5rem;
+  opacity: 0.7;
+}
+
+.sector-card .sector-preview .sector-title,
+.wedge-block .sector-preview .sector-title {
+  font-family: var(--font-title);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sector-card .sector-preview .sector-subtitle {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  font-style: italic;
+  font-family: var(--font-title);
+}
+
+/* Sector/Wedge inner content (hidden when not active) */
+.sector-card .sector-content,
+.wedge-block .sector-content {
+  display: none;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.15s;
+  user-select: text;
+}
+
+/* ---- ACTIVE SECTOR / WEDGE ---- */
+.sector-card.active,
+.wedge-block.active {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  flex: none;
+  max-width: none;
+  width: auto;
+  height: auto;
+  border-radius: var(--sector-border-radius);
+  margin: 0;
+  z-index: var(--sector-z);
+  cursor: default;
+  background: var(--bg-sector-active);
+  justify-content: flex-start;
+  overflow-y: auto;
+  border: var(--card-border);
+  box-shadow: none;
+}
+
+/* Hide preview when active — belt-and-suspenders approach */
+.sector-card.active > .sector-preview,
+.wedge-block.active > .sector-preview,
+#clock-wedge.active > .sector-preview,
+#profile-wedge.active > .sector-preview,
+#auth-wedge.active > .sector-preview {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.sector-card.active .sector-content,
+.wedge-block.active .sector-content {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+}
+
+/* Hide ALL non-active blocks when one is active */
+body.active-mode #sector-carousel {
+  overflow-x: hidden;
+}
+
+body.active-mode .sector-card:not(.active),
+body.active-mode .wedge-block:not(.active) {
+  display: none !important;
+}
+
+/* ---- WEDGE BLOCKS (Clock, Profile, Auth) ---- */
+.wedge-block {
+  flex: 0 0 calc(100% - 44px);
+  max-width: calc(100% - 44px);
+  height: 100%;
+  border-radius: var(--sector-border-radius);
+  scroll-snap-align: center;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.4s var(--ease-out-expo);
+
+  background: var(--bg-sector-card);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.wedge-block.visible {
+  display: flex;
+}
+
+/* ---- MENU OVERLAY ---- */
+#menu-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--overlay-z);
+  background: var(--bg-menu-overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-in-out);
+}
+
+#menu-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---- ORNATE CARD CORNERS ---- */
+.sector-card::before,
+.sector-card::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(var(--gold-rgb), 0.2);
+  pointer-events: none;
+  z-index: 2;
+  transition: border-color 0.3s;
+}
+
+.sector-card::before {
+  top: 6px; left: 6px;
+  border-right: none; border-bottom: none;
+  border-radius: 3px 0 0 0;
+}
+
+.sector-card::after {
+  bottom: 6px; right: 6px;
+  border-left: none; border-top: none;
+  border-radius: 0 0 3px 0;
+}
+
+.sector-card:hover::before,
+.sector-card:hover::after {
+  border-color: rgba(var(--gold-rgb), 0.4);
+}

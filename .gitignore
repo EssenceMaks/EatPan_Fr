@@ -19,10 +19,16 @@ _archive/
 # Other folders
 audio/
 
-
 # AI Agents & Figma Tooling
 Figma_EatPan_Antigravity/
 figma_uikit_generator.js
 .agents/rules/sync_with_figma.md
 docs/changelogs/figma_changelog.md
 docs/changelogs/figma_validation.md
+
+# Test Scripts
+*_test_*.py
+*_debug_*.py
+scratch_*.js
+scratch_*.css
+recipe_sample.json

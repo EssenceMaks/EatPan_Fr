@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy RPG UI</title>
+
+    <!-- Подключение фэнтезийных шрифтов -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Подключение иконок Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* =========================================
+           CSS ПЕРЕМЕННЫЕ (Глобальная настройка темы)
+           ========================================= */
+        :root {
+            /* Базовые цвета фона */
+            --bg-main: #14110f;
+            --bg-panel-dark: #1e2124;
+
+            /* Золотые оттенки для рамочек */
+            --gold-light: #f5d58c;
+            --gold-base: #c19b54;
+            --gold-dark: #6b511e;
+            --gold-shadow: #3a2a0d;
+
+            /* Цвета кобальтовых/бирюзовых кнопок */
+            --btn-cobalt-top-glare: #298d9e;
+            --btn-cobalt-top: #1f677a;
+            --btn-cobalt-mid: #154c5e;
+            --btn-cobalt-bottom: #0d3644;
+
+            /* Цвета пергамента (старой бумаги) */
+            --parchment-light: #e3c792;
+            --parchment-base: #c89e5d;
+            --parchment-dark: #9e7539;
+
+            /* Цвета прогресс-баров */
+            --bar-stamina: #2a87a8;
+            --bar-exp: #b54924;
+            --bar-bg: #0f0d0c;
+
+            /* Шрифты */
+            --font-title: 'Cinzel', serif;
+            --font-text: 'Merriweather', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            font-family: var(--font-text);
+            color: #fff;
+            padding: 10px;
+        }
+
+        /* Главный контейнер приложения (имитация экрана телефона) */
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background-color: var(--bg-main);
+            background-image:
+                radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%),
+                repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2) 0px, rgba(0, 0, 0, 0.2) 2px, transparent 2px, transparent 4px);
+            border: 4px solid var(--gold-dark);
+            box-shadow:
+                inset 0 0 20px #000,
+                0 0 15px rgba(193, 155, 84, 0.2),
+                0 0 0 1px var(--gold-base);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-bottom: 20px;
+        }
+
+        /* =========================================
+           ВЕРХНЯЯ ПАНЕЛЬ (Ресурсы и Аватар)
+           ========================================= */
+        .top-bar-container {
+            background: linear-gradient(to bottom, var(--gold-dark), #2a1f0d);
+            padding: 4px;
+            border-bottom: 2px solid var(--gold-base);
+        }
+
+        .top-bar-parchment {
+            background: linear-gradient(135deg, var(--parchment-light), var(--parchment-base), var(--parchment-dark));
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--gold-shadow);
+            padding: 8px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .avatar-box {
+            width: 70px;
+            height: 70px;
+            border: 2px solid var(--gold-base);
+            box-shadow: 0 0 5px #000;
+            background-color: #333;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Заглушка, если нет картинки */
+            background: radial-gradient(circle, #555, #222);
+        }
+
+        .stats-col {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(107, 81, 30, 0.6);
+            padding: 2px 6px;
+            border-radius: 2px;
+            box-shadow: inset 0 1px 3px #000;
+        }
+
+        .stat-label {
+            font-family: var(--font-title);
+            font-size: 10px;
+            color: var(--bg-main);
+            font-weight: 700;
+            text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.5px;
+            width: 60px;
+        }
+
+        .bar-container {
+            flex-grow: 1;
+            height: 8px;
+            background-color: var(--bar-bg);
+            border: 1px solid #000;
+            margin: 0 8px;
+            position: relative;
+            box-shadow: inset 0 1px 2px #000;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 50%;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+
+        .bar-stamina .bar-fill {
+            background-color: var(--bar-stamina);
+            width: 80%;
+        }
+
+        .bar-exp .bar-fill {
+            background-color: var(--bar-exp);
+            width: 35%;
+        }
+
+        .stat-value {
+            font-family: var(--font-title);
+            font-size: 11px;
+            color: #fff;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .resource-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 3px 8px;
+            border: 1px solid var(--gold-dark);
+            border-radius: 15px;
+            box-shadow: inset 0 1px 4px #000;
+        }
+
+        .resource-icon {
+            color: var(--gold-light);
+            width: 14px;
+            height: 14px;
+        }
+
+        /* =========================================
+           МОДАЛЬНОЕ ОКНО (Пергамент + Темный фон)
+           ========================================= */
+        .dialog-container {
+            margin: 0 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.8));
+        }
+
+        .dialog-header {
+            background: linear-gradient(to bottom, var(--parchment-light), var(--parchment-base));
+            border: 2px solid var(--gold-dark);
+            border-bottom: none;
+            padding: 20px 15px;
+            text-align: center;
+            color: #2b1a08;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: inset 0 0 20px rgba(107, 81, 30, 0.4);
+            position: relative;
+        }
+
+        /* Декоративные уголки для пергамента */
+        .dialog-header::before,
+        .dialog-header::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            width: 15px;
+            height: 15px;
+            border-top: 2px solid var(--gold-base);
+        }
+
+        .dialog-header::before {
+            left: 2px;
+            border-left: 2px solid var(--gold-base);
+        }
+
+        .dialog-header::after {
+            right: 2px;
+            border-right: 2px solid var(--gold-base);
+        }
+
+        .dialog-header strong {
+            font-family: var(--font-title);
+            font-size: 16px;
+            display: block;
+            margin-bottom: 5px;
+            color: #1a0f04;
+        }
+
+        /* =========================================
+           КНОПКИ (Кобальтовый стиль с рамками)
+           ========================================= */
+        .btn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px 0;
+        }
+
+        .btn-cobalt {
+            /* Формируем эффект выпуклой рамочки: 
+               1. Внешний золотой бордер
+               2. Внутренняя тень (светлая сверху, темная снизу) создает эффект скоса (bevel)
+            */
+            border: 2px solid var(--gold-base);
+            border-top-color: var(--gold-light);
+            border-bottom-color: var(--gold-dark);
+
+            /* Сложный градиент для создания "стеклянного" цилиндрического объема */
+            background: linear-gradient(to bottom,
+                    var(--btn-cobalt-top-glare) 0%,
+                    var(--btn-cobalt-top) 15%,
+                    var(--btn-cobalt-mid) 50%,
+                    var(--btn-cobalt-bottom) 100%);
+
+            color: var(--gold-light);
+            font-family: var(--font-title);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px #000;
+            padding: 12px 10px;
+            cursor: pointer;
+            position: relative;
+            text-align: center;
+            text-decoration: none;
+
+            /* Тенюшки: Внешняя тень + Внутренние блики */
+            box-shadow:
+                0 4px 6px rgba(0, 0, 0, 0.6),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                /* Верхний блик внутри кнопки */
+                inset 0 -2px 5px rgba(0, 0, 0, 0.6);
+            /* Нижняя тень внутри кнопки */
+
+            transition: all 0.1s ease-in-out;
+        }
+
+        /* Декоративные элементы внутри кнопки (ромбики по краям) */
+        .btn-cobalt::before,
+        .btn-cobalt::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+            width: 6px;
+            height: 6px;
+            background-color: var(--gold-light);
+            box-shadow: 1px 1px 2px #000;
+        }
+
+        .btn-cobalt::before {
+            left: 10px;
+        }
+
+        .btn-cobalt::after {
+            right: 10px;
+        }
+
+        /* Эффект нажатия */
+        .btn-cobalt:active {
+            transform: translateY(2px);
+            background: linear-gradient(to bottom, var(--btn-cobalt-mid), var(--btn-cobalt-bottom));
+            box-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.8),
+                inset 0 3px 8px rgba(0, 0, 0, 0.8);
+            border-top-color: var(--gold-dark);
+        }
+
+        /* Маленькие кнопки навигации (Назад/Далее) */
+        .nav-buttons-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 15px;
+            margin-top: auto;
+        }
+
+        .btn-gold-small {
+            background: linear-gradient(to bottom, var(--parchment-base), var(--parchment-dark));
+            border: 2px solid #3a2a0d;
+            color: #fff;
+            font-family: var(--font-title);
+            font-size: 12px;
+            padding: 8px 15px;
+            cursor: pointer;
+            text-shadow: 1px 1px 1px #000;
+            box-shadow:
+                inset 0 0 5px rgba(255, 255, 255, 0.2),
+                inset 0 0 0 1px var(--gold-base),
+                0 3px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-gold-small:active {
+            transform: translateY(2px);
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.8);
+        }
+
+        /* =========================================
+           НИЖНЯЯ ПАНЕЛЬ ИКОНОК (Круглые кнопки)
+           ========================================= */
+        .bottom-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px 10px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            margin-top: 10px;
+        }
+
+        .circle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            /* Сложная рамка с бликом для круглых кнопок */
+            border: 3px solid var(--gold-base);
+            border-top-color: var(--gold-light);
+            border-bottom-color: var(--gold-dark);
+
+            background: radial-gradient(circle at 50% 30%, var(--btn-cobalt-top-glare), var(--btn-cobalt-mid) 60%, var(--btn-cobalt-bottom));
+
+            box-shadow:
+                0 5px 10px rgba(0, 0, 0, 0.7),
+                inset 0 0 15px rgba(0, 0, 0, 0.6),
+                inset 0 2px 4px rgba(255, 255, 255, 0.4);
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--gold-light);
+            transition: all 0.1s;
+        }
+
+        .circle-btn i {
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.8));
+            margin-bottom: 2px;
+        }
+
+        .circle-btn span {
+            font-family: var(--font-title);
+            font-size: 8px;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 1px #000;
+        }
+
+        .circle-btn:active {
+            transform: scale(0.95);
+            background: radial-gradient(circle at 50% 50%, var(--btn-cobalt-mid), var(--btn-cobalt-bottom));
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.8),
+                inset 0 4px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Декоративный разделитель */
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px 0;
+            opacity: 0.7;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            height: 1px;
+            width: 30%;
+            background: linear-gradient(to right, transparent, var(--gold-base), transparent);
+        }
+
+        .divider i {
+            color: var(--gold-base);
+            margin: 0 10px;
+            width: 12px;
+            height: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- Верхняя панель (Header) -->
+        <div class="top-bar-container">
+            <div class="top-bar-parchment">
+                <div class="avatar-box">
+                    <!-- Заглушка изображения -->
+                    <div
+                        style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="user" style="color: #ccc; width: 32px; height: 32px;"></i>
+                    </div>
+                </div>
+
+                <div class="stats-col">
+                    <div style="display: flex; gap: 10px;">
+                        <!-- Полоски прогресса -->
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <div class="stat-row bar-stamina">
+                                <span class="stat-label">ВЫНОСЛ.</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill"></div>
+                                </div>
+                                <span class="stat-value">254</span>
+                            </div>
+                            <div class="stat-row bar-exp">
+                                <span class="stat-label">ОПЫТ</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill"></div>
+                                </div>
+                                <span class="stat-value">35</span>
+                            </div>
+                        </div>
+
+                        <!-- Ресурсы -->
+                        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 85px;">
+                            <div class="resource-row">
+                                <i data-lucide="circle-dollar-sign" class="resource-icon"></i>
+                                <span class="stat-value">4545</span>
+                            </div>
+                            <div class="resource-row">
+                                <i data-lucide="gem" class="resource-icon" style="color: #63dcf2;"></i>
+                                <span class="stat-value">5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"><i data-lucide="diamond"></i></div>
+
+        <!-- Центральное диалоговое окно (Parchment Box) -->
+        <div class="dialog-container">
+            <div class="dialog-header">
+                <strong>СЮЖЕТНЫЙ КВЕСТ</strong>
+                Командир, у нас сообщения о монстрах на тракте!<br>
+                Давайте поможем этим бедным жителям деревни!
+            </div>
+
+            <!-- Темная подложка для кнопок, если требуется (как на скриншотах), 
+                 здесь используем общий фон, но кнопки стилизованы -->
+            <div class="btn-list">
+                <div class="btn-cobalt">ЕСЛИ ПРИДЕТСЯ</div>
+                <div class="btn-cobalt">НАДЕЮСЬ, У НИХ ЕСТЬ ЗОЛОТО</div>
+                <div class="btn-cobalt">ВПЕРЕД! СДЕЛАЕМ ЭТО!</div>
+            </div>
+        </div>
+
+        <!-- Навигация "Назад/Вперед" -->
+        <div class="nav-buttons-row">
+            <button class="btn-gold-small">НАЗАД</button>
+            <button class="btn-gold-small">ДАЛЕЕ</button>
+        </div>
+
+        <!-- Нижняя панель с круглыми кнопками -->
+        <div class="bottom-nav">
+            <div class="circle-btn">
+                <i data-lucide="swords" stroke-width="1.5"></i>
+                <span>КВЕСТЫ</span>
+            </div>
+            <div class="circle-btn">
+                <i data-lucide="shield" stroke-width="1.5"></i>
+                <span>ОТРЯД</span>
+            </div>
+            <div class="circle-btn">
+                <i data-lucide="treasure-chest" stroke-width="1.5"></i>
+                <span>ВЕЩИ</span>
+            </div>
+            <div class="circle-btn">
+                <i data-lucide="settings" stroke-width="1.5"></i>
+                <span>ОПЦИИ</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Инициализация иконок Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

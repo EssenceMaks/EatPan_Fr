@@ -1,0 +1,514 @@
+/* =============================================
+   EATPAN - RECIPE VIEW COMPONENT
+   ============================================= */
+
+.recipe-view-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  /* bounds absolutely positioned children */
+}
+
+
+
+/* -------------------------------------------
+   CENTAUR GALLERY (2/5 Height)
+   ------------------------------------------- */
+.centaur-gallery {
+  position: relative;
+  /* Approximately 2/5 of a standard 800px high book -> ~320px */
+  height: 35vh;
+  min-height: 250px;
+  max-height: 400px;
+  width: 100%;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+}
+
+/* Individual photo wrapper to allow transforms */
+.gallery-photo {
+  position: absolute;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  /* The "border" looks like an old picture frame */
+  border: 3px solid #fff;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  background-color: #333;
+  /* Placeholder color before img loads */
+}
+
+.gallery-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Center / Main photo */
+.gallery-photo.main {
+  width: 55%;
+  height: 90%;
+  z-index: 3;
+  transform: translateZ(0);
+}
+
+/* Side photos layered behind */
+.gallery-photo.side-left {
+  width: 45%;
+  height: 75%;
+  left: 5%;
+  z-index: 1;
+  transform: rotate(-4deg) translateZ(-50px);
+  filter: brightness(0.6);
+}
+
+.gallery-photo.side-right {
+  width: 45%;
+  height: 75%;
+  right: 5%;
+  z-index: 2;
+  transform: rotate(3deg) translateZ(-30px);
+  filter: brightness(0.8);
+}
+
+/* -------------------------------------------
+   INGREDIENTS GRID
+   ------------------------------------------- */
+.ingredients-section h3 {
+  font-family: var(--font-title, 'Noto Serif', serif);
+  color: var(--ink, #2c1810);
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+  /* border-bottom: 1px dashed rgba(0, 0, 0, 0.1); */
+  padding-bottom: 8px;
+}
+
+.ingredients-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+/* Single Ingredient Card */
+.ing-card {
+  flex: 1 1 200px;
+  min-width: fit-content;
+  max-width: 230px;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  /* 2 columns: Icon, Details */
+  grid-template-rows: auto auto;
+  /* 2 rows */
+  gap: 4px 12px;
+  padding: 8px 0;
+  /* Remove horizontal padding since no bg */
+  background: transparent;
+  /* Remove background */
+  border: none;
+  box-shadow: none;
+  align-items: center;
+  overflow: hidden;
+  /* For text truncation */
+}
+
+/* Icon spanning rows 1 to 2, col 1 */
+.ing-icon-wrapper {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  /* No background */
+  border: none;
+  /* No border for transparency */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink, #2c1810);
+  /* Keep icon dark */
+  box-shadow: none;
+}
+
+.ing-icon-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* The name is top, spanning col 2 */
+.ing-name {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  font-family: var(--font-title, serif);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--ink, #2c1810);
+  margin: 0;
+  align-self: end;
+  text-align: left;
+  /* Truncation rules */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* The amounts are bottom row, col 2 */
+.ing-amounts {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  align-self: start;
+}
+
+.ing-required-amount {
+  color: #555;
+  font-weight: 500;
+}
+
+.separator {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+.status-ok {
+  color: #16a34a;
+  /* Tailwind green-600 */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-missing {
+  color: #6b7280;
+  /* Gray for zeros */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-missing svg {
+  stroke: #ef4444;
+  /* Red icon for empty/zero */
+}
+
+.status-missing.warning {
+  color: #6b7280;
+  /* Gray for text */
+}
+
+.status-missing.warning svg {
+  stroke: #fb923c;
+  /* Orange icon for partial */
+}
+
+/* -------------------------------------------
+   PREPARATION STEPS ACCORDION
+   ------------------------------------------- */
+.prep-steps-accordion {
+  margin-top: 16px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  padding-top: 12px;
+}
+
+.prep-steps-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: opacity 0.2s;
+}
+
+.prep-steps-header:hover {
+  opacity: 0.8;
+}
+
+/* Diamond Runic Toggle Button */
+.prep-steps-diamond-btn {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--gold-light, #e8cc6e);
+  background: linear-gradient(to bottom, var(--gold, #c5a044), var(--gold-dark, #8b6914));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transform: rotate(0deg);
+}
+
+.prep-steps-diamond-btn:hover {
+  border-color: var(--gold, #c5a044);
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Rotated to diamond when open */
+.prep-steps-diamond-btn.is-open {
+  transform: rotate(45deg);
+  background: linear-gradient(to bottom, #298d9e, #0d3644);
+  border-color: var(--gold-light, #e8cc6e);
+}
+
+.prep-steps-diamond-btn.is-open i {
+  transform: rotate(-45deg);
+}
+
+/* -------------------------------------------
+   ACTION BUTTONS (legacy, kept for compat)
+   ------------------------------------------- */
+.recipe-actions-row {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: none;
+  /* Hidden — replaced by bookmark ribbons */
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  border-top: 2px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+}
+
+.recipe-actions-row button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* -------------------------------------------
+   INSTRUCTIONS VIEW
+   ------------------------------------------- */
+#recipe-instructions-mount {
+  overflow: hidden;
+  transition: max-height 0.7s ease-in-out, opacity 0.7s ease-in-out, padding 0.7s ease-in-out, margin 0.7s ease-in-out;
+}
+
+#recipe-instructions-mount.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+#recipe-instructions-mount.expanded {
+  max-height: 2000px;
+  opacity: 1;
+  padding-top: 0px;
+  margin-top: 24px;
+}
+
+.steps-main-title {
+  font-family: var(--font-title, 'Noto Serif', serif);
+  color: var(--ink, #2c1810);
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+  padding-bottom: 8px;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 8px;
+}
+
+.preparation-step-ribbon {
+  margin-bottom: 2px;
+  cursor: default;
+  display: block;
+  padding: 12px 15px;
+}
+
+.preparation-step-ribbon:active {
+  transform: none;
+}
+
+.arc-spark-ribbon.arc-spark-ribbon--outward.preparation-step-ribbon {
+  clip-path: none;
+}
+
+.preparation-step-ribbon::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.step-number-seal {
+  background: radial-gradient(circle, var(--wood-medium, #5c3c1e), var(--wood-dark, #2e1e0f)) !important;
+  transform: rotate(45deg);
+  border-radius: 2px !important;
+  float: left;
+  margin: 0 12px 4px 0;
+}
+
+.step-number-text {
+  transform: rotate(-45deg);
+  font-family: var(--font-title, serif);
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.step-text-content {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--ink, #2c1810);
+  display: block !important;
+  overflow: visible;
+  padding-right: 0;
+}
+
+/* -------------------------------------------
+   GALLERY PLACEHOLDERS
+   ------------------------------------------- */
+
+/* Shared base for both placeholder types */
+.gallery-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-body, sans-serif);
+  text-align: center;
+}
+
+/* Type B: Recipe has no photo — calm, neutral */
+.gallery-placeholder--no-photo {
+  background: linear-gradient(135deg, #d4c4a0 0%, #bfa87a 100%);
+  color: var(--ink, #2c1810);
+}
+
+.gallery-placeholder--no-photo span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.4;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Type A fallback: Local machine offline — muted alert */
+.gallery-placeholder--offline {
+  background: linear-gradient(135deg, #3a3028 0%, #2a2018 100%);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.gallery-placeholder--offline span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  opacity: 0.6;
+  line-height: 1.3;
+}
+
+/* -------------------------------------------
+   EXTRA RECIPE SECTIONS (Chef Secret & Serving)
+   ------------------------------------------- */
+.recipe-extra-section {
+  margin-top: 24px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--parchment-light, #f5eed5) 0%, var(--parchment-base, #f1eacc) 100%);
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  border-radius: 8px;
+  position: relative;
+}
+
+.recipe-extra-section::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--gold, #c5a044);
+  border-radius: 8px 0 0 8px;
+}
+
+.recipe-secret-section::before {
+  background: linear-gradient(to bottom, var(--gold, #c5a044), var(--gold-dark, #8b6914));
+}
+
+.recipe-serving-section::before {
+  background: linear-gradient(to bottom, #298d9e, #0d3644);
+}
+
+.recipe-extra-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.recipe-extra-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--gold-light, #e8cc6e), var(--gold, #c5a044));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink, #2c1810);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.recipe-secret-section .recipe-extra-icon {
+  background: radial-gradient(circle, #ffd700, #b8860b);
+  color: #5c3c1e;
+}
+
+.recipe-serving-section .recipe-extra-icon {
+  background: radial-gradient(circle, #298d9e, #0d3644);
+  color: #fff;
+}
+
+.recipe-extra-title {
+  font-family: var(--font-title, 'Noto Serif', serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink, #2c1810);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.recipe-extra-text {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink, #2c1810);
+  margin: 0;
+  padding-left: 42px;
+  font-style: italic;
+}

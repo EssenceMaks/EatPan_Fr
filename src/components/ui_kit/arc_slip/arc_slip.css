@@ -1,0 +1,37 @@
+/* =============================================
+   ARC DESIGN SYSTEM — ArcSlip
+   Paper slip for board (parchment clip-path)
+   ============================================= */
+
+.arc-slip {
+  background: linear-gradient(to right, var(--parchment-light), var(--parchment-base));
+  padding: 12px 15px;
+  color: #2b1a08;
+  font-family: 'Merriweather', serif;
+  font-size: 13px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(107, 81, 30, 0.3);
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.1s;
+  clip-path: polygon(0 0, 100% 0, 97% 50%, 100% 100%, 0 100%, 3% 50%);
+}
+
+.arc-slip:active { transform: scale(0.98); }
+
+.arc-slip__seal {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #a63232, #5a1a1a);
+  border: 1px solid #ff9999;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+}

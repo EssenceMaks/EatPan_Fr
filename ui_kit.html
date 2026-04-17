@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EatPan — Arc Design System</title>
+  <meta name="description" content="Arc Design System UI Kit — Arcanumtech component library for EatPan">
+
+  <!-- Google Fonts (same as main app) -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Work+Sans:wght@300;400;500;600;700&family=Cinzel:wght@400;600;700&family=Noto+Serif:wght@400;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap"
+    rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- ===== Design System Core ===== -->
+  <link rel="stylesheet" href="./src/styles/tokens.css">
+  <link rel="stylesheet" href="./src/styles/themes.css">
+
+  <!-- ===== Arc UI Kit — Atomic Components ===== -->
+  <link rel="stylesheet" href="./src/components/ui_kit/edge_divider/edge_divider.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/rune_title/rune_title.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/glyph_button/glyph_button.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/glyph_runic/glyph_runic.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/glyph_combo/glyph_combo.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/glyph_nav/glyph_nav.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/sigil_shield/sigil_shield.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/sigil_diamond/sigil_diamond.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/flux_stat_bar/flux_stat_bar.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/flux_segment_bar/flux_segment_bar.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/flux_progress_bar/flux_progress_bar.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/gear_slider/gear_slider.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/gear_input/gear_input.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/gear_dropdown/gear_dropdown.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/spark_ribbon/spark_ribbon.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/arc_slip/arc_slip.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/core_avatar/core_avatar.css">
+  <link rel="stylesheet" href="./src/components/ui_kit/edge_galtel/edge_galtel.css">
+
+  <!-- ===== Arc UI Kit — Composite Components ===== -->
+  <link rel="stylesheet" href="./src/components/arc_bento_header/arc_bento_header.css">
+  <link rel="stylesheet" href="./src/components/arc_topbar_parchment/arc_topbar_parchment.css">
+  <link rel="stylesheet" href="./src/components/arc_topbar_compact/arc_topbar_compact.css">
+  <link rel="stylesheet" href="./src/components/arc_dialog/arc_dialog.css">
+  <link rel="stylesheet" href="./src/components/arc_paper_board/arc_paper_board.css">
+  <link rel="stylesheet" href="./src/components/arc_popup/arc_popup.css">
+  <link rel="stylesheet" href="./src/components/arc_bento_header_full/arc_bento_header_full.css">
+
+  <style>
+    /* =============================================
+       UI KIT DASHBOARD — Page-level styles
+       NOT part of any component, only for this demo
+       ============================================= */
+
+    /* --- Dark theme vars for Blue/Red/Green --- */
+    .arc-dark-blue {
+      --t-color-glare: #298d9e;
+      --t-color-top: #1f677a;
+      --t-color-mid: #154c5e;
+      --t-color-bottom: #0d3644;
+      --t-glass-border: rgba(82, 194, 214, 0.35);
+    }
+
+    .arc-dark-red {
+      --t-color-glare: #d65656;
+      --t-color-top: #a63232;
+      --t-color-mid: #6b1919;
+      --t-color-bottom: #360808;
+      --t-glass-border: rgba(214, 82, 82, 0.35);
+    }
+
+    .arc-dark-green {
+      --t-color-glare: #70c456;
+      --t-color-top: #44912d;
+      --t-color-mid: #235714;
+      --t-color-bottom: #0f2908;
+      --t-glass-border: rgba(100, 214, 82, 0.35);
+    }
+
+    /* --- Overlay theme --t-color-* mappings (9 themes) --- */
+    /* Fantasy (default, no class) uses :root gold values */
+    body:not([class*="theme-"]) .arc-app-container:not([class*="arc-dark-"]) {
+      --t-color-glare: #c19b54;
+      --t-color-top: #a68040;
+      --t-color-mid: #8c6931;
+      --t-color-bottom: #3a2a0d;
+      --t-glass-border: rgba(193, 155, 84, 0.35);
+    }
+
+    body.theme-vintage .arc-app-container {
+      --t-color-glare: #8b2222;
+      --t-color-top: #7a1919;
+      --t-color-mid: #6b0d12;
+      --t-color-bottom: #3a0508;
+      --t-glass-border: rgba(139, 34, 34, 0.35);
+    }
+
+    body.theme-royal .arc-app-container {
+      --t-color-glare: #dfc080;
+      --t-color-top: #c5a059;
+      --t-color-mid: #9a7a3a;
+      --t-color-bottom: #5a4020;
+      --t-glass-border: rgba(197, 160, 89, 0.35);
+    }
+
+    body.theme-bronze .arc-app-container {
+      --t-color-glare: #e0a050;
+      --t-color-top: #cd7f32;
+      --t-color-mid: #9a5f24;
+      --t-color-bottom: #5a3518;
+      --t-glass-border: rgba(205, 127, 50, 0.35);
+    }
+
+    body.theme-silver .arc-app-container {
+      --t-color-glare: #c0c8d8;
+      --t-color-top: #a8b2c1;
+      --t-color-mid: #7a8494;
+      --t-color-bottom: #4a5060;
+      --t-glass-border: rgba(168, 178, 193, 0.35);
+    }
+
+    body.theme-neon .arc-app-container {
+      --t-color-glare: #60ffff;
+      --t-color-top: #00dddd;
+      --t-color-mid: #00aaaa;
+      --t-color-bottom: #005555;
+      --t-glass-border: rgba(0, 255, 255, 0.35);
+    }
+
+    body.theme-tangerine .arc-app-container {
+      --t-color-glare: #ffaa30;
+      --t-color-top: #ff8c00;
+      --t-color-mid: #cc7000;
+      --t-color-bottom: #804600;
+      --t-glass-border: rgba(255, 140, 0, 0.35);
+    }
+
+    body.theme-scroll .arc-app-container {
+      --t-color-glare: #a05820;
+      --t-color-top: #8b4513;
+      --t-color-mid: #6a340e;
+      --t-color-bottom: #452008;
+      --t-glass-border: rgba(139, 69, 19, 0.35);
+    }
+
+    body.theme-cyber .arc-app-container {
+      --t-color-glare: #70ff50;
+      --t-color-top: #39ff14;
+      --t-color-mid: #2acc10;
+      --t-color-bottom: #155a0a;
+      --t-glass-border: rgba(57, 255, 20, 0.35);
+    }
+
+    /* --- Reference color vars (always available via dark themes) --- */
+    :root {
+      --gold-base: #c19b54;
+      --gold-light: #fcebc4;
+      --gold-dark: #8c6931;
+      --gold-very-dark: #1a1205;
+      --gold-shadow: #3a2a0d;
+      --parchment-light: #e3c792;
+      --parchment-base: #c89e5d;
+      --parchment-dark: #9e7539;
+      --bar-stamina: #2a87a8;
+      --bar-exp: #b54924;
+      --bar-bg: #0f0d0c;
+      --bg-panel-dark: #1e2124;
+      --bg-main: #14110f;
+      --font-title-ref: 'Cinzel', serif;
+      --font-text-ref: 'Merriweather', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: #080808;
+      min-height: 100vh;
+      font-family: var(--font-text-ref);
+      color: #fff;
+      /* Enable horizontal scroll for the column grid */
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 10px;
+    }
+
+    /* --- Theme Switcher Panel --- */
+    .arc-theme-switcher {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 8px;
+      padding: 12px 16px;
+      background: #111;
+      border: 1px solid var(--gold-dark);
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+      position: fixed;
+      top: 8px;
+      left: 10px;
+      z-index: 100;
+      width: 92%;
+      margin-bottom: 16px;
+    }
+
+    .arc-theme-btn {
+      padding: 6px 4px;
+      font-family: var(--font-title-ref);
+      font-size: 9px;
+      font-weight: bold;
+      color: #fff;
+      border: 1px solid var(--gold-base);
+      border-radius: 6px;
+      cursor: pointer;
+      text-shadow: 1px 1px 2px #000;
+      text-align: center;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+
+    .arc-theme-btn:active {
+      transform: scale(0.95);
+    }
+
+    .arc-theme-btn.active {
+      box-shadow: 0 0 8px var(--gold-base), inset 0 0 4px rgba(255, 255, 255, 0.2);
+      border-color: var(--gold-light);
+    }
+
+    .arc-theme-btn.t-blue {
+      background: linear-gradient(to bottom, #1f677a, #0d3644);
+    }
+
+    .arc-theme-btn.t-red {
+      background: linear-gradient(to bottom, #a63232, #360808);
+    }
+
+    .arc-theme-btn.t-green {
+      background: linear-gradient(to bottom, #44912d, #0f2908);
+    }
+
+    .arc-theme-btn.t-fantasy {
+      background: linear-gradient(to bottom, #3a2d1c, #1a1510);
+    }
+
+    .arc-theme-btn.t-vintage {
+      background: linear-gradient(to bottom, #c4b48e, #eae2cc);
+      color: #2c1810;
+    }
+
+    .arc-theme-btn.t-royal {
+      background: linear-gradient(to bottom, #1a2030, #06080c);
+    }
+
+    .arc-theme-btn.t-bronze {
+      background: linear-gradient(to bottom, #3a2d20, #0f0d0c);
+    }
+
+    .arc-theme-btn.t-silver {
+      background: linear-gradient(to bottom, #251a38, #0a070f);
+    }
+
+    .arc-theme-btn.t-neon {
+      background: linear-gradient(to bottom, #0a0a2e, #030309);
+    }
+
+    .arc-theme-btn.t-tanger {
+      background: linear-gradient(to bottom, #3a3a3a, #121212);
+    }
+
+    .arc-theme-btn.t-scroll {
+      background: linear-gradient(to bottom, #b8a070, #bda27e);
+      color: #111;
+    }
+
+    .arc-theme-btn.t-cyber {
+      background: linear-gradient(to bottom, #222, #070707);
+    }
+
+    /* --- App Container — Flex Column Wrap layout --- */
+    .arc-app-container {
+      background-color: var(--bg-main);
+      background-image:
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%),
+        repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.2) 0px, rgba(0, 0, 0, 0.2) 2px, transparent 2px, transparent 4px);
+      border: 4px solid var(--gold-dark);
+      box-shadow: inset 0 0 20px #000, 0 0 15px rgba(193, 155, 84, 0.2), 0 0 0 1px var(--gold-base);
+      border-radius: 4px;
+      position: relative;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+
+      /* Flexbox Column Wrap Logic */
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 20px;
+      padding: 20px;
+      margin-top: 60px;
+      
+      /* Viewport-height bound — elements automatically wrap to next column */
+      height: calc(100vh - 80px);
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    /* On small screens: single column, vertical scroll */
+    @media (max-width: 500px) {
+      body {
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      .arc-theme-switcher {
+        position: sticky;
+        width: 100%;
+        top: 0;
+        z-index: 10;
+      }
+
+      .arc-app-container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        width: 100%;
+        height: auto;
+        overflow-y: visible;
+        margin-top: 0;
+        border: none;
+        box-shadow: none;
+      }
+      
+      .arc-kit-section {
+        width: 100% !important;
+      }
+    }
+
+    /* --- Section containers --- */
+    .arc-kit-section {
+      width: 440px; /* Fixed column width */
+      flex-shrink: 0; /* Prevent sections from being squished */
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+
+    .arc-kit-section-grid {
+      display: grid;
+      gap: 15px;
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== THEME SWITCHER (12 themes) ===== -->
+  <div class="arc-theme-switcher">
+    <button class="arc-theme-btn t-blue active" onclick="setTheme('arc-dark-blue', this)">BLUE</button>
+    <button class="arc-theme-btn t-red" onclick="setTheme('arc-dark-red', this)">RED</button>
+    <button class="arc-theme-btn t-green" onclick="setTheme('arc-dark-green', this)">GREEN</button>
+    <button class="arc-theme-btn t-fantasy" onclick="setTheme('', this)">FANTASY</button>
+    <button class="arc-theme-btn t-vintage" onclick="setTheme('theme-vintage', this)">VINTAGE</button>
+    <button class="arc-theme-btn t-royal" onclick="setTheme('theme-royal', this)">ROYAL</button>
+    <button class="arc-theme-btn t-bronze" onclick="setTheme('theme-bronze', this)">BRONZE</button>
+    <button class="arc-theme-btn t-silver" onclick="setTheme('theme-silver', this)">SILVER</button>
+    <button class="arc-theme-btn t-neon" onclick="setTheme('theme-neon', this)">NEON</button>
+    <button class="arc-theme-btn t-tanger" onclick="setTheme('theme-tangerine', this)">TANGERINE</button>
+    <button class="arc-theme-btn t-scroll" onclick="setTheme('theme-scroll', this)">SCROLL</button>
+    <button class="arc-theme-btn t-cyber" onclick="setTheme('theme-cyber', this)">CYBER</button>
+  </div>
+
+  <!-- ===== DEMO APP CONTAINER ===== -->
+  <div class="arc-app-container arc-dark-blue" id="arc-app">
+
+    <!-- Sections rendered by ui_kit_main.js -->
+    <div id="kit-section-dividers"></div>
+    <div id="kit-section-glyph-buttons"></div>
+    <div id="kit-section-glyph-runic"></div>
+    <div id="kit-section-glyph-combo"></div>
+    <div id="kit-section-sigils"></div>
+    <div id="kit-section-flux-bars"></div>
+    <div id="kit-section-flux-progress"></div>
+    <div id="kit-section-gear"></div>
+    <div id="kit-section-spark"></div>
+    <div id="kit-section-arc-slips"></div>
+    <div id="kit-section-core-avatar"></div>
+    <div id="kit-section-glyph-nav"></div>
+    <div id="kit-section-assembled"></div>
+
+    <!-- Composite Components -->
+    <div id="kit-section-bento-header"></div>
+    <div id="kit-section-topbar-parchment"></div>
+    <div id="kit-section-topbar-compact"></div>
+    <div id="kit-section-dialog"></div>
+    <div id="kit-section-paper-board"></div>
+    <div id="kit-section-popup"></div>
+    <div id="kit-section-bento-header-full"></div>
+
+  </div>
+
+  <!-- ===== THEME SWITCH LOGIC ===== -->
+  <script>
+    function setTheme(themeClass, btnEl) {
+      const app = document.getElementById('arc-app');
+      app.className = 'arc-app-container';
+      document.body.className = '';
+
+      if (themeClass.startsWith('arc-dark-')) {
+        app.classList.add(themeClass);
+      } else if (themeClass.startsWith('theme-')) {
+        document.body.classList.add(themeClass);
+      }
+
+      document.querySelectorAll('.arc-theme-btn').forEach(b => b.classList.remove('active'));
+      btnEl?.classList.add('active');
+    }
+
+    /* ====================================================
+       MOUSE WHEEL → HORIZONTAL SCROLL
+       Converts vertical wheel delta to horizontal scroll on container
+       ==================================================== */
+    const appContainer = document.getElementById('arc-app');
+    document.addEventListener('wheel', (e) => {
+      if (window.innerWidth > 500 && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        appContainer.scrollBy({ left: e.deltaY, top: 0 });
+      }
+    }, { passive: false });
+
+  </script>
+
+  <!-- ===== ENTRY POINT ===== -->
+  <script type="module" src="./ui_kit_main.js"></script>
+
+</body>
+
+</html>

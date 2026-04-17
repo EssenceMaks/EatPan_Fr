@@ -1,0 +1,64 @@
+/* =============================================
+   ARC DESIGN SYSTEM — ArcTopBarParchment
+   Top bar variant 1: parchment-style with avatar + stat bars
+   ============================================= */
+
+.arc-topbar-parchment {
+  background: linear-gradient(to bottom, var(--gold-dark), #2a1f0d);
+  padding: 4px;
+  border-bottom: 2px solid var(--gold-base);
+}
+
+.arc-topbar-parchment__inner {
+  background: linear-gradient(135deg, var(--parchment-light), var(--parchment-base), var(--parchment-dark));
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--gold-shadow);
+  padding: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.arc-topbar-parchment__avatar {
+  width: 70px;
+  height: 70px;
+  border: 2px solid var(--gold-base);
+  box-shadow: 0 0 5px #000;
+  background-color: #333;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-base);
+}
+
+.arc-topbar-parchment__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.arc-topbar-parchment__resource-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 3px 8px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 15px;
+  box-shadow: inset 0 1px 4px #000;
+}
+
+.arc-topbar-parchment__resource-icon {
+  color: var(--gold-light);
+  flex-shrink: 0;
+}
+
+.arc-topbar-parchment__resource-val {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 1px 1px 0 #000;
+}

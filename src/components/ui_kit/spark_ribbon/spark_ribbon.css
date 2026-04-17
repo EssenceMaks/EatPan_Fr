@@ -1,0 +1,148 @@
+/* =============================================
+   ARC DESIGN SYSTEM — SparkRibbon
+   Alert ribbon: inward/outward × LTR/RTL
+   Types: success, warning, error
+   ============================================= */
+
+.arc-spark-ribbon {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(to right, var(--parchment-light), var(--parchment-base));
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.1s;
+  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.3));
+  color: #1a0f04;
+}
+
+.arc-spark-ribbon:active {
+  transform: scale(0.98);
+}
+
+/* Clip-path variants */
+.arc-spark-ribbon--inward {
+  clip-path: polygon(0 0, 100% 0, 93% 50%, 100% 100%, 0 100%);
+}
+
+.arc-spark-ribbon--outward {
+  clip-path: polygon(0 0, 93% 0, 100% 50%, 93% 100%, 0 100%);
+}
+
+/* RTL direction */
+.arc-spark-ribbon--rtl {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.arc-spark-ribbon--rtl.arc-spark-ribbon--inward {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 7% 50%);
+}
+
+.arc-spark-ribbon--rtl.arc-spark-ribbon--outward {
+  clip-path: polygon(7% 0, 100% 0, 100% 100%, 7% 100%, 0 50%);
+}
+
+/* Color accent stripe */
+.arc-spark-ribbon__accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+}
+
+.arc-spark-ribbon--rtl .arc-spark-ribbon__accent {
+  left: auto;
+  right: 0;
+}
+
+.arc-spark-ribbon__accent--success {
+  background: #44912d;
+}
+
+.arc-spark-ribbon__accent--warning {
+  background: #c19b54;
+}
+
+.arc-spark-ribbon__accent--error {
+  background: #a63232;
+}
+
+/* Icon variants */
+.arc-spark-ribbon__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 15px;
+  margin-left: 10px;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.arc-spark-ribbon--rtl .arc-spark-ribbon__icon {
+  margin-right: 0;
+  margin-left: 15px;
+}
+
+.arc-spark-ribbon__icon--success {
+  background: #44912d;
+}
+
+.arc-spark-ribbon__icon--warning {
+  background: #c19b54;
+}
+
+.arc-spark-ribbon__icon--error {
+  background: #a63232;
+}
+
+/* Seal icon (themed circle) */
+.arc-spark-ribbon__seal {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--t-color-glare, #298d9e), var(--t-color-bottom, #0d3644));
+  border: 2px solid var(--gold-light);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 0 8px rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 15px;
+  margin-left: 10px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.arc-spark-ribbon__seal--square {
+  border-radius: 8px;
+}
+
+.arc-spark-ribbon--rtl .arc-spark-ribbon__seal {
+  margin-right: 0;
+  margin-left: 15px;
+}
+
+/* Text content */
+.arc-spark-ribbon__content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.arc-spark-ribbon__title {
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.arc-spark-ribbon__desc {
+  font-family: 'Merriweather', serif;
+  font-size: 11px;
+  opacity: 0.8;
+}

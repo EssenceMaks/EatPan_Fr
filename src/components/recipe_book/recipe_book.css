@@ -1,0 +1,539 @@
+/* =============================================
+   EATPAN - RECIPE BOOK VISUAL COMPONENT
+   ============================================= */
+
+.rb-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.rb-wrapper {
+  display: grid;
+  grid-template-columns: max-content 1fr 1fr;
+  grid-template-areas: "ribbons left right";
+  width: 100%;
+  height: 100%;
+  max-width: 1600px;
+  background: var(--ink, #2c1810);
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  /* The book cover border effect */
+  border: 4px solid var(--ink, #2c1810);
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s ease;
+}
+
+/* Side ribbons area — sits in the dark ink border of the book */
+.rb-side-ribbons {
+  grid-area: ribbons;
+  position: relative;
+  z-index: 10;
+  padding: 1.5rem 0 1.5rem 4px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Base side styles */
+.rb-side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Shared Book Page Structure */
+.book-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  padding: 0 12px;
+}
+
+.book-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 24px;
+  margin-top: 20px;
+  border-bottom: 2px solid var(--crimson, #8b1a1a);
+  flex-shrink: 0;
+  min-height: 64px;
+}
+
+.book-page-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-right: 2px;
+  padding: 16px 24px 40px 32px;
+}
+
+.book-page-scroll-spine-left {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-left: 2px;
+  padding-left: 8px;
+  /* For scrollbar hack */
+  transform: scaleX(-1);
+}
+
+.book-page-scroll-spine-left>* {
+  transform: scaleX(-1);
+  padding: 16px 32px 40px 12px;
+}
+
+/* Shared scrollbar mixin */
+.book-page-scroll::-webkit-scrollbar,
+.book-page-scroll-spine-left::-webkit-scrollbar {
+  width: 14px;
+}
+
+.book-page-scroll::-webkit-scrollbar-track,
+.book-page-scroll-spine-left::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.book-page-scroll::-webkit-scrollbar-thumb,
+.book-page-scroll-spine-left::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" viewBox="0 0 14 20"><path d="M7 4 L12 10 L7 16 L2 10 Z" fill="%23f1eacc" stroke="%23805533" stroke-width="1.5"/></svg>'),
+    linear-gradient(to bottom, rgba(128, 85, 51, 0.5), rgba(128, 85, 51, 0.5));
+  background-repeat: no-repeat, no-repeat;
+  background-position: center center, center center;
+  background-size: 14px 20px, 2px 100%;
+}
+
+.book-page-scroll::-webkit-scrollbar-thumb:hover,
+.book-page-scroll-spine-left::-webkit-scrollbar-thumb:hover {
+  background-image:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="20" viewBox="0 0 14 20"><path d="M7 4 L12 10 L7 16 L2 10 Z" fill="%23ffffff" stroke="%23805533" stroke-width="1.5"/></svg>'),
+    linear-gradient(to bottom, rgba(128, 85, 51, 0.9), rgba(128, 85, 51, 0.9));
+}
+
+/* The Left Side (Categories/List) — diamond scrollbar on the RIGHT edge */
+.rb-left-side {
+  grid-area: left;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.15) 0%, transparent 6%), var(--parchment, #f1eacc);
+  border-right: 1px solid rgba(44, 24, 16, 0.2);
+  /* Inner spine shadow */
+  box-shadow: inset -25px 0 35px -15px rgba(0, 0, 0, 0.3);
+}
+
+
+
+/* The Right Side (Recipe Display) */
+.rb-right-side {
+  grid-area: right;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.1) 0%, transparent 5%), var(--parchment, #f1eacc);
+  border-left: 1px solid rgba(255, 255, 255, 0.4);
+  /* Inner spine shadow */
+  box-shadow: inset 25px 0 35px -15px rgba(0, 0, 0, 0.25);
+}
+
+/* Typography & Mock Content */
+.rb-title {
+  font-family: var(--font-title, 'Noto Serif', serif);
+  color: var(--brand-red, #6b0d12);
+  text-align: center;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.rb-mock-list {
+  display: grid;
+  gap: 12px;
+}
+
+.rb-mock-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: rgba(128, 85, 51, 0.05);
+  /* very light accent */
+  border-radius: 6px;
+  border: 1px solid rgba(128, 85, 51, 0.2);
+  cursor: pointer;
+  font-family: var(--font-body, 'Work Sans', sans-serif);
+  font-weight: 500;
+  color: var(--ink, #2c1810);
+  transition: all 0.2s ease;
+}
+
+.rb-mock-item:hover {
+  background: rgba(128, 85, 51, 0.15);
+  transform: translateX(4px);
+  border-color: var(--accent, #805533);
+}
+
+
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rb-right-content {
+  font-family: var(--font-body, 'Work Sans', sans-serif);
+  color: var(--ink, #2c1810);
+  line-height: 1.6;
+}
+
+.rb-back-btn {
+  display: none;
+  /* Visible on mobile */
+  align-items: center;
+  gap: 8px;
+  color: var(--brand-red, #6b0d12);
+  background: transparent;
+  border: none;
+  font-family: var(--font-title, 'Noto Serif', serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 24px;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.rb-back-btn:hover {
+  opacity: 0.7;
+}
+
+/* -------------------------------------------
+   RESPONSIVE MODES
+   ------------------------------------------- */
+
+/* MOBILE / NARROW TABLET: max-width: 899px (shows only 1 page at a time) */
+@media (max-width: 899px) {
+  .rb-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 120px 1fr;
+    grid-template-areas:
+      "ribbons"
+      "left";
+    width: 100%;
+    /* Disable border since it's full screen anyway usually */
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .rb-side-ribbons {
+    height: 120px;
+    padding: 12px 12px 0;
+  }
+
+  .rb-side {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    background: var(--parchment, #f1eacc);
+  }
+
+  .rb-left-side {
+    border-right: none;
+    box-shadow: none;
+  }
+
+  .rb-right-side {
+    grid-area: unset;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-left: none;
+    /* Extra shadow to show it sliding OVER the left */
+    box-shadow: -10px 0 20px rgba(0, 0, 0, 0.2);
+    /* Start out of view */
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 10;
+  }
+
+  /* class applied via JS when recipe selected */
+  .mobile-show-right .rb-right-side {
+    transform: translateX(0);
+  }
+
+  .rb-back-btn {
+    /* display: inline-flex; */
+    display: none;
+  }
+
+  .rb-overlay:not(.rb-create-bookmark) {
+    display: none;
+  }
+
+  /* On mobile, create bookmark becomes a fixed top-right fab */
+  .rb-create-bookmark {
+    top: auto !important;
+    bottom: 50px !important;
+    left: auto !important;
+    right: 16px !important;
+    transform: none !important;
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 50% !important;
+    clip-path: none !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .rb-create-bookmark .rb-create-bookmark-text {
+    display: none;
+  }
+
+  /* Hide create button when in create form mode */
+  .rb-wrapper.mode-create .rb-create-bookmark {
+    display: none !important;
+  }
+}
+
+/* -------------------------------------------
+   RIBBON OVERLAYS — absolute within rb-wrapper
+   ------------------------------------------- */
+.rb-overlay {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.rb-overlay>* {
+  pointer-events: auto;
+}
+
+/* Left bottom ribbons — anchored to bottom of left page */
+.rb-overlay--left-bottom {
+  bottom: -1px;
+  left: 48%;
+  transform: translateX(-70%);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+/* Right bottom ribbons — anchored to bottom-left of right page */
+.rb-overlay--right-bottom {
+  bottom: -1px;
+  right: 10%;
+  transform: translateX(90%);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+/* Right side interaction tabs — right edge of book */
+.rb-overlay--right-tabs {
+  right: -3px;
+  top: 80px;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Hide overlays in create and placeholder mode across all screens */
+.rb-wrapper.mode-create .rb-overlay--right-tabs,
+.rb-wrapper.mode-create .rb-overlay--right-bottom,
+.rb-wrapper.mode-placeholder .rb-overlay--right-tabs,
+.rb-wrapper.mode-placeholder .rb-overlay--right-bottom {
+  display: none !important;
+}
+
+
+/* -------------------------------------------
+   CREATE RECIPE BOOKMARK — top-center ribbon
+   ------------------------------------------- */
+.rb-create-bookmark {
+  /* Override rb-overlay defaults */
+  pointer-events: auto !important;
+
+  /* Positioning: absolute within rb-wrapper, flush at top */
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+
+  /* Shape: ribbon hanging down from top */
+  width: 56px;
+  height: 78px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 8px;
+  cursor: pointer;
+
+  /* Ribbon clip-path: inverted V at the bottom */
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 82%, 0% 100%);
+
+  /* Colors: crimson to match the RPG theme */
+  background: linear-gradient(180deg, var(--crimson, #8b1a1a) 0%, #6b0d12 100%);
+  color: rgba(255, 255, 255, 0.9);
+  border: none;
+  font-family: var(--font-title, serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.rb-create-bookmark:hover {
+  height: 100px;
+  background: linear-gradient(180deg, #a02020 0%, #8b1a1a 100%);
+  box-shadow: 0 6px 20px rgba(139, 26, 26, 0.4);
+}
+
+.rb-create-bookmark:active {
+  height: 84px;
+  transition-duration: 0.1s;
+}
+
+.rb-create-bookmark-text {
+  font-size: 0.5rem;
+  margin-top: 2px;
+  opacity: 0.85;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+}
+
+/* NARROW DESKTOP / ALBUM BOOK: 900px - 1199px */
+@media (min-width: 900px) and (max-width: 1199px) {
+  .rb-wrapper {
+    width: 90%;
+    grid-template-columns: max-content 1fr 1fr;
+  }
+
+  .rb-side {
+    padding: 20px;
+  }
+}
+
+/* NORMAL DESKTOP: 1200px+ */
+@media (min-width: 1200px) {
+  .rb-wrapper {
+    width: 100%;
+    grid-template-columns: max-content 1fr 1fr;
+  }
+}
+
+/* -------------------------------------------
+   MOBILE ACTION TABS (RecipeOverview)
+   ------------------------------------------- */
+.rb-mobile-action-tabs {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .rb-mobile-action-tabs {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+    padding-bottom: 4px;
+    background: transparent;
+    border-bottom: 1px solid rgba(139, 26, 26, 0.15);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-shrink: 0;
+    margin: 0 40px;
+  }
+
+  .rb-mobile-action-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bm-mobile-cluster {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .bm-mobile-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    background: var(--parchment-dark, #c4b48e);
+    border: none;
+    color: var(--ink, #2c1810);
+    padding: 6px 4px 6px 4px;
+    width: 38px;
+    height: 48px;
+    font-family: var(--font-body, 'Work Sans', sans-serif);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 10px), 50% 100%, 0% calc(100% - 10px));
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+  }
+
+  .bm-mobile-tab svg {
+    width: 16px !important;
+    height: 16px !important;
+    min-height: 16px;
+    min-width: 16px;
+    flex-shrink: 0;
+    stroke-width: 2;
+  }
+
+  .bm-mobile-tab:hover {
+    clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 13px), 50% calc(100% - 3px), 0% calc(100% - 13px));
+  }
+
+  .bm-mobile-tab.active {
+    background: var(--crimson, #8b1a1a);
+    color: white;
+    clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 15px), 50% calc(100% - 5px), 0% calc(100% - 15px));
+  }
+}
+
+/* -------------------------------------------
+   INLINE CREATE LINK
+   ------------------------------------------- */
+.rb-inline-link {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: rgba(139, 26, 26, 0.8);
+  text-underline-offset: 4px;
+  cursor: pointer;
+  color: var(--ink, #2c1810);
+  transition: text-decoration-color 0.3s ease;
+}
+
+.rb-inline-link:hover {
+  text-decoration-color: transparent;
+}
