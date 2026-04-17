@@ -32,3 +32,7 @@ docs/changelogs/figma_validation.md
 scratch_*.js
 scratch_*.css
 recipe_sample.json
+
+# Temporary dev files
+fix_cats.mjs
+implementation_plan_17_04_*.md

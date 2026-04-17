@@ -73,9 +73,20 @@
   - **Subject:** `eatpan.sync`
 - Формат подій в Outbox включає тип сутності (`recipe`, `recipe_book`), `uuid`, операцію (`upsert`, `patch`, `delete`) та сам `payload`.
 
+---
+
+## 4. Соціальна Активність & Категорії (Нові Ендпоінти)
+| Метод | Ендпоінт | Опис | Клієнтська реалізація (Фронт) |
+|-------|----------|------|-------------------------------|
+| `GET` | `/api/v1/categories/` | Отримання списку категорій | `CategoryService.fetchAll()` |
+| `POST`| `/api/v1/categories/` | Створення нової категорії (JSON `data`) | `CategoryService.create()` |
+| `GET` | `/api/v1/recipes/{id}/comments/` | Отримання списку коментарів до рецепту | `CommentService.fetchForRecipe()` |
+| `POST`| `/api/v1/recipes/{id}/comments/` | Додавання коментаря до рецепту | `CommentService.create()` |
+| `POST`| `/api/v1/reactions/recipe/{id}/` | Додавання або зміна емодзі-реакції на рецепт | `ReactionService.reactRecipe()` |
+| `POST`| `/api/v1/reactions/comment/{id}/`| Додавання або зміна емодзі-реакції на коментар | `ReactionService.reactComment()` |
+| `PATCH`| `/api/v1/user-recipe-states/{recipe_id}/`| Оновлення статусу приготування (Planned/Cooked) | `CookingService.updateState()` |
 
 
-меню внизу а не вверху
 @media (min-width: 320px) and (max-width: 479px) and (orientation: portrait)
 @media (min-width: 320px) and (max-width: 479px) and (orientation: landscape)
 @media (min-width: 480px) and (max-width: 767px) and (orientation: portrait)

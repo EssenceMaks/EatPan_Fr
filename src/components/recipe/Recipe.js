@@ -13,6 +13,7 @@ export default class Recipe extends Component {
     this.overview = new RecipeOverview({
       recipeData: this.recipeData,
       mediaAssets: this.mediaAssets,
+      onEdit: props.onEdit,
       onMoreDetails: async (mountContainer) => {
         await this.instructions.render(mountContainer, 'innerHTML');
         
