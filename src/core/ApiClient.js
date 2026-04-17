@@ -162,6 +162,24 @@ export const BookService = {
 };
 
 // ============================================================
+// CATEGORIES
+// ============================================================
+export const CategoryService = {
+  fetchAll: () => apiFetch('/categories/'),
+  create: (data) => apiFetch('/categories/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  update: (id, data) => apiFetch(`/categories/${id}/`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  delete: (id) => apiFetch(`/categories/${id}/`, { method: 'DELETE' }),
+};
+
+// ============================================================
 // USER PROFILE (planned — for UserProfile endpoints)
 // ============================================================
 export const ProfileService = {

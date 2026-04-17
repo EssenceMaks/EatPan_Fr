@@ -54,7 +54,7 @@ export default class RecipeBookRightPage extends Component {
   }
 
   // ------ RECIPE VIEW ------
-  async loadRecipe(id) {
+  async loadRecipe(id, forceReload = false) {
     this._destroyCreateForm();
     this._mode = 'recipe';
     
@@ -63,7 +63,7 @@ export default class RecipeBookRightPage extends Component {
 
     const mountContainer = this.$('#recipe-mount-point');
     if (!mountContainer) return;
-    if (this.currentRecipeId === String(id)) return;
+    if (!forceReload && this.currentRecipeId === String(id)) return;
     this.currentRecipeId = String(id);
 
     // Show back button
@@ -87,6 +87,7 @@ export default class RecipeBookRightPage extends Component {
       recipeId: id,
       recipeData: recipe?.data || null,
       mediaAssets: recipe?.media_assets || [],
+      onEdit: () => this.showEditForm(id, recipe?.data, recipe?.media_assets)
     });
     await this.recipeComponent.render(mountContainer, 'innerHTML');
 
@@ -116,6 +117,42 @@ export default class RecipeBookRightPage extends Component {
     this.createForm = new RecipeCreateForm({
       onCreated: callbacks.onCreated || (() => {}),
       onClose: callbacks.onClose || (() => {}),
+    });
+
+    await this.createForm.render(mountContainer, 'innerHTML');
+
+    if (window.lucide) {
+      window.lucide.createIcons({ root: this.element });
+    }
+  }
+
+  async showEditForm(id, data, mediaAssets) {
+    this._destroyRecipe();
+    this._mode = 'create';
+    // deliberately keep currentRecipeId so it stays tracked
+    this.currentRecipeId = String(id);
+
+    const wrapper = document.getElementById('rb-wrapper');
+    if (wrapper) wrapper.classList.remove('mode-placeholder');
+
+    const mountContainer = this.$('#recipe-mount-point');
+    if (!mountContainer) return;
+
+    const backBtn = this.$('#rb-back-trigger');
+    if (backBtn) backBtn.style.display = 'none';
+
+    mountContainer.innerHTML = '';
+
+    this.createForm = new RecipeCreateForm({
+      recipeId: id,
+      recipeData: data,
+      mediaAssets: mediaAssets,
+      onCreated: () => {
+        // After editing, reload this same recipe
+        window.dispatchEvent(new CustomEvent('recipe-updated', { detail: { id } }));
+        this.loadRecipe(id, true);
+      },
+      onClose: () => this.loadRecipe(id, true), // Cancel edit -> go back to viewing recipe
     });
 
     await this.createForm.render(mountContainer, 'innerHTML');

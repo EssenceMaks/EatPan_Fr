@@ -49,6 +49,29 @@ export default class RecipeBookLeftPage extends Component {
       hierarchy: {},
       onRecipeSelect: this.onRecipeSelected
     });
+
+    this.officialCategories = null; // To store official DB categories
+    
+    // Listen for category deletions/creations globally
+    this._onCatsChanged = () => this._loadOfficialCategories();
+    window.addEventListener('eatpan-categories-changed', this._onCatsChanged);
+  }
+
+  destroy() {
+    window.removeEventListener('eatpan-categories-changed', this._onCatsChanged);
+    super.destroy();
+  }
+
+  _loadOfficialCategories() {
+    import('../../../core/ApiClient.js').then(async ({ CategoryService }) => {
+      try {
+        const cats = await CategoryService.fetchAll();
+        this.officialCategories = cats;
+        this.update(); // re-render grid/list with new fallback grouping
+      } catch (e) {
+        console.error('Failed to load official categories', e);
+      }
+    });
   }
 
   // Helper method: get groups array from recipes
@@ -77,9 +100,26 @@ export default class RecipeBookLeftPage extends Component {
   // Get categories and their counts for Grid View
   _getCategoriesData(filtered) {
     const counts = {};
+    const officialCatNames = (this.officialCategories || []).map(c => c.data?.name);
+
     filtered.forEach(r => {
-      const cat = r.data?.category || 'Без категорії';
-      counts[cat] = (counts[cat] || 0) + 1;
+      // Determine which categories this recipe belongs to
+      let cats = [];
+      if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
+        cats = r.data.categories;
+      } else if (r.data?.category) {
+        // Legacy: comma-separated string
+        cats = r.data.category.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      if (cats.length === 0) cats = ['Без категорії'];
+
+      for (let cat of cats) {
+        // Fallback: If category isn't known in the DB, group it as Forgotten
+        if (this.officialCategories && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
+           cat = 'Забуті категорії';
+        }
+        counts[cat] = (counts[cat] || 0) + 1;
+      }
     });
     return {
       categories: Object.keys(counts).sort((a,b) => a.localeCompare(b)),
@@ -90,14 +130,35 @@ export default class RecipeBookLeftPage extends Component {
   // Get hierarchical data for List View
   _getListHierarchy(filtered) {
     const hierarchy = {};
+    const officialCatNames = (this.officialCategories || []).map(c => c.data?.name);
+
+    // Helper: get resolved categories for a recipe
+    const getRecipeCats = (r) => {
+      let cats = [];
+      if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
+        cats = r.data.categories;
+      } else if (r.data?.category) {
+        cats = r.data.category.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      if (cats.length === 0) cats = ['Без категорії'];
+      return cats.map(cat => {
+        if (this.officialCategories && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
+          return 'Забуті категорії';
+        }
+        return cat;
+      });
+    };
+
     const relevant = this.activeCategory 
-        ? filtered.filter(r => (r.data?.category || 'Без категорії') === this.activeCategory)
+        ? filtered.filter(r => getRecipeCats(r).includes(this.activeCategory))
         : filtered;
 
     relevant.forEach(r => {
-      const cat = r.data?.category || 'Без категорії';
-      if (!hierarchy[cat]) hierarchy[cat] = [];
-      hierarchy[cat].push(r);
+      const cats = getRecipeCats(r);
+      for (const cat of cats) {
+        if (!hierarchy[cat]) hierarchy[cat] = [];
+        hierarchy[cat].push(r);
+      }
     });
     return hierarchy;
   }
@@ -174,6 +235,10 @@ export default class RecipeBookLeftPage extends Component {
   }
 
   async onMount() {
+    if (this.officialCategories === null) {
+      this._loadOfficialCategories();
+    }
+
     // 1. Mount recipe groups
     const gContainer = this.$('.rb-groups-mount');
     if (gContainer) {
@@ -194,7 +259,18 @@ export default class RecipeBookLeftPage extends Component {
           await this.cmpCatGrid.render(cContainer);
         } else {
           // Category active: show grid of ACTUAL RECIPES
-          const specificRecipes = filtered.filter(r => (r.data?.category || 'Без категорії') === this.activeCategory);
+          const specificRecipes = filtered.filter(r => {
+            // Check modern categories array first
+            if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
+              return r.data.categories.includes(this.activeCategory);
+            }
+            // Legacy: comma-separated category string
+            if (r.data?.category) {
+              const cats = r.data.category.split(',').map(s => s.trim());
+              return cats.includes(this.activeCategory);
+            }
+            return this.activeCategory === 'Без категорії';
+          });
           this.cmpRecipeGrid.updateData(specificRecipes);
           await this.cmpRecipeGrid.render(cContainer);
         }

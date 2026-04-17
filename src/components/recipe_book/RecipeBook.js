@@ -111,6 +111,13 @@ export default class RecipeBook extends Component {
     // Load recipes from API asynchronously
     this._loadRecipes();
 
+    // Listen for recipe updates (from edit form) to refresh left page
+    this._onRecipeUpdated = () => {
+      console.log('📖 RecipeBook: recipe-updated event received, refreshing...');
+      this._loadRecipes();
+    };
+    window.addEventListener('recipe-updated', this._onRecipeUpdated);
+
     // Re-instantiate icons
     if (window.lucide) {
       window.lucide.createIcons({ root: this.element });
@@ -134,6 +141,18 @@ export default class RecipeBook extends Component {
     this._authListener = supabase.auth.onAuthStateChange((_event, session) => {
       this._toggleCreateButton(!!session);
     });
+
+    // Handle Edit button in Desktop Right Tabs
+    const editDesktopBtn = this.$('.bm-right-tab[title="Редагувати"]');
+    if (editDesktopBtn) {
+      editDesktopBtn.addEventListener('click', () => {
+        if (this.rightPage && this.rightPage.currentRecipeId && this.rightPage.recipeComponent) {
+          const id = this.rightPage.currentRecipeId;
+          const rc = this.rightPage.recipeComponent;
+          this.rightPage.showEditForm(id, rc.recipeData, rc.mediaAssets);
+        }
+      });
+    }
   }
 
   _setupSwipeToClose() {
@@ -168,6 +187,9 @@ export default class RecipeBook extends Component {
     if (this._popStateHandler) {
       window.removeEventListener('popstate', this._popStateHandler);
     }
+    if (this._onRecipeUpdated) {
+      window.removeEventListener('recipe-updated', this._onRecipeUpdated);
+    }
     if (this._authListener?.data?.subscription) {
       this._authListener.data.subscription.unsubscribe();
     }
@@ -185,12 +207,20 @@ export default class RecipeBook extends Component {
       this.leftPage.setAuthMessage(!session);
     }
 
-    // Extract unique categories from loaded recipes
+    // Extract unique categories from loaded recipes (support both array and legacy string)
     const catSet = new Map();
     this.recipes.forEach(r => {
-      const cat = r.data?.category || 'Без категорії';
-      if (!catSet.has(cat)) {
-        catSet.set(cat, { id: cat, label: cat, icon: getCategoryIcon(cat) });
+      let cats = [];
+      if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
+        cats = r.data.categories;
+      } else if (r.data?.category) {
+        cats = r.data.category.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      if (cats.length === 0) cats = ['Без категорії'];
+      for (const cat of cats) {
+        if (!catSet.has(cat)) {
+          catSet.set(cat, { id: cat, label: cat, icon: getCategoryIcon(cat) });
+        }
       }
     });
     this.categories = Array.from(catSet.values()).sort((a, b) => a.label.localeCompare(b.label));
