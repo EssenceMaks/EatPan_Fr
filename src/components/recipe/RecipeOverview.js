@@ -167,6 +167,36 @@ export default class RecipeOverview extends Component {
       `;
     }).join('');
 
+    // Parse Secrets
+    let secretsArr = [];
+    if (d.secrets && Array.isArray(d.secrets)) secretsArr = d.secrets;
+    else if (d.secret && Array.isArray(d.secret)) secretsArr = d.secret;
+    else if (d.secret && typeof d.secret === 'string' && d.secret.trim()) secretsArr = [d.secret];
+    
+    let secretsHtml = secretsArr.length > 0
+      ? secretsArr.map((s, i) => {
+          let t = typeof s === 'string' ? s : (s.text || s.description || '');
+          let mb = i < secretsArr.length - 1 ? 'margin-bottom: 12px;' : '';
+          return `<p class="recipe-extra-text" style="${mb}">${t}</p>`;
+        }).join('')
+      : '<p class="recipe-extra-text"><em style="opacity:0.6;">Додайте свій секрет шефа</em></p>';
+
+    // Parse Utensils (formerly Serving)
+    let servingArr = [];
+    if (d.serving_recommendations && Array.isArray(d.serving_recommendations)) servingArr = d.serving_recommendations;
+    else if (d.serving_recommendation && Array.isArray(d.serving_recommendation)) servingArr = d.serving_recommendation;
+    else if (d.serving && Array.isArray(d.serving)) servingArr = d.serving;
+    else if (d.serving_recommendation && typeof d.serving_recommendation === 'string' && d.serving_recommendation.trim()) servingArr = [d.serving_recommendation];
+    else if (d.serving && typeof d.serving === 'string' && d.serving.trim()) servingArr = [d.serving];
+
+    let servingHtml = servingArr.length > 0
+      ? servingArr.map((s, i) => {
+          let t = typeof s === 'string' ? s : (s.text || s.description || '');
+          let mb = i < servingArr.length - 1 ? 'margin-bottom: 12px;' : '';
+          return `<p class="recipe-extra-text" style="${mb}">${t}</p>`;
+        }).join('')
+      : '<p class="recipe-extra-text"><em style="opacity:0.6;">Додайте необхідне приладдя</em></p>';
+
     return `
       <div class="recipe-view-container book-page-container">
         <!-- New sticky header -->
@@ -243,18 +273,18 @@ export default class RecipeOverview extends Component {
                 </div>
                 <h4 class="recipe-extra-title">Секрет шефа</h4>
               </div>
-              <p class="recipe-extra-text">${(d.secret && d.secret.trim()) ? d.secret : '<em style="opacity:0.6;">Немає секрету</em>'}</p>
+              ${secretsHtml}
             </div>
 
-            <!-- Serving Suggestions -->
+            <!-- Utensils (Formerly Serving) -->
             <div class="recipe-extra-section recipe-serving-section">
               <div class="recipe-extra-header">
                 <div class="recipe-extra-icon">
                   <i data-lucide="utensils-crossed" style="width:18px;height:18px;"></i>
                 </div>
-                <h4 class="recipe-extra-title">Подача</h4>
+                <h4 class="recipe-extra-title">Кухонне приладдя</h4>
               </div>
-              <p class="recipe-extra-text">${(d.serving && d.serving.trim()) ? d.serving : '<em style="opacity:0.6;">Немає рекомендацій</em>'}</p>
+              ${servingHtml}
             </div>
 
           </div>
