@@ -102,8 +102,8 @@
 /* Single Ingredient Card */
 .ing-card {
   flex: 1 1 200px;
-  min-width: 150px;
-  max-width: 200px;
+  min-width: fit-content;
+  max-width: 230px;
   display: grid;
   grid-template-columns: 48px 1fr;
   /* 2 columns: Icon, Details */
@@ -200,9 +200,19 @@
   gap: 4px;
 }
 
+.status-missing svg {
+  stroke: #ef4444;
+  /* Red icon for empty/zero */
+}
+
 .status-missing.warning {
-  color: #fb923c;
-  /* Orange for partially missing */
+  color: #6b7280;
+  /* Gray for text */
+}
+
+.status-missing.warning svg {
+  stroke: #fb923c;
+  /* Orange icon for partial */
 }
 
 /* -------------------------------------------
@@ -241,8 +251,8 @@
   cursor: pointer;
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
   box-shadow:
-    0 2px 6px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,255,255,0.3);
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   border-radius: 4px;
   transform: rotate(0deg);
 }
@@ -250,8 +260,8 @@
 .prep-steps-diamond-btn:hover {
   border-color: var(--gold, #c5a044);
   box-shadow:
-    0 3px 10px rgba(0,0,0,0.5),
-    inset 0 1px 0 rgba(255,255,255,0.3);
+    0 3px 10px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Rotated to diamond when open */
@@ -274,7 +284,8 @@
   left: 0;
   right: 0;
   height: 80px;
-  display: none; /* Hidden — replaced by bookmark ribbons */
+  display: none;
+  /* Hidden — replaced by bookmark ribbons */
   align-items: center;
   gap: 16px;
   padding: 0 16px;
@@ -393,6 +404,7 @@
   background: linear-gradient(135deg, #d4c4a0 0%, #bfa87a 100%);
   color: var(--ink, #2c1810);
 }
+
 .gallery-placeholder--no-photo span {
   font-size: 0.8rem;
   font-weight: 600;
@@ -406,6 +418,7 @@
   background: linear-gradient(135deg, #3a3028 0%, #2a2018 100%);
   color: rgba(255, 255, 255, 0.7);
 }
+
 .gallery-placeholder--offline span {
   font-size: 0.7rem;
   font-weight: 500;

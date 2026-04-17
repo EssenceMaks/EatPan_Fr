@@ -79,20 +79,76 @@ export default class RecipeOverview extends Component {
       const amount = typeof ing === 'string' ? '' : (ing.amount || ing.quantity || '');
       const icon = this._getIngredientIcon(name);
 
-      // Temporary mock logic to show the fresh UI design states if no data provided
+      // Smart mock logic to show UI design states if no data provided
       let stockStr = typeof ing === 'object' ? ing.stock : null;
       let statusClass = typeof ing === 'object' ? ing.statusClass : null;
       let statusIcon = typeof ing === 'object' ? ing.statusIcon : null;
+      let displayStock = stockStr;
 
       if (!stockStr) {
-        // Cycle through the UI states to showcase the design
-        if (i % 3 === 0) {
-           stockStr = "5/50"; statusClass = "status-ok"; statusIcon = "check";
-        } else if (i % 3 === 1) {
-           stockStr = "4/2"; statusClass = "status-missing warning"; statusIcon = "alert-circle";
-        } else {
-           stockStr = "1/0"; statusClass = "status-missing"; statusIcon = "circle";
+        let reqNumStr = '';
+        let unit = '';
+        
+        if (amount) {
+          const lowerAmount = amount.toLowerCase();
+          if (!lowerAmount.includes('taste') && !lowerAmount.includes('смаком')) {
+            const match = amount.match(/^([\d\s½¼¾\.\,\/]*)(.*)$/);
+            if (match) {
+                reqNumStr = match[1].trim();
+                unit = match[2].trim();
+            } else {
+                unit = amount.trim();
+            }
+          }
         }
+        
+        if (!reqNumStr) reqNumStr = '1';
+
+        let reqNumLogic = parseFloat(String(reqNumStr).replace(',', '.'));
+        if (isNaN(reqNumLogic) || reqNumLogic <= 0) reqNumLogic = 1;
+
+        if (i % 3 === 0) { // OK
+           let avail = reqNumLogic >= 10 ? Math.round(reqNumLogic * 1.5) : 50;
+           if (avail <= reqNumLogic) avail = reqNumLogic + 5;
+           stockStr = `${reqNumStr}/${avail}`;
+           statusClass = "status-ok"; 
+           statusIcon = "check";
+        } else if (i % 3 === 1) { // Partial
+           let avail = Math.max(1, Math.floor(reqNumLogic / 2));
+           stockStr = `${reqNumStr}/${avail}`; 
+           statusClass = "status-missing warning"; 
+           statusIcon = "alert-circle"; // Orange exclamation pattern
+        } else { // Empty
+           stockStr = `${reqNumStr}/0`; 
+           statusClass = "status-missing"; 
+           statusIcon = "circle-dashed"; // Purely missing zero state
+        }
+        
+        if (unit) {
+           const cleaned = unit.toLowerCase().replace(/[^a-zа-яёіїєґ]/g, '');
+           const validUnits = ['g', 'kg', 'mg', 'ml', 'l', 'oz', 'lb', 'tbsp', 'tbs', 'tsp', 'cup', 'cups', 'г', 'кг', 'мл', 'л', 'шт', 'pcs'];
+           if (!validUnits.includes(cleaned)) unit = '';
+        }
+        
+        displayStock = unit ? `${stockStr} ${unit}` : stockStr;
+      } else {
+        // Fallback for actual data provided to append units
+        let unit = '';
+        if (amount) {
+           const lowerAmount = amount.toLowerCase();
+           if (!lowerAmount.includes('taste') && !lowerAmount.includes('смаком')) {
+             unit = amount.replace(/^[\d\s½¼¾\.\,\/]+/, '').trim();
+           }
+        }
+        if (unit) {
+           const cleaned = unit.toLowerCase().replace(/[^a-zа-яёіїєґ]/g, '');
+           const validUnits = ['g', 'kg', 'mg', 'ml', 'l', 'oz', 'lb', 'tbsp', 'tbs', 'tsp', 'cup', 'cups', 'г', 'кг', 'мл', 'л', 'шт', 'pcs'];
+           if (!validUnits.includes(cleaned)) unit = '';
+        }
+
+        displayStock = unit && typeof stockStr === 'string' && !stockStr.includes(unit) 
+            ? `${stockStr} ${unit}` 
+            : stockStr;
       }
 
       return `
@@ -104,7 +160,7 @@ export default class RecipeOverview extends Component {
           <div class="ing-amounts">
             <span class="ing-required-amount">${amount} ${amount ? '<span class="separator">|</span>' : ''}</span>
             <span class="${statusClass}">
-              ${stockStr} <i data-lucide="${statusIcon}" style="width: 16px; height: 16px;"></i>
+              ${displayStock} <i data-lucide="${statusIcon}" style="width: 16px; height: 16px;"></i>
             </span>
           </div>
         </div>
