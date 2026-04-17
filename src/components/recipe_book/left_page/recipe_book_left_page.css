@@ -55,37 +55,40 @@
   height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding-bottom: 24px;
-  padding-right: 24px;
+  padding: 8px 24px 24px 0px;
 }
 
 /* Horizontal scrollbar styling using EatPan diamond logic */
 .rb-categories-grid::-webkit-scrollbar {
   height: 14px;
 }
+
 .rb-categories-grid::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   margin: 0 8px;
 }
+
 .rb-categories-grid::-webkit-scrollbar-thumb {
   background-color: transparent;
-  background-image: 
+  background-image:
     url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="14" viewBox="0 0 20 14"><path d="M4 7 L10 2 L16 7 L10 12 Z" fill="%23f1eacc" stroke="%23805533" stroke-width="1.5"/></svg>'),
     linear-gradient(to right, rgba(128, 85, 51, 0.5), rgba(128, 85, 51, 0.5));
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
   background-size: 20px 14px, 100% 2px;
 }
+
 .rb-categories-grid::-webkit-scrollbar-thumb:hover {
-    background-image: 
+  background-image:
     url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="14" viewBox="0 0 20 14"><path d="M4 7 L10 2 L16 7 L10 12 Z" fill="%23ffffff" stroke="%23805533" stroke-width="1.5"/></svg>'),
     linear-gradient(to right, rgba(128, 85, 51, 0.9), rgba(128, 85, 51, 0.9));
 }
 
 /* Recipe Groups container area */
 .rb-groups-container {
-  display: flex;
+  display: none;
+  /* display: flex; */
   flex-direction: column;
   margin-bottom: 24px;
 }

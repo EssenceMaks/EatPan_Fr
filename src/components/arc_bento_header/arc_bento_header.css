@@ -23,7 +23,7 @@
   align-items: start;
   width: 100%;
   pointer-events: none;
-  padding: 2px;
+  padding: 6px;
   gap: 2px;
   box-sizing: border-box;
 }

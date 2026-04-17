@@ -49,6 +49,7 @@ export default class SideTabRibbon extends Component {
            data-ribbon-id="${id}"
            title="${title}">
         ${innerHtml}
+        ${title ? `<span class="stb-tooltip">${title}</span>` : ''}
       </div>
     `;
   }

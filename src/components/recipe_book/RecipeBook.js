@@ -42,6 +42,12 @@ export default class RecipeBook extends Component {
 
     this.leftPage = new RecipeBookLeftPage({
       onRecipeSelected: (id) => this.handleRecipeSelect(id),
+      onCategorySelected: (catId) => {
+        this.activeCategory = catId;
+        if (this.sideRibbons) {
+          this.sideRibbons.updateActiveCategory(catId);
+        }
+      },
       activeCategory: null,
       recipes: [],
     });

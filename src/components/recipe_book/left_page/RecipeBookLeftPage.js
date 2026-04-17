@@ -7,8 +7,9 @@ import RecipeCardGrid from './RecipeCardGrid.js';
 export default class RecipeBookLeftPage extends Component {
   constructor(props = {}) {
     super(props);
-    this.onRecipeSelected = props.onRecipeSelected || (() => {});
-    
+    this.onRecipeSelected = props.onRecipeSelected || (() => { });
+    this.onCategorySelected = props.onCategorySelected || null;
+
     // Internal state
     this.activeGroup = 'all';     // "Всі рецепти", "Особисті", etc.
     this.activeCategory = props.activeCategory || null; // e.g. "М'ясо", null means Grid View of categories
@@ -23,7 +24,8 @@ export default class RecipeBookLeftPage extends Component {
       activeGroup: this.activeGroup,
       onGroupSelect: (grp) => {
         this.activeGroup = grp;
-        this.activeCategory = null; 
+        this.activeCategory = null;
+        if (this.onCategorySelected) this.onCategorySelected(null);
         this.viewMode = 'grid';
         this.listAllOpen = false;
         this.update();
@@ -35,6 +37,7 @@ export default class RecipeBookLeftPage extends Component {
       recipeCounts: {},
       onSelectCategory: (cat) => {
         this.activeCategory = cat;
+        if (this.onCategorySelected) this.onCategorySelected(cat);
         // STAY in grid mode, but now it will render the RecipeCardGrid!
         this.update();
       }
@@ -122,7 +125,7 @@ export default class RecipeBookLeftPage extends Component {
       }
     });
     return {
-      categories: Object.keys(counts).sort((a,b) => a.localeCompare(b)),
+      categories: Object.keys(counts).sort((a, b) => a.localeCompare(b)),
       recipeCounts: counts
     };
   }
@@ -149,7 +152,7 @@ export default class RecipeBookLeftPage extends Component {
       });
     };
 
-    const relevant = this.activeCategory 
+    const relevant = this.activeCategory
         ? filtered.filter(r => getRecipeCats(r).includes(this.activeCategory))
         : filtered;
 
@@ -210,10 +213,10 @@ export default class RecipeBookLeftPage extends Component {
                 <button class="rb-back-to-cat-btn" style="background:transparent;border:none;color:var(--brand-red,#8b1a1a);font-family:var(--font-title,serif);font-weight:700;display:flex;align-items:center;gap:4px;cursor:pointer;padding:0;outline:none;">
                   <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> 
                 </button>
-                <h3 class="rb-title" style="font-size: 1.25rem;margin:0;text-transform:uppercase;">КАТЕГОРІЯ ${this.activeCategory}</h3>
+                <h3 class="rb-title" style="font-size: 1.15rem;margin:0;text-transform:uppercase;">КАТЕГОРІЯ ${this.activeCategory}</h3>
               </div>
             ` : `
-              <h3 class="rb-title" style="font-size: 1.25rem;">КАТЕГОРІЇ</h3>
+              <h3 class="rb-title" style="font-size: 1.15rem;">КАТЕГОРІЇ</h3>
             `}
             <div class="rb-view-toggles">
               <button class="rb-view-btn ${this.viewMode === 'grid' ? 'active' : ''}" data-mode="grid">
@@ -250,7 +253,7 @@ export default class RecipeBookLeftPage extends Component {
     const cContainer = this.$('.rb-content-mount');
     if (cContainer) {
       const filtered = this._getGroupFilteredRecipes();
-      
+
       if (this.viewMode === 'grid') {
         if (!this.activeCategory) {
           // No category active: show tiles of Categories
@@ -286,7 +289,7 @@ export default class RecipeBookLeftPage extends Component {
     this.$$('.rb-view-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const mode = e.currentTarget.getAttribute('data-mode');
-        
+
         if (mode === 'grid') {
           this.viewMode = 'grid';
           this.listAllOpen = false;
@@ -297,7 +300,7 @@ export default class RecipeBookLeftPage extends Component {
           this.viewMode = 'list';
           this.listAllOpen = !this.listAllOpen;
         }
-        
+
         this.update();
       });
     });
@@ -306,6 +309,7 @@ export default class RecipeBookLeftPage extends Component {
     this.$$('.rb-back-to-cat-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         this.activeCategory = null;
+        if (this.onCategorySelected) this.onCategorySelected(null);
         this.update();
       });
     });
