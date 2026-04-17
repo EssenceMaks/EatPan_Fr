@@ -158,7 +158,29 @@ export default class RecipeOverview extends Component {
               </div>
               <div id="recipe-instructions-mount" class="collapsed"></div>
             </div>
-            
+
+            <!-- Chef's Secret -->
+            <div class="recipe-extra-section recipe-secret-section">
+              <div class="recipe-extra-header">
+                <div class="recipe-extra-icon">
+                  <i data-lucide="sparkles" style="width:18px;height:18px;"></i>
+                </div>
+                <h4 class="recipe-extra-title">Секрет шефа</h4>
+              </div>
+              <p class="recipe-extra-text">${(d.secret && d.secret.trim()) ? d.secret : '<em style="opacity:0.6;">Немає секрету</em>'}</p>
+            </div>
+
+            <!-- Serving Suggestions -->
+            <div class="recipe-extra-section recipe-serving-section">
+              <div class="recipe-extra-header">
+                <div class="recipe-extra-icon">
+                  <i data-lucide="utensils-crossed" style="width:18px;height:18px;"></i>
+                </div>
+                <h4 class="recipe-extra-title">Подача</h4>
+              </div>
+              <p class="recipe-extra-text">${(d.serving && d.serving.trim()) ? d.serving : '<em style="opacity:0.6;">Немає рекомендацій</em>'}</p>
+            </div>
+
           </div>
         </div>
 

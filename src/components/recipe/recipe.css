@@ -419,3 +419,83 @@
   opacity: 0.6;
   line-height: 1.3;
 }
+
+/* -------------------------------------------
+   EXTRA RECIPE SECTIONS (Chef Secret & Serving)
+   ------------------------------------------- */
+.recipe-extra-section {
+  margin-top: 24px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--parchment-light, #f5eed5) 0%, var(--parchment-base, #f1eacc) 100%);
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  border-radius: 8px;
+  position: relative;
+}
+
+.recipe-extra-section::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--gold, #c5a044);
+  border-radius: 8px 0 0 8px;
+}
+
+.recipe-secret-section::before {
+  background: linear-gradient(to bottom, var(--gold, #c5a044), var(--gold-dark, #8b6914));
+}
+
+.recipe-serving-section::before {
+  background: linear-gradient(to bottom, #298d9e, #0d3644);
+}
+
+.recipe-extra-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.recipe-extra-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--gold-light, #e8cc6e), var(--gold, #c5a044));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink, #2c1810);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.recipe-secret-section .recipe-extra-icon {
+  background: radial-gradient(circle, #ffd700, #b8860b);
+  color: #5c3c1e;
+}
+
+.recipe-serving-section .recipe-extra-icon {
+  background: radial-gradient(circle, #298d9e, #0d3644);
+  color: #fff;
+}
+
+.recipe-extra-title {
+  font-family: var(--font-title, 'Noto Serif', serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink, #2c1810);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.recipe-extra-text {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink, #2c1810);
+  margin: 0;
+  padding-left: 42px;
+  font-style: italic;
+}
