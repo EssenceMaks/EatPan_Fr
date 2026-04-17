@@ -401,34 +401,39 @@ export default class RecipeCreateForm extends Component {
   async _uploadPhotosAndGetUUIDs(session) {
     if (this.selectedFiles.length === 0) return [];
     
-    // We assume TARGET_BUCKET 'id_eatpan_media' is used in Supabase.
-    // However, the real storage bucket we are using is likely 'id_eatpan_media'.
-    // Let's use the local supabase client and its storage API.
-    const bucket = 'id_eatpan_media';
+    // Upload photos through Django Backend → Local Supabase Storage
+    // Django forwards file to kong:8000 (local Docker Supabase Storage container)
+    // and creates a MediaAsset record. Returns { uuid, url }.
+    const { apiFetch } = await import('../../core/ApiClient.js');
     const uuids = [];
     
-    for (let i = 0; i < this.selectedFiles.length; i++) {
-      const file = this.selectedFiles[i];
-      const uuid = window.crypto.randomUUID();
-      // Path: study/recipes/{uuid}/{filename} 
-      // or just root recipes/{uuid}/{filename}
-      // Usually it's better to isolate. Let's do: 'recipes/{uuid}/{clean_name}'
-      const ext = file.name.split('.').pop() || 'jpg';
-      const path = `study/recipes/${uuid}/image_${i}.${ext}`;
+    for (const file of this.selectedFiles) {
+      const formData = new FormData();
+      formData.append('file', file);
+      // Link to existing recipe if editing
+      if (this.recipeId) {
+        formData.append('recipe_id', this.recipeId);
+      }
       
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .upload(path, file, { cacheControl: '3600', upsert: false });
+      try {
+        const resp = await apiFetch('/media/upload/', {
+          method: 'POST',
+          body: formData,
+          // rawResponse=true so we get the Response object, not auto-parsed JSON
+          rawResponse: true,
+        });
         
-      if (error) {
-        console.error('Failed to upload', file.name, error);
-      } else {
-        // Successfully uploaded, we store the full cloud path or just the uuid
-        // If backend parses URLs, we should give it the full supabase storage URL.
-        // Or if backend generates it given uuid, we can pass uuid.
-        // Actually import_example_media logic uses the full cloud storage URL.
-        const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(path);
-        uuids.push(publicData.publicUrl);
+        if (resp && resp.ok) {
+          const result = await resp.json();
+          if (result.uuid) {
+            uuids.push(result.uuid);  // Store UUID, NOT full URL
+            console.log(`📸 Uploaded ${file.name} → UUID: ${result.uuid}`);
+          }
+        } else {
+          console.error('Upload failed for', file.name, resp?.status);
+        }
+      } catch (e) {
+        console.error('Failed to upload', file.name, e);
       }
     }
     

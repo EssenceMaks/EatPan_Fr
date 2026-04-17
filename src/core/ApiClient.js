@@ -44,9 +44,17 @@ async function apiFetch(path, options = {}) {
     localStorage.removeItem('eatpan_active_api');
   }
 
+  const isFormData = options.body instanceof FormData;
+  const rawResponse = options.rawResponse || false;
+
   const doFetch = async (base, withAuth = true) => {
-    const hdrs = withAuth ? await getAuthHeaders(options.headers || {}) : (options.headers || {});
-    return fetch(`${base}${path}`, { cache: 'no-store', ...options, headers: hdrs });
+    const extraHdrs = { ...(options.headers || {}) };
+    // For FormData: do NOT set Content-Type, browser adds multipart boundary automatically
+    if (isFormData) delete extraHdrs['Content-Type'];
+    const hdrs = withAuth ? await getAuthHeaders(extraHdrs) : extraHdrs;
+    const fetchOpts = { cache: 'no-store', ...options, headers: hdrs };
+    delete fetchOpts.rawResponse; // remove custom option before passing to fetch
+    return fetch(`${base}${path}`, fetchOpts);
   };
 
   // Try a single endpoint: with auth → if 401/403 → retry anonymous
@@ -78,6 +86,7 @@ async function apiFetch(path, options = {}) {
     try {
       const r = await tryEndpoint(cachedBase, '(cached)');
       if (r.ok) {
+        if (rawResponse) return r;
         if (r.status === 204) return null;
         return await r.json();
       }
@@ -97,6 +106,7 @@ async function apiFetch(path, options = {}) {
       if (r.ok) {
         window._activeApiBase = base;
         localStorage.setItem('eatpan_active_api', base);
+        if (rawResponse) return r;
         if (r.status === 204) return null;
         return await r.json();
       }
@@ -235,4 +245,4 @@ export function isLocalMedia() {
   return active === LOCAL_API || active === CLOUD_API; // Cloudflare tunnels to local
 }
 
-export { API_BASE };
+export { API_BASE, apiFetch };
