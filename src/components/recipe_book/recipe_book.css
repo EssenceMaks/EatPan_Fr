@@ -33,7 +33,7 @@
   grid-area: ribbons;
   position: relative;
   z-index: 10;
-  padding: 1.5rem 0 1.5rem 4px;
+  padding: 1.5rem 0 4px 4px;
   overflow: hidden;
   min-height: 0;
 }
@@ -62,10 +62,10 @@
   align-items: center;
   justify-content: center;
   padding: 16px 24px;
-  margin-top: 20px;
+  margin-top: 18px;
   border-bottom: 2px solid var(--crimson, #8b1a1a);
   flex-shrink: 0;
-  min-height: 64px;
+  min-height: 68px;
 }
 
 .book-page-scroll {
@@ -153,7 +153,7 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .rb-mock-list {
@@ -291,7 +291,7 @@
   /* On mobile, create bookmark becomes a fixed top-right fab */
   .rb-create-bookmark {
     top: auto !important;
-    bottom: 50px !important;
+    bottom: 70px !important;
     left: auto !important;
     right: 16px !important;
     transform: none !important;

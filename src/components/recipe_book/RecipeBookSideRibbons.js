@@ -314,6 +314,18 @@ export default class RecipeBookSideRibbons extends Component {
     });
   }
 
+  updateActiveCategory(catId) {
+    const newId = (!catId) ? '__all__' : catId;
+    if (this.props.activeId === newId) return;
+    this.props.activeId = newId;
+
+    if (window.innerWidth < 900) {
+      this._buildRibbons();
+    } else {
+      this._updateActive(newId);
+    }
+  }
+
   onDestroy() {
     if (this._resizeObs) this._resizeObs.disconnect();
   }

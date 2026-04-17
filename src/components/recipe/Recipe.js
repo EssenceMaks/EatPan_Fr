@@ -13,6 +13,7 @@ export default class Recipe extends Component {
     this.overview = new RecipeOverview({
       recipeData: this.recipeData,
       mediaAssets: this.mediaAssets,
+      onEdit: props.onEdit,
       onMoreDetails: async (mountContainer) => {
         await this.instructions.render(mountContainer, 'innerHTML');
         
@@ -44,6 +45,12 @@ export default class Recipe extends Component {
     
     // Always render overview. There is no substate for steps anymore, just an accordion
     await this.overview.render(this.mountContainer, 'innerHTML');
+    
+    // Render instructions immediately since accordion is expanded by default
+    const instructionsMount = this.overview.$('#recipe-instructions-mount');
+    if (instructionsMount) {
+      await this.instructions.render(instructionsMount, 'innerHTML');
+    }
     
     // Re-bind Lucide icons
     if (window.lucide) {

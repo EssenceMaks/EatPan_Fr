@@ -1,6 +1,7 @@
 import Component from '../../core/Component.js';
 import { IS_LOCAL } from '../../core/ApiClient.js';
 import { resolveMediaUrl } from '../../core/mediaResolver.js';
+import ArcLightbox from '../ui_kit/arc_lightbox/ArcLightbox.js';
 
 export default class RecipeOverview extends Component {
   constructor(props = {}) {
@@ -55,26 +56,65 @@ export default class RecipeOverview extends Component {
     const imageUrl = d.image_url || d.photo_url || '';
     const ingredients = d.ingredients || [];
 
-    // Resolve image URL from media_assets using UUID in data.media.images
-    let resolvedImageUrl = imageUrl;
-    if (!resolvedImageUrl && this.mediaAssets.length > 0) {
-      // Try to find the first image asset
-      const mediaRef = d.media?.images?.[0]; // UUID reference
-      if (mediaRef) {
-        const asset = this.mediaAssets.find(a => a.uuid === mediaRef);
-        if (asset?.url) resolvedImageUrl = asset.url;
-      }
-      // Fallback: just use the first image-type asset
-      if (!resolvedImageUrl) {
-        const firstImage = this.mediaAssets.find(a => a.kind === 'image');
-        if (firstImage?.url) resolvedImageUrl = firstImage.url;
+    // Extract ALL images from assets
+    // If recipe has original photo_url, prepend it.
+    let resolvedImageUrls = [];
+    if (imageUrl) {
+      resolvedImageUrls.push(resolveMediaUrl(imageUrl));
+    }
+
+    // Add everything from mediaAssets that is an image
+    if (this.mediaAssets.length > 0 || d.media?.images?.length > 0) {
+      // Specifically look for UUIDs in d.media.images
+      if (d.media?.images?.length > 0) {
+        d.media.images.forEach(ref => {
+          if (String(ref).startsWith('http')) {
+            const rUrl = resolveMediaUrl(ref);
+            if (!resolvedImageUrls.includes(rUrl)) resolvedImageUrls.push(rUrl);
+          } else if (this.mediaAssets.length > 0) {
+            const asset = this.mediaAssets.find(a => a.uuid === ref);
+            if (asset?.url) {
+              const rUrl = resolveMediaUrl(asset.url);
+              if (!resolvedImageUrls.includes(rUrl)) resolvedImageUrls.push(rUrl);
+            }
+          }
+        });
+      } else {
+        // Fallback, just grab all assets ignoring kind
+        this.mediaAssets.forEach(asset => {
+          if (asset.url) {
+            const rUrl = resolveMediaUrl(asset.url);
+            if (!resolvedImageUrls.includes(rUrl)) resolvedImageUrls.push(rUrl);
+          }
+        });
       }
     }
-    // Apply URL rewriting: cloud Supabase → local Docker storage
-    resolvedImageUrl = resolveMediaUrl(resolvedImageUrl) || '';
 
-    // Gallery: main image with smart fallback
-    const mainImg = this._buildMainImage(resolvedImageUrl, title);
+    // Save for lightbox usage
+    this.extractedImages = resolvedImageUrls;
+
+    // Build the gallery HTML
+    let galleryHtml = '';
+    if (resolvedImageUrls.length > 0) {
+      galleryHtml = `<div class="ag-gallery-grid">`;
+      // We will show up to 6 pictures max in the grid
+      const showCount = Math.min(resolvedImageUrls.length, 6);
+      for (let i = 0; i < showCount; i++) {
+        const isMain = i === 0;
+        const isLastVisible = i === 5 && resolvedImageUrls.length > 6;
+        const overtext = isLastVisible ? `<div class="ag-gallery-overlay">+${resolvedImageUrls.length - 6}</div>` : '';
+        
+        galleryHtml += `
+          <div class="ag-gallery-item ${isMain ? 'ag-main' : ''}" data-index="${i}">
+            <img src="${resolvedImageUrls[i]}" alt="Photo ${i+1}" onerror="this.style.opacity=0.3">
+            ${overtext}
+          </div>
+        `;
+      }
+      galleryHtml += `</div>`;
+    } else {
+      galleryHtml = `<div class="gallery-placeholder gallery-placeholder--no-photo"><i data-lucide="image-off" style="width:40px;height:40px;opacity:0.35;"></i><span>Без фото</span></div>`;
+    }
 
     // Ingredients HTML
     const ingredientsHtml = ingredients.map((ing, i) => {
@@ -234,17 +274,9 @@ export default class RecipeOverview extends Component {
               ${category ? `<p style="font-size: 0.75rem; color: var(--crimson, #8b1a1a); text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">${category}</p>` : ''}
             </div>
 
-            <!-- Centaur Style Photo Gallery -->
-            <div class="centaur-gallery">
-              <div class="gallery-photo side-left">
-                <div style="width:100%;height:100%;background:#805533;"></div>
-              </div>
-              <div class="gallery-photo side-right">
-                <div style="width:100%;height:100%;background:#5a3c24;"></div>
-              </div>
-              <div class="gallery-photo main">
-                ${mainImg}
-              </div>
+            <!-- Centaur Style Photo Gallery / Multi-photo block -->
+            <div class="recipe-gallery-container">
+              ${galleryHtml}
             </div>
 
             <!-- Ingredients List -->
@@ -261,11 +293,11 @@ export default class RecipeOverview extends Component {
             <div class="prep-steps-accordion" id="prep-steps-accordion">
               <div class="prep-steps-header" id="prep-steps-toggle">
                 <h3 class="steps-main-title" style="margin:0;border:none;padding:0;">Процес приготування</h3>
-                <button class="prep-steps-diamond-btn" id="diamond-toggle" type="button" title="Розгорнути інструкцію">
+                <button class="prep-steps-diamond-btn is-open" id="diamond-toggle" type="button" title="Згорнути інструкцію">
                   <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>
                 </button>
               </div>
-              <div id="recipe-instructions-mount" class="collapsed"></div>
+              <div id="recipe-instructions-mount" class="expanded"></div>
             </div>
 
             <!-- Chef's Secret -->
@@ -316,6 +348,29 @@ export default class RecipeOverview extends Component {
           mount.classList.add('collapsed');
           diamondBtn.classList.remove('is-open');
         }
+      });
+    }
+
+    const editBtn = this.element.querySelector('.bm-mobile-tab[title="Редагувати"]');
+    if (editBtn) {
+      editBtn.addEventListener('click', () => {
+        if (typeof this.props.onEdit === 'function') {
+          this.props.onEdit();
+        }
+      });
+    }
+
+    // Lightbox listener
+    if (this.extractedImages && this.extractedImages.length > 0) {
+      this.$$('.ag-gallery-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const idx = parseInt(item.dataset.index, 10);
+          const lb = new ArcLightbox({
+            images: this.extractedImages,
+            initialIndex: idx
+          });
+          lb.render(document.body, 'appendChild');
+        });
       });
     }
   }
