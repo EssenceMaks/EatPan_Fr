@@ -261,11 +261,11 @@ export default class RecipeOverview extends Component {
             <div class="prep-steps-accordion" id="prep-steps-accordion">
               <div class="prep-steps-header" id="prep-steps-toggle">
                 <h3 class="steps-main-title" style="margin:0;border:none;padding:0;">Процес приготування</h3>
-                <button class="prep-steps-diamond-btn" id="diamond-toggle" type="button" title="Розгорнути інструкцію">
+                <button class="prep-steps-diamond-btn is-open" id="diamond-toggle" type="button" title="Згорнути інструкцію">
                   <i data-lucide="chevron-down" style="width:16px;height:16px;"></i>
                 </button>
               </div>
-              <div id="recipe-instructions-mount" class="collapsed"></div>
+              <div id="recipe-instructions-mount" class="expanded"></div>
             </div>
 
             <!-- Chef's Secret -->

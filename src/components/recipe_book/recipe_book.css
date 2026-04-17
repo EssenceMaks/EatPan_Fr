@@ -291,7 +291,7 @@
   /* On mobile, create bookmark becomes a fixed top-right fab */
   .rb-create-bookmark {
     top: auto !important;
-    bottom: 50px !important;
+    bottom: 70px !important;
     left: auto !important;
     right: 16px !important;
     transform: none !important;
