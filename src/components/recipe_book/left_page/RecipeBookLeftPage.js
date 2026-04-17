@@ -8,6 +8,7 @@ export default class RecipeBookLeftPage extends Component {
   constructor(props = {}) {
     super(props);
     this.onRecipeSelected = props.onRecipeSelected || (() => { });
+    this.onCategorySelected = props.onCategorySelected || null;
 
     // Internal state
     this.activeGroup = 'all';     // "Всі рецепти", "Особисті", etc.
@@ -24,6 +25,7 @@ export default class RecipeBookLeftPage extends Component {
       onGroupSelect: (grp) => {
         this.activeGroup = grp;
         this.activeCategory = null;
+        if (this.onCategorySelected) this.onCategorySelected(null);
         this.viewMode = 'grid';
         this.listAllOpen = false;
         this.update();
@@ -35,6 +37,7 @@ export default class RecipeBookLeftPage extends Component {
       recipeCounts: {},
       onSelectCategory: (cat) => {
         this.activeCategory = cat;
+        if (this.onCategorySelected) this.onCategorySelected(cat);
         // STAY in grid mode, but now it will render the RecipeCardGrid!
         this.update();
       }
@@ -230,6 +233,7 @@ export default class RecipeBookLeftPage extends Component {
     this.$$('.rb-back-to-cat-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         this.activeCategory = null;
+        if (this.onCategorySelected) this.onCategorySelected(null);
         this.update();
       });
     });
