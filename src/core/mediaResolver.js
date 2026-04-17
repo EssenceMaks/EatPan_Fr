@@ -18,15 +18,10 @@ const CLOUD_BUCKET = 'ideatpanmedia';
 // Цільовий правильний бакет у вашому локальному Docker
 const TARGET_BUCKET = 'id_eatpan_media';
 
-// Визначаємо, чи користувач зараз сидить за вашим робочим комп'ютером (де запущений Docker)
-const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-// Базові адреси
-const LOCAL_STORAGE_BASE = 'http://localhost:6500';
-
-// !!! ТУТ МАЄ БУТИ ДОМЕН ВАШОГО СВІЖОГО ХМАРНОГО ТУНЕЛЮ ДЛЯ ПОРТУ 6500 !!!
-// Оскільки ви створюєте тунель, замініть це значення на реальний домен,
-// який ви прив'язали в Cloudflare до http://localhost:6500 (наприклад: https://media.eatpan.com)
+// ЗАВЖДИ використовуємо тунель для всіх:
+// - І для вас (Майстра)
+// - І для інших розробників, які запускають локально (localhost:6800)
+// - І для кінцевих користувачів на Github Pages
 const TUNNEL_STORAGE_BASE = 'https://supa_media.eatpan.com';
 
 /**
@@ -46,9 +41,7 @@ export function resolveMediaUrl(rawUrl) {
   const pathAfterBucket = rawUrl.substring(idx + marker.length);
 
   // СМАРТ-РЕСОЛВЕР:
-  // Якщо це ви розробляєте на localhost - запит піде на localhost:6500
-  // Якщо це будь-який інший юзер з Github Pages - запит піде через ваш новий Cloudflare тунель
-  const activeBase = isLocalhost ? LOCAL_STORAGE_BASE : TUNNEL_STORAGE_BASE;
-
-  return `${activeBase}/storage/v1/object/public/${TARGET_BUCKET}/${pathAfterBucket}`;
+  // Відтепер ми завжди йдемо через тунель, щоб інші розробники
+  // вашої команди також отримували фотографії з вашого Майстер-ПК!
+  return `${TUNNEL_STORAGE_BASE}/storage/v1/object/public/${TARGET_BUCKET}/${pathAfterBucket}`;
 }
