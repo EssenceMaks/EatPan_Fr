@@ -27,7 +27,7 @@ const LOCAL_STORAGE_BASE = 'http://localhost:6500';
 // !!! ТУТ МАЄ БУТИ ДОМЕН ВАШОГО СВІЖОГО ХМАРНОГО ТУНЕЛЮ ДЛЯ ПОРТУ 6500 !!!
 // Оскільки ви створюєте тунель, замініть це значення на реальний домен,
 // який ви прив'язали в Cloudflare до http://localhost:6500 (наприклад: https://media.eatpan.com)
-const TUNNEL_STORAGE_BASE = 'https://media.eatpan.com';
+const TUNNEL_STORAGE_BASE = 'https://supa_media.eatpan.com';
 
 /**
  * Перетворює URL
