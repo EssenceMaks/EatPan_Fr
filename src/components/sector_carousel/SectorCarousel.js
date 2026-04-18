@@ -442,6 +442,10 @@ export default class SectorCarousel extends Component {
   }
 
   deactivateAll() {
+    this.visualDeactivate();
+  }
+
+  visualDeactivate() {
     document.body.classList.remove('active-mode', 'clock-mode');
     this.carousel.querySelectorAll('.sector-card.active, .wedge-block.active').forEach(b => b.classList.remove('active'));
     this._restoreScroll();

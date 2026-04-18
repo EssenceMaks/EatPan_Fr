@@ -43,7 +43,7 @@ export default class AppShell extends Component {
     });
     const carouselTarget = document.getElementById('sector-carousel');
     if (carouselTarget) {
-      await this.carousel.render(carouselTarget.parentNode, 'innerHTML');
+      await this.carousel.render(carouselTarget, 'replace');
     }
 
     // 3. Mount MenuOverlay
@@ -272,8 +272,51 @@ export default class AppShell extends Component {
   // MENU ACTIONS
   // ============================================================
   _handleMenuAction(action) {
-    if (action === 'profile') this.carousel?.toggleProfileWedge();
-    if (action === 'auth') this.carousel?.toggleAuthWedge();
+    if (action === 'profile') {
+      this.carousel?.toggleProfileWedge();
+    } else if (action === 'auth') {
+      this.carousel?.toggleAuthWedge();
+    } else if (action.startsWith('goto-')) {
+      const sectorId = action.replace('goto-', '');
+      if (this.carousel && this.carousel.element) {
+        const targetBlock = this.carousel.element.querySelector(`.original-block[data-sector-id="${sectorId}"]`);
+        if (targetBlock) {
+          
+          const navigateToTarget = () => {
+             this.carousel.element.classList.remove('snapping');
+             const targetPos = this.carousel._scrollBlockToCenter(targetBlock, 'smooth');
+             
+             let scrollTimeout;
+             const checkScroll = () => {
+                const diff = Math.abs(this.carousel.element.scrollLeft - targetPos);
+                if (diff < 5) {
+                   setTimeout(() => {
+                      this.carousel.element.classList.add('snapping');
+                      this.carousel.activateBlock(targetBlock);
+                   }, 50); // tiny pause for aesthetics
+                } else {
+                   scrollTimeout = requestAnimationFrame(checkScroll);
+                }
+             };
+             
+             const fallbackTimer = setTimeout(() => {
+                cancelAnimationFrame(scrollTimeout);
+                this.carousel.element.classList.add('snapping');
+                this.carousel.activateBlock(targetBlock);
+             }, 1200);
+             
+             checkScroll();
+          };
+
+          if (document.body.classList.contains('active-mode')) {
+             this.carousel.visualDeactivate();
+             setTimeout(navigateToTarget, 300); // Wait for zoom out complete
+          } else {
+             navigateToTarget();
+          }
+        }
+      }
+    }
   }
 
   // ============================================================
