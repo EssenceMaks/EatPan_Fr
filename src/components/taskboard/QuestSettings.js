@@ -28,15 +28,26 @@ export default class QuestSettings extends Component {
       }
 
       container.innerHTML = `
-        <div class="tb-sidebar-header">ПАРАМЕТРИ КВЕСТУ</div>
+        <div class="tb-sidebar-header">ДЕТАЛІ КВЕСТУ</div>
         
         <div class="tb-detail-row" style="margin-bottom: 15px;">
-            <label>Назва / Опис</label>
+            <label>НАЗВА</label>
             <input type="text" class="tb-input" id="det-title" value="${quest.title}" style="margin-bottom: 5px;">
-            <textarea class="tb-input" id="det-desc" placeholder="Нотатки...">${quest.desc || ''}</textarea>
+            <textarea class="tb-input" id="det-desc" placeholder="Опис">${quest.desc || ''}</textarea>
         </div>
 
-        <!-- Слайдер 1: Діапазон ГОДИН -->
+        <!-- Слайдер 1: Хвилини ПОЧАТКУ -->
+        <div class="tb-setup-row">
+            <span class="tb-setup-label">Хвилини<br/>(Початок)</span>
+            <div style="flex-grow: 1;">
+               <input type="range" id="rangeStartMin" min="0" max="55" step="5" class="single-slider" />
+            </div>
+            <div style="width: 45px; display: flex; justify-content: flex-end;">
+               <input type="number" id="inputStartMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 30px; text-align: right; color: var(--text-gold); font-weight: bold; font-size: 13px;" />
+            </div>
+        </div>
+
+        <!-- Слайдер 2: Діапазон ГОДИН -->
         <div class="tb-setup-row">
             <span class="tb-setup-label">Години</span>
             <div style="flex-grow: 1; display: flex; align-items: center;">
@@ -46,21 +57,12 @@ export default class QuestSettings extends Component {
                     <input type="range" id="rangeEndHour" min="0" max="23" step="1" class="range-input" />
                 </div>
             </div>
-            <div style="display: flex; align-items: center; justify-content: flex-end; width: 45px; color: var(--text-gold); font-weight: bold; font-size: 13px;">
+            <div style="display: flex; align-items: center; justify-content: flex-end; min-width: 85px; color: var(--text-gold); font-weight: bold; font-size: 13px;">
                 <input type="number" id="inputStartHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 20px;" />
-                <span style="font-size: 10px; margin: 0 2px;">-</span>
+                <span style="font-size: 11px;">:</span><input type="number" id="inputStartMinSec" min="0" max="59" class="seamless-input tb-num-input" style="width: 20px;" />
+                <span style="font-size: 10px; margin: 0 4px;">-</span>
                 <input type="number" id="inputEndHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 20px;" />
-            </div>
-        </div>
-
-        <!-- Слайдер 2: Хвилини ПОЧАТКУ -->
-        <div class="tb-setup-row">
-            <span class="tb-setup-label">Хвилини<br/>(Початок)</span>
-            <div style="flex-grow: 1;">
-               <input type="range" id="rangeStartMin" min="0" max="55" step="5" class="single-slider" />
-            </div>
-            <div style="width: 45px; display: flex; justify-content: flex-end;">
-               <input type="number" id="inputStartMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 30px; text-align: right; color: var(--text-gold); font-weight: bold; font-size: 13px;" />
+                <span style="font-size: 11px;">:</span><input type="number" id="inputEndMinSec" min="0" max="59" class="seamless-input tb-num-input" style="width: 20px;" />
             </div>
         </div>
 
@@ -90,14 +92,17 @@ export default class QuestSettings extends Component {
             <div style="text-align: right;">
                <div style="font-size: 9px; color: #5c7482; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Тривалість</div>
                <div style="color: white; font-family: 'Cinzel', serif; font-size: 16px; display: inline-flex; align-items: baseline;">
-                  <input type="number" id="inputDurHour" min="0" max="24" class="seamless-input tb-num-input" style="width: 25px; text-align: right; color: white;" /> год
+                  <span id="durHourWrapper"><input type="number" id="inputDurHour" min="0" max="24" class="seamless-input tb-num-input" style="width: 25px; text-align: right; color: white;" /> год</span>
                   <input type="number" id="inputDurMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 25px; text-align: right; color: white; margin-left: 5px;" /> хв
                </div>
             </div>
         </div>
         
         <div class="tb-detail-row" style="margin-top: 10px;">
-            <label>КОЛІР КВЕСТУ</label>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <label>КОЛІР КВЕСТУ</label>
+                <div id="det-current-color" style="width: 14px; height: 14px; border-radius: 2px; background: ${quest.color}; border: 1px solid var(--gold-dark); box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>
+            </div>
             <div id="palette-mount" style="padding: 10px 0;"></div>
         </div>
       `;
@@ -110,6 +115,8 @@ export default class QuestSettings extends Component {
           this.colorPalette = new ArcColorPalette({
               initialColor: quest.color,
               onChange: (newColor) => {
+                  const swatch = container.querySelector('#det-current-color');
+                  if(swatch) swatch.style.background = newColor;
                   this.updateQuest({ color: newColor });
               }
           });
@@ -153,6 +160,8 @@ export default class QuestSettings extends Component {
           rangeTrack: container.querySelector('#rangeTrack'),
           inputStartHour: container.querySelector('#inputStartHour'),
           inputEndHour: container.querySelector('#inputEndHour'),
+          inputStartMinSec: container.querySelector('#inputStartMinSec'),
+          inputEndMinSec: container.querySelector('#inputEndMinSec'),
           
           rangeStartMin: container.querySelector('#rangeStartMin'),
           inputStartMin: container.querySelector('#inputStartMin'),
@@ -166,7 +175,8 @@ export default class QuestSettings extends Component {
           manualEndMin: container.querySelector('#manualEndMin'),
 
           inputDurHour: container.querySelector('#inputDurHour'),
-          inputDurMin: container.querySelector('#inputDurMin')
+          inputDurMin: container.querySelector('#inputDurMin'),
+          durHourWrapper: container.querySelector('#durHourWrapper')
       };
 
       const updateUI = () => {
@@ -190,6 +200,20 @@ export default class QuestSettings extends Component {
           let maxVal = Math.max(state.startH, state.endH);
           let percent1 = (minVal / 23) * 100;
           let percent2 = (maxVal / 23) * 100;
+          
+          if(els.rangeTrack) {
+              els.rangeTrack.style.left = percent1 + "%";
+              els.rangeTrack.style.width = (percent2 - percent1) + "%";
+          }
+
+          let startMinPercent = (state.startM / 55) * 100;
+          els.rangeStartMin.style.background = `linear-gradient(to right, var(--square-bg) ${startMinPercent}%, var(--text-gold) ${startMinPercent}%)`;
+          
+          let endMinPercent = (state.endM / 55) * 100;
+          els.rangeEndMin.style.background = `linear-gradient(to right, var(--text-gold) ${endMinPercent}%, var(--square-bg) ${endMinPercent}%)`;
+
+          if(els.inputStartMinSec && document.activeElement !== els.inputStartMinSec) els.inputStartMinSec.value = state.startM.toString().padStart(2, '0');
+          if(els.inputEndMinSec && document.activeElement !== els.inputEndMinSec) els.inputEndMinSec.value = state.endM.toString().padStart(2, '0');
 
           if(document.activeElement !== els.manualStartHour) els.manualStartHour.value = state.startH.toString().padStart(2, '0');
           if(document.activeElement !== els.manualStartMin) els.manualStartMin.value = state.startM.toString().padStart(2, '0');
@@ -209,7 +233,8 @@ export default class QuestSettings extends Component {
           let dM = diff % 60;
           
           if(document.activeElement !== els.inputDurHour) els.inputDurHour.value = dH;
-          if(document.activeElement !== els.inputDurMin) els.inputDurMin.value = dM;
+          if(document.activeElement !== els.inputDurMin || parseInt(els.inputDurMin.value) >= 60) els.inputDurMin.value = dM;
+          if(els.durHourWrapper) els.durHourWrapper.style.display = (dH === 0) ? 'none' : 'inline';
 
           this.updateQuest({
              hour: state.startH,
@@ -235,6 +260,16 @@ export default class QuestSettings extends Component {
           state.endH = parseInt(e.target.value);
           updateUI();
       });
+
+      const bringToFront = (el, otherEl) => {
+          el.style.zIndex = 5;
+          otherEl.style.zIndex = 4;
+      };
+
+      els.rangeStartHour.addEventListener('mousedown', () => bringToFront(els.rangeStartHour, els.rangeEndHour));
+      els.rangeStartHour.addEventListener('touchstart', () => bringToFront(els.rangeStartHour, els.rangeEndHour), {passive: true});
+      els.rangeEndHour.addEventListener('mousedown', () => bringToFront(els.rangeEndHour, els.rangeStartHour));
+      els.rangeEndHour.addEventListener('touchstart', () => bringToFront(els.rangeEndHour, els.rangeStartHour), {passive: true});
 
       els.inputStartHour.addEventListener('input', (e) => {
           let v = parseInt(e.target.value);
@@ -264,7 +299,7 @@ export default class QuestSettings extends Component {
          state.endM = newEnd % 60;
          updateUI();
       });
-      els.inputStartMin.addEventListener('input', (e) => {
+      const handleStartMinInput = (e) => {
          let v = parseInt(e.target.value);
          if(!isNaN(v) && v >= 0 && v < 60) {
              let oldTotal = state.startH * 60 + state.startM;
@@ -276,16 +311,20 @@ export default class QuestSettings extends Component {
              state.endM = newEnd % 60;
              updateUI();
          }
-      });
+      };
+      if(els.inputStartMin) els.inputStartMin.addEventListener('input', handleStartMinInput);
+      if(els.inputStartMinSec) els.inputStartMinSec.addEventListener('input', handleStartMinInput);
 
       els.rangeEndMin.addEventListener('input', (e) => {
          state.endM = parseInt(e.target.value);
          updateUI();
       });
-      els.inputEndMin.addEventListener('input', (e) => {
+      const handleEndMinInput = (e) => {
          let v = parseInt(e.target.value);
          if(!isNaN(v) && v >= 0 && v < 60) { state.endM = v; updateUI(); }
-      });
+      };
+      if(els.inputEndMin) els.inputEndMin.addEventListener('input', handleEndMinInput);
+      if(els.inputEndMinSec) els.inputEndMinSec.addEventListener('input', handleEndMinInput);
 
       // Поля вводу тривалості
       els.inputDurHour.addEventListener('input', (e) => {
@@ -301,7 +340,7 @@ export default class QuestSettings extends Component {
       });
       els.inputDurMin.addEventListener('input', (e) => {
          let v = parseInt(e.target.value);
-         if(!isNaN(v) && v >= 0 && v < 60) {
+         if(!isNaN(v) && v >= 0) {
              let totalStartMins = state.startH * 60 + state.startM;
              let totalDiffMins = parseInt(els.inputDurHour.value || 0) * 60 + v;
              let newEnd = totalStartMins + totalDiffMins;

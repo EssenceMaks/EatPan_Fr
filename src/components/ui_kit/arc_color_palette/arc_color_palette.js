@@ -73,7 +73,7 @@ export default class ArcColorPalette extends Component {
             <div class="arc-color-group">
                 <label class="arc-color-picker-label" title="Точний колір">
                     🎨
-                    <input type="color" class="custom-color-input" value="${this.state.selectedColor}" style="display: none;">
+                    <input type="color" class="custom-color-input" value="${this.state.selectedColor && this.state.selectedColor.startsWith('#') ? this.state.selectedColor : '#5c7482'}" style="display: none;">
                 </label>
             </div>
         </div>

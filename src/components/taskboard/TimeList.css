@@ -169,7 +169,7 @@
 
 .end-time-label {
   font-size: 11px;
-  color: #5c7482;
+  color: var(--text-gold);
   font-style: italic;
   white-space: nowrap;
 }
