@@ -7,6 +7,7 @@
  */
 import Component from '../../core/Component.js';
 import RecipeBook from '../recipe_book/RecipeBook.js';
+import TaskBoard from '../taskboard/TaskBoard.js';
 
 // ============================================================
 // SECTOR REGISTRY — easy to add/remove/reorder
@@ -146,6 +147,13 @@ export default class SectorCarousel extends Component {
       originalRecipeBookContainer.innerHTML = '';
       this.recipeBookComponent = new RecipeBook();
       await this.recipeBookComponent.render(originalRecipeBookContainer, 'innerHTML');
+    }
+
+    const originalTaskBoardContainer = this.carousel.querySelector('.original-block[data-sector-id="taskboard"] .sector-content');
+    if (originalTaskBoardContainer) {
+      originalTaskBoardContainer.innerHTML = '';
+      this.taskBoardComponent = new TaskBoard();
+      await this.taskBoardComponent.render(originalTaskBoardContainer, 'innerHTML');
     }
   }
 

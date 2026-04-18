@@ -1,0 +1,61 @@
+/* =======================================
+   COLUMN 2: QUEST LIST
+   ======================================= */
+.tb-questlist-col {
+  background: var(--bg-panel);
+  border: 1px solid #1a3240;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.tb-sidebar-header {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--text-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--square-border);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.tb-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tb-list-item {
+  font-size: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: var(--square-bg);
+  border: 1px solid transparent;
+  transition: background 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tb-list-item:hover {
+  background: var(--hover-bg);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.tb-list-item.active {
+  border: 1px solid var(--border-gold);
+  color: var(--text-gold);
+  background: #152d3a;
+}
+
+.tb-list-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}

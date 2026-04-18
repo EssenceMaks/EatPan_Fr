@@ -1,0 +1,25 @@
+@import url('./TimeList.css');
+@import url('./QuestList.css');
+@import url('./QuestSettings.css');
+
+:root {
+  --bg-gradient: linear-gradient(135deg, #0f1c24 0%, #1a3240 100%);
+  --bg-panel: #0b1a22;
+  --text-main: #b8c5cc;
+  --text-gold: #c69b50;
+  --border-gold: #8c7343;
+  --hover-bg: #152d3a;
+  --square-border: #1e3d4d;
+  --square-bg: #0f242f;
+}
+
+.taskboard-layout {
+  display: grid;
+  grid-template-columns: 1.5fr minmax(200px, 1fr) minmax(300px, 1.2fr);
+  gap: 20px;
+  height: 100%;
+  padding: 10px 20px;
+  overflow: hidden;
+  color: var(--text-main);
+  user-select: none;
+}

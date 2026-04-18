@@ -1,0 +1,301 @@
+import Component from '../../core/Component.js';
+import ArcColorPalette from '../ui_kit/arc_color_palette/arc_color_palette.js';
+
+export default class QuestSettings extends Component {
+  constructor(props) {
+    super(props);
+    this.colorPalette = null;
+  }
+
+  async template() {
+    return `<div class="tb-details-col" id="quest-details-container"></div>`;
+  }
+
+  async onMount() {
+    this.renderDetails();
+  }
+
+  async renderDetails() {
+      if (!this._mounted) return;
+      const container = this.element;
+      
+      const { activeQuestId, getQuestData } = this.props;
+      const quest = activeQuestId && getQuestData ? getQuestData(activeQuestId) : null;
+
+      if (!activeQuestId || !quest) {
+          container.innerHTML = `<div class="empty-state">Выберите или создайте квест на таймлайне</div>`;
+          return;
+      }
+
+      container.innerHTML = `
+        <div class="tb-sidebar-header">ПАРАМЕТРЫ КВЕСТА</div>
+        
+        <div class="tb-detail-row" style="margin-bottom: 15px;">
+            <label>Название / Описание</label>
+            <input type="text" class="tb-input" id="det-title" value="${quest.title}" style="margin-bottom: 5px;">
+            <textarea class="tb-input" id="det-desc" placeholder="Заметки...">${quest.desc || ''}</textarea>
+        </div>
+
+        <!-- Слайдер 1: Диапазон ЧАСОВ -->
+        <div class="tb-setup-row">
+            <span class="tb-setup-label">Часы</span>
+            <div style="flex-grow: 1; display: flex; align-items: center;">
+                <div class="range-slider">
+                    <div id="rangeTrack" class="range-track"></div>
+                    <input type="range" id="rangeStartHour" min="0" max="24" step="1" class="range-input" />
+                    <input type="range" id="rangeEndHour" min="0" max="24" step="1" class="range-input" />
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: flex-end; width: 45px; color: var(--text-gold); font-weight: bold; font-size: 13px;">
+                <input type="number" id="inputStartHour" class="seamless-input tb-num-input" style="width: 20px;" />
+                <span style="font-size: 10px; margin: 0 2px;">-</span>
+                <input type="number" id="inputEndHour" class="seamless-input tb-num-input" style="width: 20px;" />
+            </div>
+        </div>
+
+        <!-- Слайдер 2: Минуты НАЧАЛА -->
+        <div class="tb-setup-row">
+            <span class="tb-setup-label">Минуты<br/>(Начало)</span>
+            <div style="flex-grow: 1;">
+               <input type="range" id="rangeStartMin" min="0" max="55" step="5" class="single-slider" />
+            </div>
+            <div style="width: 45px; display: flex; justify-content: flex-end;">
+               <input type="number" id="inputStartMin" class="seamless-input tb-num-input" style="width: 30px; text-align: right; color: var(--text-gold); font-weight: bold; font-size: 13px;" />
+            </div>
+        </div>
+
+        <!-- Слайдер 3: Минуты ОКОНЧАНИЯ -->
+        <div class="tb-setup-row" style="margin-bottom: 10px;">
+            <span class="tb-setup-label">Минуты<br/>(Конец)</span>
+            <div style="flex-grow: 1;">
+               <input type="range" id="rangeEndMin" min="0" max="55" step="5" class="single-slider" />
+            </div>
+            <div style="width: 45px; display: flex; justify-content: flex-end;">
+               <input type="number" id="inputEndMin" class="seamless-input tb-num-input" style="width: 30px; text-align: right; color: var(--text-gold); font-weight: bold; font-size: 13px;" />
+            </div>
+        </div>
+
+        <!-- Результаты -->
+        <div class="tb-setup-results">
+            <div>
+               <div style="font-size: 9px; color: #5c7482; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Время квеста</div>
+               <div style="color: var(--text-gold); font-family: 'Cinzel', serif; font-size: 16px; font-weight: bold;">
+                  <span id="det-time-label">00:00 - 00:00</span>
+               </div>
+            </div>
+            <div style="text-align: right;">
+               <div style="font-size: 9px; color: #5c7482; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Длительность</div>
+               <div style="color: white; font-family: 'Cinzel', serif; font-size: 16px; display: inline-flex; align-items: baseline;">
+                  <input type="number" id="inputDurHour" min="0" max="24" class="seamless-input tb-num-input" style="width: 25px; text-align: right; color: white;" /> ч
+                  <input type="number" id="inputDurMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 25px; text-align: right; color: white; margin-left: 5px;" /> м
+               </div>
+            </div>
+        </div>
+        
+        <div class="tb-detail-row" style="margin-top: 10px;">
+            <label>ЦВЕТ КВЕСТА</label>
+            <div id="palette-mount" style="padding: 10px 0;"></div>
+        </div>
+      `;
+
+      const paletteMount = container.querySelector('#palette-mount');
+      if (paletteMount) {
+          if (this.colorPalette) {
+              this.colorPalette.destroy();
+          }
+          this.colorPalette = new ArcColorPalette({
+              initialColor: quest.color,
+              onChange: (newColor) => {
+                  this.updateQuest({ color: newColor });
+              }
+          });
+          await this.colorPalette.render(paletteMount, 'innerHTML');
+          this.colorPalette.setEvents();
+      }
+
+      this.bindDetailsEvents();
+  }
+
+  updateQuest(updates) {
+     if(this.props.onUpdate) {
+         this.props.onUpdate(this.props.activeQuestId, updates);
+     }
+  }
+
+  bindDetailsEvents() {
+      const container = this.element;
+      
+      const { activeQuestId, getQuestData } = this.props;
+      const data = activeQuestId && getQuestData ? getQuestData(activeQuestId) : null;
+      if (!data) return;
+
+      const titleInp = container.querySelector('#det-title');
+      const descInp = container.querySelector('#det-desc');
+      
+      titleInp.addEventListener('change', (e) => this.updateQuest({ title: e.target.value }));
+      descInp.addEventListener('change', (e) => this.updateQuest({ desc: e.target.value }));
+
+      // Time variables setup
+      let state = {
+          startH: data.hour,
+          startM: data.startM,
+          endH: data.hour + data.durH + Math.floor((data.startM + data.durM) / 60),
+          endM: (data.startM + data.durM) % 60
+      };
+
+      const els = {
+          rangeStartHour: container.querySelector('#rangeStartHour'),
+          rangeEndHour: container.querySelector('#rangeEndHour'),
+          rangeTrack: container.querySelector('#rangeTrack'),
+          inputStartHour: container.querySelector('#inputStartHour'),
+          inputEndHour: container.querySelector('#inputEndHour'),
+          
+          rangeStartMin: container.querySelector('#rangeStartMin'),
+          inputStartMin: container.querySelector('#inputStartMin'),
+          
+          rangeEndMin: container.querySelector('#rangeEndMin'),
+          inputEndMin: container.querySelector('#inputEndMin'),
+          
+          timeLabel: container.querySelector('#det-time-label'),
+          inputDurHour: container.querySelector('#inputDurHour'),
+          inputDurMin: container.querySelector('#inputDurMin')
+      };
+
+      const updateUI = () => {
+          if(state.endH < state.startH || (state.endH === state.startH && state.endM < state.startM)) {
+              state.endH = state.startH;
+              state.endM = state.startM;
+          }
+
+          els.rangeStartHour.value = state.startH;
+          els.rangeEndHour.value = state.endH;
+          els.inputStartHour.value = state.startH;
+          els.inputEndHour.value = state.endH;
+          
+          els.rangeStartMin.value = state.startM;
+          els.inputStartMin.value = state.startM;
+          
+          els.rangeEndMin.value = state.endM;
+          els.inputEndMin.value = state.endM;
+
+          let minVal = Math.min(state.startH, state.endH);
+          let maxVal = Math.max(state.startH, state.endH);
+          let percent1 = (minVal / 24) * 100;
+          let percent2 = (maxVal / 24) * 100;
+
+          els.rangeTrack.style.left = percent1 + "%";
+          els.rangeTrack.style.width = (percent2 - percent1) + "%";
+
+          els.timeLabel.textContent = `${state.startH.toString().padStart(2, '0')}:${state.startM.toString().padStart(2, '0')} - ${state.endH.toString().padStart(2, '0')}:${state.endM.toString().padStart(2, '0')}`;
+          
+          let totalStartMins = state.startH * 60 + state.startM;
+          let totalEndMins = state.endH * 60 + state.endM;
+          let diff = totalEndMins - totalStartMins;
+          
+          let dH = Math.floor(diff / 60);
+          let dM = diff % 60;
+          
+          if(document.activeElement !== els.inputDurHour) els.inputDurHour.value = dH;
+          if(document.activeElement !== els.inputDurMin) els.inputDurMin.value = dM;
+
+          this.updateQuest({
+             hour: state.startH,
+             startM: state.startM,
+             durH: dH,
+             durM: dM
+          });
+      };
+
+      updateUI();
+
+      els.rangeStartHour.addEventListener('input', (e) => {
+          state.startH = parseInt(e.target.value);
+          let diff = (state.endH * 60 + state.endM) - (state.startH * 60 + state.startM);
+          if(diff < 0) diff = 10;
+          let newEnd = (state.startH * 60 + state.startM) + diff;
+          state.endH = Math.floor(newEnd / 60) % 24;
+          state.endM = newEnd % 60;
+          updateUI();
+      });
+
+      els.rangeEndHour.addEventListener('input', (e) => {
+          state.endH = parseInt(e.target.value);
+          updateUI();
+      });
+
+      els.inputStartHour.addEventListener('input', (e) => {
+          let v = parseInt(e.target.value);
+          if(!isNaN(v) && v >= 0 && v <= 24) { 
+              let diff = (state.endH * 60 + state.endM) - (state.startH * 60 + state.startM);
+              if(diff < 0) diff = 10;
+              state.startH = v; 
+              let newEnd = (state.startH * 60 + state.startM) + diff;
+              state.endH = Math.floor(newEnd / 60) % 24;
+              state.endM = newEnd % 60;
+              updateUI(); 
+          }
+      });
+
+      els.inputEndHour.addEventListener('input', (e) => {
+          let v = parseInt(e.target.value);
+          if(!isNaN(v) && v >= 0 && v <= 24) { state.endH = v; updateUI(); }
+      });
+
+      els.rangeStartMin.addEventListener('input', (e) => {
+         let oldTotal = state.startH * 60 + state.startM;
+         state.startM = parseInt(e.target.value);
+         let diff = (state.endH * 60 + state.endM) - oldTotal;
+         if(diff < 0) diff = 10;
+         let newEnd = (state.startH * 60 + state.startM) + diff;
+         state.endH = Math.floor(newEnd / 60) % 24;
+         state.endM = newEnd % 60;
+         updateUI();
+      });
+      els.inputStartMin.addEventListener('input', (e) => {
+         let v = parseInt(e.target.value);
+         if(!isNaN(v) && v >= 0 && v < 60) {
+             let oldTotal = state.startH * 60 + state.startM;
+             state.startM = v;
+             let diff = (state.endH * 60 + state.endM) - oldTotal;
+             if(diff < 0) diff = 10;
+             let newEnd = (state.startH * 60 + state.startM) + diff;
+             state.endH = Math.floor(newEnd / 60) % 24;
+             state.endM = newEnd % 60;
+             updateUI();
+         }
+      });
+
+      els.rangeEndMin.addEventListener('input', (e) => {
+         state.endM = parseInt(e.target.value);
+         updateUI();
+      });
+      els.inputEndMin.addEventListener('input', (e) => {
+         let v = parseInt(e.target.value);
+         if(!isNaN(v) && v >= 0 && v < 60) { state.endM = v; updateUI(); }
+      });
+
+      // Duration Inputs
+      els.inputDurHour.addEventListener('input', (e) => {
+         let v = parseInt(e.target.value);
+         if(!isNaN(v) && v >= 0 && v <= 24) {
+             let totalStartMins = state.startH * 60 + state.startM;
+             let totalDiffMins = v * 60 + parseInt(els.inputDurMin.value || 0);
+             let newEnd = totalStartMins + totalDiffMins;
+             state.endH = Math.floor(newEnd / 60) % 24;
+             state.endM = newEnd % 60;
+             updateUI();
+         }
+      });
+      els.inputDurMin.addEventListener('input', (e) => {
+         let v = parseInt(e.target.value);
+         if(!isNaN(v) && v >= 0 && v < 60) {
+             let totalStartMins = state.startH * 60 + state.startM;
+             let totalDiffMins = parseInt(els.inputDurHour.value || 0) * 60 + v;
+             let newEnd = totalStartMins + totalDiffMins;
+             state.endH = Math.floor(newEnd / 60) % 24;
+             state.endM = newEnd % 60;
+             updateUI();
+         }
+      });
+  }
+}
