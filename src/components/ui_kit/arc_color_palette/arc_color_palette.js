@@ -71,7 +71,7 @@ export default class ArcColorPalette extends Component {
         <div class="arc-palette-row" style="margin-top: 4px;">
             <span class="arc-palette-label">CUSTOM</span>
             <div class="arc-color-group">
-                <label class="arc-color-picker-label" title="Точный цвет">
+                <label class="arc-color-picker-label" title="Точний колір">
                     🎨
                     <input type="color" class="custom-color-input" value="${this.state.selectedColor}" style="display: none;">
                 </label>

@@ -19,33 +19,33 @@ export default class TaskBoard extends Component {
       userId: null
     };
 
-    // Sub-components
+    // Підкомпоненти
     this.timeList = null;
     this.questList = null;
     this.questSettings = null;
     
-    // Timer for debouncing saves
+    // Таймер для дебаунсу збережень
     this.saveDebounce = null;
   }
 
   async onMount() {
-    // Determine user context for storage (Stage 1 uses this as key)
+    // Визначення контексту користувача для сховища (Стадія 1 використовує це як ключ)
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user?.id) {
       this.state.userId = session.user.id;
     }
 
-    // Load State
+    // Завантаження стану
     this.loadState();
     
-    // Initialize components
+    // Ініціалізація компонентів
     this.initTimeList();
     this.initQuestList();
     this.initQuestSettings();
   }
 
   // ============================================
-  // TEMPLATING
+  // ШАБЛОНІЗАЦІЯ
   // ============================================
   async template() {
     return `
@@ -63,7 +63,7 @@ export default class TaskBoard extends Component {
   }
 
   // ============================================
-  // INITIALIZERS
+  // ІНІЦІАЛІЗАТОРИ
   // ============================================
   async initTimeList() {
       this.timeList = new TimeList({
@@ -114,7 +114,7 @@ export default class TaskBoard extends Component {
               if(this.state.activeQuestId === taskId) {
                  this.questSettings.renderDetails();
               }
-              // Quests might have changed sorting order
+              // Квести могли змінити порядок сортування
               this.questList.refreshList();
           },
 
@@ -166,7 +166,7 @@ export default class TaskBoard extends Component {
   async initQuestSettings() {
       this.questSettings = new QuestSettings({
           activeQuestId: this.state.activeQuestId,
-          getQuestData: (id) => this.state.questsData[id], // Pass accessor to get live reference
+          getQuestData: (id) => this.state.questsData[id], // Передаємо доступ до отримання живого посилання
           onUpdate: (taskId, updates) => {
               if(!this.state.questsData[taskId]) return;
               Object.assign(this.state.questsData[taskId], updates);
@@ -180,12 +180,12 @@ export default class TaskBoard extends Component {
   }
 
   // ============================================
-  // ORCHESTRATION LOGIC
+  // ЛОГІКА ОРКЕСТРАЦІЇ
   // ============================================
   setActiveQuest(taskId) {
      this.state.activeQuestId = taskId;
      
-     // Update children tracking state
+     // Оновлення стану відстеження дочірніх елементів
      if (this.timeList) {
          this.timeList.props.activeQuestId = taskId;
          this.timeList.updateActiveQuestHighlight();
@@ -201,7 +201,7 @@ export default class TaskBoard extends Component {
   }
 
   // ============================================
-  // PERSISTENCE (STAGE 1: LOCALSTORAGE)
+  // ЗБЕРЕЖЕННЯ ДАНИХ (СТАДІЯ 1: LOCALSTORAGE)
   // ============================================
   loadState() {
      const storageKey = this.state.userId ? `eatpan_quests_v1_${this.state.userId}` : 'eatpan_quests_v1_guest';
@@ -211,7 +211,7 @@ export default class TaskBoard extends Component {
              const data = JSON.parse(saved);
              this.state.questsData = data.quests || {};
              
-             // Backwards-compatibility for missing array properties logically attached in current cycle
+             // Зворотна сумісність для відсутніх властивостей масиву, які логічно прикріплюються в поточному циклі
              for (const [key, q] of Object.entries(this.state.questsData)) {
                  if (!q.media_assets) q.media_assets = [];
              }

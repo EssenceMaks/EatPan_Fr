@@ -8,7 +8,7 @@ export default class QuestList extends Component {
   async template() {
     return `
       <div class="tb-questlist-col">
-        <div class="tb-sidebar-header">КВЕСТЫ НА ДЕНЬ</div>
+        <div class="tb-sidebar-header">КВЕСТИ НА ДЕНЬ</div>
         <div class="tb-list-container" id="quest-list-container">
            <!-- Quests injected here via JS -->
         </div>
@@ -19,7 +19,7 @@ export default class QuestList extends Component {
   async onMount() {
     this.refreshList();
     
-    // Delegation for clicks
+    // Делегування кліків
     this.element.addEventListener('click', (e) => {
        const row = e.target.closest('.tb-list-item');
        if (row && row.dataset.taskId) {
@@ -28,7 +28,7 @@ export default class QuestList extends Component {
     });
   }
 
-  // Refreshes the list UI directly without re-mounting
+  // Оновлює UI списку без перемонтування
   refreshList() {
     if (!this._mounted) return;
     const listContainer = this.element.querySelector('#quest-list-container');
@@ -36,7 +36,7 @@ export default class QuestList extends Component {
     
     listContainer.innerHTML = '';
     
-    // Sort quests chronologically
+    // Сортування квестів у хронологічному порядку
     const sorted = Object.entries(this.props.questsData)
         .filter(([_, q]) => !q.archived)
         .sort((a, b) => {
@@ -55,9 +55,9 @@ export default class QuestList extends Component {
         dot.style.backgroundColor = quest.color;
         
         const text = document.createElement('span');
-        text.textContent = quest.title || 'Новый квест';
+        text.textContent = quest.title || 'Новий квест';
         
-        // Strikethrough if completed
+        // Закреслення, якщо виконано
         if(quest.completed) {
             text.style.textDecoration = 'line-through';
             text.style.opacity = '0.7';

@@ -16,10 +16,10 @@ export default class TimeList extends Component {
     return `
       <div class="tb-timeline-col">
           <div class="header-row">
-              <div class="col-1"><span class="header-label">ВРЕМЯ</span></div>
+              <div class="col-1"><span class="header-label">ЧАС</span></div>
               <div class="col-2" style="display: flex; align-items: center; justify-content: space-between; padding-right: 5px;">
-                  <span class="header-label">СЛОТЫ</span>
-                  <span id="randomize-colors-btn" title="Случайные цвета квестов" style="cursor: pointer; font-size: 12px; transition: transform 0.1s;">🎨</span>
+                  <span class="header-label">СЛОТИ</span>
+                  <span id="randomize-colors-btn" title="Випадкові кольори квестів" style="cursor: pointer; font-size: 12px; transition: transform 0.1s;">🎨</span>
               </div>
               <div class="col-3"></div>
               <div class="col-4"><span class="header-label">КВЕСТ</span></div>
@@ -65,7 +65,7 @@ export default class TimeList extends Component {
   setEvents() {
     const wrapper = this.element.querySelector('#time-list-wrapper');
     
-    // Timeline clicks & dragging
+    // Кліки та перетягування на таймлайні
     wrapper.addEventListener('click', (e) => {
         if (e.target.classList.contains('time_cells_cube')) {
             const index = this.getCubeIndex(e.target);
@@ -120,7 +120,7 @@ export default class TimeList extends Component {
         }
     });
 
-    // Drag tasks to hours
+    // Перетягування квестів на години
     wrapper.addEventListener('dragover', (e) => {
       const line = e.target.closest('.time_list_current_line');
       if (line) {
@@ -178,7 +178,7 @@ export default class TimeList extends Component {
                if (this.props.onArchive) this.props.onArchive(taskId);
            }
            else if (action === 'trash') {
-               if (confirm('Вы действительно хотите удалить квест?')) {
+               if (confirm('Ви дійсно хочете видалити квест?')) {
                    row.remove();
                    this.afterTaskRemoved(row);
                    if (this.props.onTrash) this.props.onTrash(taskId);
@@ -187,7 +187,7 @@ export default class TimeList extends Component {
        }
     });
 
-    // Label select
+    // Вибір за підписом
     this.element.addEventListener('click', (e) => {
        const group = e.target.closest('.task-title-group');
        if(group) {
@@ -223,17 +223,17 @@ export default class TimeList extends Component {
   }
 
   getRandomColor() {
-      // Need this helper since it was in TaskBoard
+      // Цей помічник потрібен, оскільки раніше він був у TaskBoard
       const h = Math.floor(Math.random() * 360);
       return `hsl(${h}, 50%, 60%)`;
   }
 
-  // --- Exposed to parent via this.timeList.refreshCells() ---
+  // --- Відкрито для батьківського компонента через this.timeList.refreshCells() ---
   refreshCells() {
     let globalAssignments = Array.from({ length: 144 }, () => []);
     const questsData = this.props.questsData;
     
-    // Ensure tasks are in the correct DOM container if their hour shifted
+    // Переконатися, що квести знаходяться у правильному DOM-контейнері під час зміни їхньої години
     for (const key in questsData) {
         const task = questsData[key];
         if (task.archived) continue;
@@ -317,7 +317,7 @@ export default class TimeList extends Component {
      }
   }
 
-  // Helper functions transferred from TaskBoard 
+  // Допоміжні функції, перенесені з TaskBoard
   getCubeIndex(cube) {
     const line = cube.closest('.time_list_current_line');
     if(!line) return null;
@@ -395,7 +395,7 @@ export default class TimeList extends Component {
             endLabel.remove();
         }
         
-        // Update local text representation
+        // Оновлення локального текстового відображення
         const titleSpan = titleGroup.querySelector('.task-title-text');
         if(titleSpan) titleSpan.textContent = task.title;
         
@@ -427,7 +427,7 @@ export default class TimeList extends Component {
     const row = this.createRow('task-input-wrapper');
     const input = document.createElement('input');
     input.className = 'task-input';
-    input.placeholder = 'Свободный час... (Клик для квеста)';
+    input.placeholder = 'Вільний час... (Клік для квесту)';
     row.querySelector('.col-4').appendChild(input);
 
     tasksArea.appendChild(row);
@@ -450,7 +450,7 @@ export default class TimeList extends Component {
 
   createTaskItemDOM(taskId, task) {
     const existing = this.element.querySelector(`#${taskId}`);
-    if (existing) return; // Prevent duplicates
+    if (existing) return; // Запобігання дублюванню
 
     const row = this.createRow('task-item');
     row.id = taskId;
