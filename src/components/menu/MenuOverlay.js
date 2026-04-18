@@ -58,9 +58,9 @@ export default class MenuOverlay extends Component {
               <button class="arc-theme-btn t-silver" data-theme="theme-silver">SILVER</button>
               <button class="arc-theme-btn t-neon" data-theme="theme-neon">NEON</button>
               <button class="arc-theme-btn t-tanger" data-theme="theme-tangerine">TANGERINE</button>
-              <button class="arc-theme-btn t-blue" data-theme="arc-dark-blue">BLUE</button>
-              <button class="arc-theme-btn t-red" data-theme="arc-dark-red">RED</button>
-              <button class="arc-theme-btn t-green" data-theme="arc-dark-green">GREEN</button>
+              <button class="arc-theme-btn t-blue" data-theme="theme-blue">BLUE</button>
+              <button class="arc-theme-btn t-red" data-theme="theme-red">RED</button>
+              <button class="arc-theme-btn t-green" data-theme="theme-green">GREEN</button>
             </div>
           </div>
 

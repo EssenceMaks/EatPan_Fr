@@ -49,6 +49,14 @@
   box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.8);
 }
 
+.arc-glyph--convex.active {
+  border-color: var(--gold-light, #e0a050);
+  background: radial-gradient(circle at 50% 50%, var(--gold-light, #e0a050) 0%, var(--gold-base, #c69b50) 60%, var(--gold-dark, #8b2222) 100%);
+  box-shadow: 0 0 15px rgba(198, 155, 80, 0.9), inset 0 0 15px rgba(0, 0, 0, 0.4);
+  color: var(--text-on-dark, #fff);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
 /* --- Radial (еліптична з ромбами) --- */
 .arc-glyph--radial {
   border: 2px solid var(--gold-base);
