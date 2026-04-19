@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Энерго-Планировщик: Biohacker Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f1a;
+            color: #e2e8f0;
+            user-select: none;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Узкая рабочая область (уменьшена на ~30%) */
+        .workspace {
+            height: 35vh;
+            position: relative;
+            background: #0f172a;
+            border-bottom: 2px solid #1e293b;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .grid-line {
+            position: absolute;
+            height: 100%;
+            border-left: 1px solid rgba(51, 65, 85, 0.3);
+            pointer-events: none;
+        }
+
+        .hour-text {
+            position: absolute;
+            top: 6px;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #475569;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Интерактивные бары */
+        .event-bar-wrapper {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .action-block {
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: grab;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            min-width: 40px;
+            z-index: 2;
+        }
+
+        /* Хвост энергии (затухание/подъем) */
+        .energy-tail {
+            position: absolute;
+            height: 24px;
+            left: 0;
+            border-radius: 0 12px 12px 0;
+            z-index: 1;
+            opacity: 0.25;
+            pointer-events: none;
+            background: currentColor;
+            mask-image: linear-gradient(to right, black, transparent);
+            -webkit-mask-image: linear-gradient(to right, black, transparent);
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            cursor: ew-resize;
+            top: 9px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .event-bar-wrapper:hover .resize-handle {
+            opacity: 1;
+        }
+
+        .res-l {
+            left: -4px;
+        }
+
+        .res-r {
+            right: -4px;
+        }
+
+        /* Радиальное меню */
+        #radialMenu {
+            position: fixed;
+            width: 160px;
+            height: 160px;
+            z-index: 100;
+            display: none;
+            pointer-events: none;
+        }
+
+        .menu-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #38bdf8;
+            border-radius: 50%;
+            z-index: 2;
+            pointer-events: auto;
+            transition: all 0.2s ease;
+        }
+
+        .menu-center:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .menu-item {
+            position: absolute;
+            width: 44px;
+            height: 44px;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.2s;
+        }
+
+        .menu-item:hover {
+            background: #38bdf8;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Навигатор */
+        .minimap-container {
+            height: 90px;
+            background: #111827;
+            position: relative;
+            margin: 15px;
+            padding: 0px 0px;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            overflow: hidden;
+        }
+
+        .selector-overlay {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            background: rgba(56, 189, 248, 0.1);
+            border: 2px solid #38bdf8;
+            border-radius: 6px;
+            cursor: move;
+            z-index: 20;
+        }
+
+        /* Цвета сущностей */
+        .type-sleep {
+            color: #3b82f6;
+        }
+
+        /* blue */
+        .type-food {
+            color: #10b981;
+        }
+
+        /* emerald */
+        .type-train {
+            color: #f43f5e;
+        }
+
+        /* rose */
+        .type-prep {
+            color: #8b5cf6;
+        }
+
+        /* violet */
+        .type-vit {
+            color: #14b8a6;
+        }
+
+        /* teal */
+        .type-shop {
+            color: #f59e0b;
+        }
+
+        /* amber */
+        .type-ticket {
+            color: #06b6d4;
+        }
+
+        /* cyan */
+        .type-work {
+            color: #6366f1;
+        }
+
+        /* indigo */
+        .type-laundry {
+            color: #a855f7;
+        }
+
+        /* purple */
+        .type-party {
+            color: #ec4899;
+        }
+
+        /* pink */
+
+        .bg-type-sleep {
+            background: #3b82f6;
+        }
+
+        .bg-type-food {
+            background: #10b981;
+        }
+
+        .bg-type-train {
+            background: #f43f5e;
+        }
+
+        .bg-type-prep {
+            background: #8b5cf6;
+        }
+
+        .bg-type-vit {
+            background: #14b8a6;
+        }
+
+        .bg-type-shop {
+            background: #f59e0b;
+        }
+
+        .bg-type-ticket {
+            background: #06b6d4;
+        }
+
+        /* Горизонтальные линии сложности */
+        .horizontal-lane {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            pointer-events: none;
+        }
+
+        .bg-type-work {
+            background: #6366f1;
+        }
+
+        .bg-type-laundry {
+            background: #a855f7;
+        }
+
+        .bg-type-party {
+            background: #ec4899;
+        }
+
+        /* Главный контейнер ленты (горизонтальный скролл) */
+        .timeline-feed {
+            display: flex;
+            flex-direction: row;
+            /* Горизонтально */
+            gap: 16px;
+            padding-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .day-col {
+            min-width: 250px;
+            max-width: 320px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px dashed rgba(51, 65, 85, 0.4);
+            padding-left: 8px;
+            transition: min-width 0.3s, max-width 0.3s;
+        }
+
+        .day-events {
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: flex-start;
+            flex: 1;
+            padding-bottom: 24px;
+            /* Отступ от низа */
+        }
+
+        .day-header {
+            font-size: 11px;
+            font-weight: bold;
+            color: #94a3b8;
+            padding-bottom: 12px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        /* Свернутое состояние колонки (если дней много) */
+        .col-collapsed {
+            min-width: 48px;
+            max-width: 48px;
+            cursor: pointer;
+            padding-left: 0;
+        }
+
+        .col-collapsed .timeline-item {
+            justify-content: center;
+        }
+
+        .col-collapsed .timeline-time-col,
+        .col-collapsed .timeline-card {
+            display: none !important;
+            /* Полностью скрываем карточку и время */
+        }
+
+        /* Время, которое показывается ТОЛЬКО когда колонка свернута */
+        .collapsed-time {
+            display: none;
+            font-size: 9px;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .col-collapsed .collapsed-time {
+            display: block;
+        }
+
+        /* Плюсик в свернутом виде */
+        .collapsed-add-btn {
+            display: none;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .col-collapsed .collapsed-add-btn {
+            display: flex;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .col-collapsed .collapsed-add-btn:hover {
+            opacity: 1;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: stretch;
+            gap: 12px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        /* Время слева */
+        .timeline-time-col {
+            width: 45px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .timeline-time-start {
+            position: absolute;
+            bottom: 16px;
+            /* Выровнять с иконкой на дне */
+            right: 0;
+            transform: translateY(50%);
+            font-size: 13px;
+            /* Главное время (старт) делаем крупнее */
+            color: #94a3b8;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timeline-time-end {
+            position: absolute;
+            top: 16px;
+            /* Вверху карточки */
+            right: 0;
+            transform: translateY(-50%);
+            font-size: 11px;
+            /* Второстепенное время (конец) делаем меньше */
+            color: #64748b;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Блок иконки и линии */
+        .timeline-node-col {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 32px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        /* Сама цветная иконка круглая */
+        .timeline-node {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            /* Переведено с absolute, чтобы иконка занимала объем в потоке */
+            margin-top: auto;
+            /* Прижимаем к низу flex-контейнера */
+        }
+
+        /* Линия между иконками */
+        .timeline-line {
+            position: absolute;
+            width: 2px;
+            background: #334155;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+            /* Линия идет от низа предыдущей(или края) до верха иконки */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .timeline-line:hover {
+            background: #475569;
+        }
+
+        .line-add-btn {
+            opacity: 0;
+            background: #1e293b;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px dotted #94a3b8;
+            transition: opacity 0.2s, transform 0.2s;
+            color: #94a3b8;
+            transform: scale(0.8);
+        }
+
+        .timeline-line:hover .line-add-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .line-add-btn:hover {
+            color: white;
+            border-color: #38bdf8;
+            background: #0f172a;
+        }
+
+        /* Сама карточка события */
+        .timeline-card {
+            flex-grow: 1;
+            min-width: 200px;
+            max-width: 300px;
+            /* ширина 200-300px по запросу */
+            background: #1e2532;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            position: relative;
+        }
+
+        .timeline-card:hover {
+            background: #252d3d;
+            border-color: #475569;
+        }
+
+        /* Три точки - контекстное меню в карточке (визуально) */
+        .timeline-more {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            color: #64748b;
+        }
+
+        /* Контрол-панель фильтров */
+        .filter-strip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            overflow-x: auto;
+            border-bottom: 1px solid #1e293b;
+            background: #0f131c;
+        }
+
+        .filter-strip::-webkit-scrollbar {
+            display: none;
+        }
+
+        .toggle-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: #334155;
+            color: #f1f5f9;
+        }
+
+        .toggle-btn.active {
+            background: #38bdf8;
+            border-color: #38bdf8;
+            color: #0f1115;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        }
+
+        /* Аватарки юзеров */
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+
+        .user-avatar.active {
+            opacity: 1;
+            filter: grayscale(0%);
+            border-color: #38bdf8;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body class="flex flex-col">
+
+    <!-- Верхняя рабочая область -->
+    <div class="workspace" id="workspace" onclick="handleWorkspaceClick(event)">
+        <div id="gridContainer"></div>
+        <div id="eventContainer"></div>
+    </div>
+
+    <!-- Радиальное меню -->
+    <div id="radialMenu">
+    </div>
+
+    <!-- Блок фильтров: Дни и Юзеры -->
+    <div class="flex flex-col shrink-0">
+        <!-- Ряд 1: Период (Дни) -->
+        <div class="filter-strip">
+            <span class="text-[10px] text-slate-500 font-bold uppercase mr-2 shrink-0">Шкала</span>
+            <button class="toggle-btn" onclick="setDays(1)">1 день</button>
+            <button class="toggle-btn" onclick="setDays(2)">2 дня</button>
+            <button class="toggle-btn" onclick="setDays(3)">3 дня</button>
+            <button class="toggle-btn" onclick="setDays(5)">5 дней</button>
+            <button class="toggle-btn" onclick="setDays(7)">7 дней</button>
+            <button class="toggle-btn" onclick="setDays(14)">14 дней</button>
+        </div>
+
+        <!-- Ряд 2: Пользователи -->
+        <div class="filter-strip" id="userFiltersContainer">
+            <span class="text-[10px] text-slate-500 font-bold uppercase mr-2 shrink-0">Люди</span>
+            <!-- Аватарки генерируются через JS -->
+        </div>
+    </div>
+
+    <!-- Панель управления -->
+    <div class="flex-1 flex flex-col p-4 overflow-hidden">
+        <div class="minimap-container" id="minimap">
+            <div id="minimapEvents"></div>
+            <div class="selector-overlay" id="selector">
+                <div
+                    class="absolute left-[-8px] top-1/2 -translate-y-1/2 w-4 h-8 bg-sky-500 rounded cursor-ew-resize sel-handle sel-l shadow-lg flex items-center justify-center">
+                    <div class="w-[1px] h-3 bg-white/50"></div>
+                </div>
+                <div
+                    class="absolute right-[-8px] top-1/2 -translate-y-1/2 w-4 h-8 bg-sky-500 rounded cursor-ew-resize sel-handle sel-r shadow-lg flex items-center justify-center">
+                    <div class="w-[1px] h-3 bg-white/50"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col mt-2 pr-2 min-h-0">
+            <div class="flex justify-between items-center mb-4 px-2 shrink-0">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-slate-500">Биоритмы и задачи</h2>
+                    <div class="flex gap-2" id="feedUserSwitcher">
+                        <!-- Сюда вставятся иконки активных юзеров для выбора чей фид смотреть -->
+                    </div>
+                </div>
+                <!-- Этот текст теперь не нужен, так как добавление задач идет кликом по плюсику -->
+            </div>
+            <!-- Обертка для скролла -->
+            <div id="timelineFeed" class="timeline-feed px-2"></div>
+        </div>
+    </div>
+
+    <!-- Модалка -->
+    <div id="editModal"
+        class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="bg-slate-800 w-full max-w-sm rounded-3xl p-8 border border-slate-700 shadow-2xl">
+            <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <i id="mIcon" data-lucide="settings" class="w-5 h-5 text-sky-400"></i>
+                <span id="mTitle">Настройка</span>
+            </h3>
+            <div class="space-y-4">
+                <input type="text" id="mLabel"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-sky-500">
+
+                <div class="grid grid-cols-2 gap-4 text-[10px] uppercase font-bold text-slate-500">
+                    <div>
+                        <label class="mb-1 block">Действие (мин)</label>
+                        <input type="number" id="mActionDur"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    </div>
+                    <div>
+                        <label class="mb-1 block">Эффект (мин)</label>
+                        <input type="number" id="mEffectDur"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-[10px] uppercase font-bold text-slate-500">
+                    <div>
+                        <label class="mb-1 block">Старт Энергии %</label>
+                        <input type="number" id="mEnergyStart"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    </div>
+                    <div>
+                        <label class="mb-1 block">Пик Энергии %</label>
+                        <input type="number" id="mEnergyEnd"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button onclick="saveModal()" class="flex-1 bg-sky-600 py-3 rounded-xl font-bold">ОК</button>
+                    <button onclick="closeModal()" class="flex-1 bg-slate-700 py-3 rounded-xl font-bold">Отмена</button>
+                </div>
+                <button onclick="deleteEvent()"
+                    class="w-full text-rose-500 text-xs mt-4 opacity-50 hover:opacity-100">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация по умолчанию для новых сущностей
+        const DEFAULT_CONFIGS = {
+            sleep: { label: 'Сон', icon: 'moon', actionMin: 480, effectMin: 480, eS: 15, eE: 85, color: 'type-sleep' },
+            food: { label: 'Прием пищи', icon: 'utensils', actionMin: 20, effectMin: 300, eS: 40, eE: 65, color: 'type-food' },
+            train: { label: 'Тренировка', icon: 'dumbbell', actionMin: 20, effectMin: 120, eS: 70, eE: 40, color: 'type-train' },
+            prep: { label: 'Готовка', icon: 'chef-hat', actionMin: 45, effectMin: 45, eS: 60, eE: 55, color: 'type-prep' },
+            vit_bads: { label: 'Витамины', icon: 'pill', actionMin: 5, effectMin: 60, eS: 50, eE: 55, color: 'type-vit' },
+            first_aid: { label: 'Аптечка', icon: 'activity', actionMin: 5, effectMin: 120, eS: 30, eE: 40, color: 'type-vit' },
+            shop_big: { label: 'Закупка', icon: 'shopping-cart', actionMin: 60, effectMin: 60, eS: 60, eE: 40, color: 'type-shop' },
+            shop_small: { label: 'Магазин', icon: 'shopping-bag', actionMin: 20, effectMin: 20, eS: 55, eE: 45, color: 'type-shop' },
+            shop_delivery: { label: 'Доставка', icon: 'truck', actionMin: 10, effectMin: 10, eS: 50, eE: 50, color: 'type-shop' },
+            shop_clothes: { label: 'Одежда', icon: 'shirt', actionMin: 120, effectMin: 60, eS: 80, eE: 50, color: 'type-shop' },
+            ticket: { label: 'Тикет', icon: 'ticket', actionMin: 60, effectMin: 60, eS: 60, eE: 50, color: 'type-ticket' },
+            work: { label: 'Работа', icon: 'briefcase', actionMin: 240, effectMin: 120, eS: 80, eE: 30, color: 'type-work' },
+            laundry: { label: 'Стирка', icon: 'shirt', actionMin: 15, effectMin: 120, eS: 50, eE: 45, color: 'type-laundry' }, // shirt is used as laundry approx
+            party_cafe: { label: 'Кафе', icon: 'coffee', actionMin: 120, effectMin: 180, eS: 60, eE: 80, color: 'type-party' },
+            party_beach: { label: 'Пляж', icon: 'umbrella', actionMin: 240, effectMin: 360, eS: 80, eE: 90, color: 'type-party' }
+        };
+
+        const RADIAL_MENU_STRUCTURE = {
+            main: [
+                { id: 'sleep', type: 'activity', conf: 'sleep' },
+                { id: 'food', type: 'activity', conf: 'food' },
+                { id: 'vitamins', type: 'submenu', label: 'Здоровье', icon: 'pill', color: '#14b8a6', target: 'vitamins' },
+                { id: 'train', type: 'activity', conf: 'train' },
+                { id: 'prep', type: 'activity', conf: 'prep' },
+                { id: 'shopping', type: 'submenu', label: 'Покупки', icon: 'shopping-cart', color: '#f59e0b', target: 'shopping' },
+                { id: 'ticket', type: 'activity', conf: 'ticket' },
+                { id: 'work', type: 'activity', conf: 'work' },
+                { id: 'laundry', type: 'activity', conf: 'laundry' },
+                { id: 'party', type: 'submenu', label: 'Отдых', icon: 'party-popper', color: '#ec4899', target: 'party' }
+            ],
+            vitamins: [
+                { id: 'vit_bads', type: 'activity', conf: 'vit_bads' },
+                { id: 'first_aid', type: 'activity', conf: 'first_aid' }
+            ],
+            shopping: [
+                { id: 'shop_big', type: 'activity', conf: 'shop_big' },
+                { id: 'shop_small', type: 'activity', conf: 'shop_small' },
+                { id: 'shop_delivery', type: 'activity', conf: 'shop_delivery' },
+                { id: 'shop_clothes', type: 'activity', conf: 'shop_clothes' }
+            ],
+            party: [
+                { id: 'party_cafe', type: 'activity', conf: 'party_cafe' },
+                { id: 'party_beach', type: 'activity', conf: 'party_beach' }
+            ]
+        };
+
+        let radialState = 'main';
+
+        // Пользователи
+        const users = [
+            { id: 'u1', name: 'A', color: '#3b82f6' },
+            { id: 'u2', name: 'B', color: '#10b981' },
+            { id: 'u3', name: 'C', color: '#f43f5e' }
+        ];
+
+        let events = []; // Теперь пустой массив, будем грузить из Supabase
+
+        // --- Supabase Setup ---
+        const SUPABASE_URL = 'https://wphpjpvivmngukunydhv.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_ZIBGtbUzcrV0vi9A2JrJvg_AkoQtpxY';
+        // Инициализируем клиента
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function loadEvents() {
+            try {
+                console.log("Начинаем загрузку событий из Supabase...");
+                const { data, error } = await supabaseClient.from('eatpan_events').select('*');
+                console.log("Ответ от Supabase:", data, error);
+
+                if (data) {
+                    // Мапим структуру из БД во внутреннюю структуру приложения
+                    events = data.map(d => ({
+                        id: d.id,
+                        type: d.type,
+                        label: d.label,
+                        start: Number(d.start_time),
+                        actionDur: Number(d.action_dur),
+                        effectDur: Number(d.effect_dur),
+                        eS: Number(d.es),
+                        eE: Number(d.ee),
+                        lane: Number(d.lane),
+                        userId: d.user_id
+                    }));
+                    console.log("События успешно смаплены, всего:", events.length);
+                    sync();
+                } else if (error) {
+                    console.error("Ошибка загрузки данных из Supabase", error);
+                    alert("Ошибка загрузки из БД: " + error.message);
+                }
+            } catch (err) {
+                console.error("Критическая ошибка в loadEvents:", err);
+                alert("Критическая ошибка в JS при загрузке: " + err.message);
+            }
+        }
+
+        let selectedDays = 1;
+        let TOTAL_HOURS = selectedDays * 24;
+        let viewRange = { start: 0, end: 24 };
+        let activeUsers = new Set(['u1', 'u2', 'u3']);
+        let activeFeedUser = 'u1'; // Чья лента сейчас открыта внизу
+
+        let activeId = null;
+        let pendingClickTime = null;
+
+        const workspace = document.getElementById('workspace');
+        const gridContainer = document.getElementById('gridContainer');
+        const eventContainer = document.getElementById('eventContainer');
+        const radialMenu = document.getElementById('radialMenu');
+        const selector = document.getElementById('selector');
+        const minimap = document.getElementById('minimap');
+        const listView = document.getElementById('timelineFeed');
+
+        function initControls() {
+            // Рисуем аватарки пользователей для выбора строк (Главный Фильтр)
+            const container = document.getElementById('userFiltersContainer');
+            container.innerHTML = '<span class="text-[10px] text-slate-500 font-bold uppercase mr-2 shrink-0">Люди</span>';
+
+            users.forEach(u => {
+                const ava = document.createElement('div');
+                ava.className = `user-avatar ${activeUsers.has(u.id) ? 'active' : ''}`;
+                ava.style.background = u.color;
+                ava.innerText = u.name;
+                ava.onclick = () => toggleUser(u.id);
+                container.appendChild(ava);
+            });
+
+            // Рисуем переключатель для ленты внизу
+            const feedSwitcher = document.getElementById('feedUserSwitcher');
+            feedSwitcher.innerHTML = '';
+            // Показываем только тех, кто активен сверху
+            Array.from(activeUsers).forEach(uid => {
+                const u = users.find(x => x.id === uid);
+                if (!u) return;
+                const ava = document.createElement('div');
+                ava.className = `w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white cursor-pointer transition-all border-2 ${activeFeedUser === u.id ? 'border-amber-400 scale-110 opacity-100' : 'border-transparent opacity-40 hover:opacity-80'}`;
+                ava.style.background = u.color;
+                ava.innerText = u.name;
+                ava.onclick = () => { activeFeedUser = u.id; sync(); };
+                feedSwitcher.appendChild(ava);
+            });
+        }
+
+        function setDays(days) {
+            selectedDays = days;
+            TOTAL_HOURS = days * 24;
+            // Сбрасываем отображение на начало, или масштабируем? Пока сбросим на 0 -> дней
+            viewRange = { start: 0, end: Math.min(TOTAL_HOURS, 24 * Math.min(3, days)) }; // показываем максимум 3 дня за раз на экране
+
+            // Обновляем UI кнопок
+            document.querySelectorAll('.filter-strip .toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.innerText.startsWith(days.toString())) {
+                    btn.classList.add('active');
+                }
+            });
+            sync();
+        }
+
+        function toggleUser(id) {
+            if (activeUsers.has(id)) {
+                activeUsers.delete(id);
+                // Если мы выключили юзера, чья лента открыта, переключаемся на первого доступного
+                if (activeFeedUser === id) {
+                    activeFeedUser = Array.from(activeUsers)[0] || null;
+                }
+            } else {
+                activeUsers.add(id);
+                if (!activeFeedUser) activeFeedUser = id;
+            }
+            initControls();
+            sync();
+        }
+
+        function sync() {
+            initControls(); // Fix: Force UI refresh for active Feed user styles.
+            renderMinimap();
+            renderWorkspace();
+            renderList();
+            lucide.createIcons();
+        }
+
+        function renderWorkspace() {
+            gridContainer.innerHTML = '';
+            eventContainer.innerHTML = '';
+            const w = workspace.clientWidth;
+            const duration = viewRange.end - viewRange.start;
+
+            for (let h = Math.floor(viewRange.start); h <= Math.ceil(viewRange.end); h++) {
+                const x = ((h - viewRange.start) / duration) * w;
+                if (x < 0 || x > w) continue;
+                const line = document.createElement('div');
+                line.className = 'grid-line';
+                line.style.left = x + 'px';
+
+                const text = document.createElement('div');
+                text.className = 'hour-text';
+                text.innerText = `${h % 24}:00`;
+
+                // Стилизуем жирность в зависимости от часа
+                const hourMod = h % 24;
+                if (hourMod % 12 === 0) {
+                    text.classList.add('font-bold', 'text-slate-300');
+                    text.style.fontSize = '12px';
+                    line.style.borderLeftColor = 'rgba(148, 163, 184, 0.4)'; // Линия ярче
+                } else if (hourMod % 6 === 0) {
+                    text.classList.add('font-medium', 'text-slate-400');
+                    text.style.fontSize = '11px';
+                }
+
+                line.appendChild(text);
+                gridContainer.appendChild(line);
+            }
+
+            const activeUsersArray = Array.from(activeUsers);
+            const blockHeight = 160;
+            const baseTop = 60;
+            const laneSpacing = 35;
+
+            // Расширяем высоту рабочей зоны в зависимости от количества юзеров
+            workspace.style.minHeight = (baseTop + activeUsersArray.length * blockHeight + 50) + 'px';
+
+            const laneColors = ['#22c55e', '#3b82f6', '#eab308', '#ef4444'];
+
+            // Отрисовка блоков каждого пользователя
+            activeUsersArray.forEach((uid, uIndex) => {
+                const u = users.find(x => x.id === uid);
+                const blockY = baseTop + uIndex * blockHeight;
+
+                // 1. Аватарка (фиксированная слева через z-index: 10)
+                const avatar = document.createElement('div');
+                avatar.className = 'absolute z-10 w-[80px] h-[80px] rounded-2xl flex flex-col items-center justify-center shadow-lg border-2 border-slate-700/50';
+                avatar.style.left = '16px';
+                avatar.style.top = (blockY - 10) + 'px'; // чуть приподнимем над сеткой
+                avatar.style.background = '#1e293b'; // сам фон карточки
+
+                // Внутренний цветной кружок или квадрат
+                const avaColor = document.createElement('div');
+                avaColor.className = 'w-10 h-10 rounded-xl mb-1 flex items-center justify-center font-bold text-white text-lg shadow-inner';
+                avaColor.style.background = u.color;
+                avaColor.innerText = u.name;
+
+                const nameLabel = document.createElement('div');
+                nameLabel.className = 'text-[10px] font-bold text-slate-400 uppercase tracking-wider';
+                nameLabel.innerText = u.name;
+
+                avatar.appendChild(avaColor);
+                avatar.appendChild(nameLabel);
+                gridContainer.appendChild(avatar);
+
+                // 2. Отрисовка 4-х горизонтальных линий сложности для этого юзера
+                for (let i = 0; i < 4; i++) {
+                    const lane = document.createElement('div');
+                    lane.className = 'horizontal-lane';
+                    lane.style.top = (blockY + i * laneSpacing) + 'px';
+                    lane.style.borderBottom = `1px solid ${laneColors[i]}`;
+                    lane.style.opacity = '0.3';
+                    // Линии начинаются чуть правее аватарки
+                    lane.style.left = '110px';
+                    gridContainer.appendChild(lane);
+                }
+
+                // 3. Серая разделительная линия под красной (последней) линией
+                const separator = document.createElement('div');
+                separator.className = 'absolute left-0 right-0 h-[1px] pointer-events-none';
+                separator.style.top = (blockY + 3 * laneSpacing + 40) + 'px';
+                separator.style.borderBottom = '1px solid #334155'; // Цвет tailwind slate-700
+                gridContainer.appendChild(separator);
+            });
+
+            events.forEach(ev => {
+                if (!activeUsers.has(ev.userId)) return; // Скрываем, если юзер не активен
+                if (ev.start + ev.effectDur < viewRange.start || ev.start > viewRange.end) return;
+
+                const xStart = ((ev.start - viewRange.start) / duration) * w;
+                const xActionEnd = ((ev.start + ev.actionDur - viewRange.start) / duration) * w;
+                const xEffectEnd = ((ev.start + ev.effectDur - viewRange.start) / duration) * w;
+                // Находим блок пользователя
+                const uIndex = activeUsersArray.indexOf(ev.userId);
+                if (uIndex === -1) return; // На всякий случай
+
+                const blockY = baseTop + uIndex * blockHeight;
+                const laneIndex = ev.lane !== undefined ? ev.lane : 0;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'event-bar-wrapper';
+                wrapper.style.left = xStart + 'px';
+
+                // top иконки должен быть (blockY + laneIndex * laneSpacing - 32)
+                wrapper.style.top = (blockY + laneIndex * laneSpacing - 32) + 'px';
+
+                // Активный блок (Действие)
+                const actionBlock = document.createElement('div');
+                actionBlock.className = `action-block bg-type-${ev.type}`;
+                actionBlock.style.width = Math.max(38, xActionEnd - xStart) + 'px';
+                actionBlock.innerHTML = `
+                    <div class="resize-handle res-l" onmousedown="initEventResize(event, ${ev.id}, 'left')"></div>
+                    <i data-lucide="${DEFAULT_CONFIGS[ev.type].icon}" class="w-5 h-5 text-white"></i>
+                    <div class="resize-handle res-r" onmousedown="initEventResize(event, ${ev.id}, 'right')"></div>
+                `;
+
+                // Хвост энергии
+                const energyTail = document.createElement('div');
+                energyTail.className = `energy-tail type-${ev.type}`;
+                energyTail.style.width = Math.max(0, xEffectEnd - xStart) + 'px';
+
+                wrapper.onmousedown = (e) => {
+                    if (e.target.classList.contains('resize-handle')) return;
+                    initEventDrag(e, ev.id);
+                };
+                wrapper.onclick = (e) => { e.stopPropagation(); if (!isBusy) openModal(ev.id); };
+
+                wrapper.appendChild(energyTail);
+                wrapper.appendChild(actionBlock);
+                eventContainer.appendChild(wrapper);
+            });
+        }
+
+        function renderMinimap() {
+            const mmEvents = document.getElementById('minimapEvents');
+            mmEvents.innerHTML = '';
+            const w = minimap.clientWidth;
+
+            const activeUsersArray = Array.from(activeUsers);
+
+            events.forEach(ev => {
+                if (!activeUsers.has(ev.userId)) return;
+
+                const x = (ev.start / TOTAL_HOURS) * w;
+                const width = (ev.effectDur / TOTAL_HOURS) * w;
+                const rowObj = activeUsersArray.indexOf(ev.userId);
+
+                const mEv = document.createElement('div');
+                mEv.className = `absolute h-1 rounded-full bg-type-${ev.type} opacity-50`;
+                mEv.style.left = x + 'px';
+                mEv.style.width = Math.max(2, width) + 'px';
+                mEv.style.top = (15 + rowObj * 10) + 'px';
+                mmEvents.appendChild(mEv);
+            });
+
+            const selL = (viewRange.start / TOTAL_HOURS) * w;
+            const selW = ((viewRange.end - viewRange.start) / TOTAL_HOURS) * w;
+            selector.style.left = selL + 'px';
+            selector.style.width = selW + 'px';
+        }
+
+        function renderList() {
+            listView.innerHTML = '';
+            if (!activeFeedUser) return;
+
+            // Генерируем колонки для каждого выбранного дня
+            for (let day = 0; day < selectedDays; day++) {
+                const dayStart = day * 24;
+                const dayEnd = (day + 1) * 24;
+
+                const col = document.createElement('div');
+                col.className = 'day-col';
+                // Если дней слишком много (больше 3), мы можем свернуть колонки (авто-адаптация)
+                // Для простоты, свернем все кроме первого. По клику будем разворачивать.
+                if (selectedDays > 3 && day > 0) {
+                    col.classList.add('col-collapsed');
+                }
+
+                col.onclick = (e) => {
+                    if (col.classList.contains('col-collapsed')) {
+                        // Разворачиваем эту колонку, сворачиваем остальные (если хотим аккордеон)
+                        document.querySelectorAll('.day-col').forEach(c => c.classList.add('col-collapsed'));
+                        col.classList.remove('col-collapsed');
+                    }
+                };
+
+                // Фильтруем события по пользователю и дню
+                const dayEvents = events.filter(ev =>
+                    ev.userId === activeFeedUser &&
+                    ev.start >= dayStart &&
+                    ev.start < dayEnd
+                ).sort((a, b) => a.start - b.start);
+
+                const colDate = new Date();
+                colDate.setDate(colDate.getDate() + day);
+                const weekDay = colDate.toLocaleDateString('ru-RU', { weekday: 'short' });
+                const dateStr = colDate.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+
+                col.innerHTML = `
+                    <div class="day-header flex flex-col items-center gap-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-300 font-bold capitalize">${weekDay}.</span>
+                            <span class="bg-sky-500/20 text-sky-400 text-[9px] px-1.5 py-0.5 rounded-md font-bold">${dayEvents.length}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 font-medium">${dateStr}</div>
+                    </div>
+                `;
+
+                const eventsWrapper = document.createElement('div');
+                eventsWrapper.className = 'day-events';
+
+                if (dayEvents.length === 0) {
+                    // Пустое состояние дня
+                    eventsWrapper.innerHTML = `
+                        <div class="flex flex-col items-center justify-center opacity-30 mt-auto cursor-pointer hover:opacity-100 transition-opacity" onclick="openRadialMenu(event.clientX, event.clientY, ${dayStart + 12})">
+                            <div class="w-8 h-8 rounded-full border border-dashed border-slate-500 flex items-center justify-center mb-2">
+                                <i data-lucide="plus" class="w-4 h-4 text-slate-500"></i>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const PX_PER_HOUR = 30; // Масштаб времени
+                    let prevEndTime = dayStart;
+
+                    dayEvents.forEach((ev, index) => {
+                        const conf = DEFAULT_CONFIGS[ev.type];
+                        const item = document.createElement('div');
+                        item.className = 'timeline-item';
+
+                        // Вычисляем отступ от предыдущего события
+                        const gapHrs = ev.start - prevEndTime;
+                        let bottomMarginPx = gapHrs * PX_PER_HOUR;
+
+                        // Если это не первый элемент и они накладываются, даем минимальный отступ
+                        if (index > 0) {
+                            bottomMarginPx = Math.max(8, bottomMarginPx);
+                        } else {
+                            bottomMarginPx = Math.max(0, bottomMarginPx);
+                        }
+
+                        // Применяем пропорциональный отступ снизу, так как элементы выстраиваются снизу вверх
+                        if (bottomMarginPx > 0) {
+                            item.style.marginBottom = bottomMarginPx + 'px';
+                        }
+
+                        let midTime = (prevEndTime + ev.start) / 2;
+                        if (index === 0) {
+                            midTime = (dayStart + ev.start) / 2;
+                        }
+
+                        prevEndTime = ev.start + ev.actionDur;
+
+                        const isLast = (index === dayEvents.length - 1);
+                        const isFirst = (index === 0);
+
+                        // Линия рисуется ОТ текущего элемента ВНИЗ к предыдущему
+                        let lineStyle = 'display: none;';
+                        if (index > 0) {
+                            // Высота линии = нижний_отступ + константа_на_высоту_иконки
+                            let lineH = bottomMarginPx + 44;
+                            // Низ линии опускаем на нужную глубину, чтобы верх совпадал с центром иконки (bottom: 16px)
+                            lineStyle = `bottom: -${lineH - 16}px; height: ${lineH}px;`;
+                        }
+
+                        const eDiff = ev.eE - ev.eS;
+                        const eColorBg = eDiff >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400';
+
+                        item.innerHTML = `
+                            <div class="timeline-time-col">
+                                <div class="timeline-time-end">${formatT(ev.start + ev.actionDur)}</div>
+                                <div class="timeline-time-start">${formatT(ev.start)}</div>
+                            </div>
+                            
+                            <div class="timeline-node-col">
+                                <div class="collapsed-time">${formatT(ev.start)}</div>
+                                <div class="timeline-line" style="${lineStyle}" onclick="event.stopPropagation(); openRadialMenu(event.clientX, event.clientY, ${midTime})">
+                                    <div class="line-add-btn" title="Добавить задачу (в ${formatT(midTime)})">
+                                        <i data-lucide="plus" class="w-3 h-3"></i>
+                                    </div>
+                                </div>
+                                <div class="timeline-node bg-type-${ev.type}">
+                                    <i data-lucide="${conf.icon}" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-card" onclick="event.stopPropagation(); openModal(${ev.id})">
+                                <div class="timeline-more"><i data-lucide="more-vertical" class="w-4 h-4"></i></div>
+                                <div class="text-sm font-semibold text-slate-200 pr-6 truncate">${ev.label}</div>
+                                <div class="text-xs text-slate-400 mb-2">${formatD(ev.actionDur)}</div>
+                                
+                                ${ev.effectDur > 0 ? `
+                                <div class="flex items-center gap-3 mt-1 text-[11px] border-t border-slate-700/50 pt-2 whitespace-nowrap overflow-hidden text-ellipsis">
+                                    <span class="text-slate-500">Послевкусие: <span class="text-slate-300 font-medium">${formatD(ev.effectDur)}</span></span>
+                                    <span class="px-2 py-0.5 rounded-md ${eColorBg} font-medium flex gap-1 items-center shrink-0">
+                                        Энергия: ${ev.eS}% → ${ev.eE}%
+                                    </span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                        eventsWrapper.appendChild(item);
+                    });
+
+                    // Кнопка добавления для свернутой колонки
+                    const addBtn = document.createElement('div');
+                    addBtn.className = 'collapsed-add-btn';
+                    addBtn.innerHTML = `
+                        <div class="w-6 h-6 rounded-full border border-dashed border-slate-500 flex items-center justify-center hover:bg-slate-800 cursor-pointer" onclick="event.stopPropagation(); openRadialMenu(event.clientX, event.clientY, ${dayStart + 12})">
+                            <i data-lucide="plus" class="w-3 h-3 text-slate-500"></i>
+                        </div>
+                    `;
+                    eventsWrapper.appendChild(addBtn);
+                }
+
+                col.appendChild(eventsWrapper);
+                listView.appendChild(col);
+            }
+            lucide.createIcons();
+        }
+
+        // --- Обработка клика по пустому месту (Радиальное меню) ---
+        function handleWorkspaceClick(e) {
+            if (isBusy) return;
+            const rect = workspace.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const time = viewRange.start + (x / rect.width) * (viewRange.end - viewRange.start);
+
+            openRadialMenu(e.clientX, e.clientY, time);
+        }
+
+        function openRadialMenu(x, y, time) {
+            pendingClickTime = Math.round(time * 4) / 4;
+            radialMenu.style.display = 'block';
+            radialMenu.style.left = (x - 80) + 'px';
+            radialMenu.style.top = (y - 80) + 'px';
+            radialState = 'main';
+            renderRadialMenu();
+
+            const closeMenu = (ev) => {
+                if (!radialMenu.contains(ev.target)) {
+                    radialMenu.style.display = 'none';
+                    document.removeEventListener('mousedown', closeMenu);
+                }
+            };
+            setTimeout(() => {
+                document.addEventListener('mousedown', closeMenu);
+            }, 10);
+        }
+
+        function renderRadialMenu() {
+            radialMenu.innerHTML = '';
+
+            // Центральная кнопка
+            const centerBtn = document.createElement('div');
+            centerBtn.className = 'menu-center flex items-center justify-center cursor-pointer shadow-lg';
+            if (radialState === 'main') {
+                centerBtn.innerHTML = '<div class="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_white]"></div>';
+                centerBtn.onclick = () => { radialMenu.style.display = 'none'; };
+            } else {
+                centerBtn.innerHTML = '<i data-lucide="arrow-left" class="w-4 h-4 text-white"></i>';
+                centerBtn.onclick = () => { radialState = 'main'; renderRadialMenu(); };
+            }
+            radialMenu.appendChild(centerBtn);
+
+            const items = RADIAL_MENU_STRUCTURE[radialState];
+            const radius = 80;
+            const angleStep = (2 * Math.PI) / items.length;
+            const startAngle = -Math.PI / 2;
+
+            items.forEach((item, index) => {
+                const angle = startAngle + index * angleStep;
+                const x = 80 + radius * Math.cos(angle) - 22;
+                const y = 80 + radius * Math.sin(angle) - 22;
+
+                const mi = document.createElement('div');
+                mi.className = 'menu-item absolute transition-transform duration-200 shadow-md';
+                // Animating spawn
+                mi.style.left = x + 'px';
+                mi.style.top = y + 'px';
+                mi.style.transform = 'scale(0)';
+
+                let iconName, title;
+                if (item.type === 'activity') {
+                    const conf = DEFAULT_CONFIGS[item.conf];
+                    iconName = conf.icon;
+                    title = conf.label;
+                } else if (item.type === 'submenu') {
+                    iconName = item.icon;
+                    title = item.label;
+                    mi.style.borderColor = item.color;
+                    mi.style.color = item.color;
+                }
+
+                mi.title = title;
+                mi.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i>`;
+
+                mi.onclick = (e) => {
+                    e.stopPropagation();
+                    if (item.type === 'submenu') {
+                        radialState = item.target;
+                        renderRadialMenu();
+                    } else if (item.type === 'activity') {
+                        addActivity(item.conf);
+                    }
+                };
+
+                radialMenu.appendChild(mi);
+
+                // Animate entry
+                setTimeout(() => {
+                    mi.style.transform = 'scale(1)';
+                }, index * 15);
+            });
+
+            lucide.createIcons();
+        }
+
+        async function addActivity(type) {
+            const conf = DEFAULT_CONFIGS[type];
+            const id = Date.now();
+            const newEv = {
+                id,
+                type,
+                label: conf.label,
+                start: pendingClickTime,
+                actionDur: conf.actionMin / 60,
+                effectDur: conf.effectMin / 60,
+                eS: conf.eS,
+                eE: conf.eE,
+                lane: 0, // По умолчанию падает на 0 (зеленую) линию
+                userId: activeFeedUser // Привязываем к активному юзеру
+            };
+            events.push(newEv);
+            radialMenu.style.display = 'none';
+            sync();
+
+            // Сохраняем в Supabase
+            await supabaseClient.from('eatpan_events').insert([{
+                id: newEv.id,
+                type: newEv.type,
+                label: newEv.label,
+                start_time: newEv.start,
+                action_dur: newEv.actionDur,
+                effect_dur: newEv.effectDur,
+                es: newEv.eS,
+                ee: newEv.eE,
+                lane: newEv.lane,
+                user_id: newEv.userId
+            }]);
+        }
+
+        // --- Логика Drag & Resize ---
+        let isBusy = false;
+        function initEventDrag(e, id) {
+            isBusy = true;
+            const ev = events.find(x => x.id === id);
+            let startX = e.clientX;
+            let startT = ev.start;
+
+            // Находим стартовые параметры Y
+            const rect = workspace.getBoundingClientRect();
+            let startY = e.clientY;
+            let startLane = ev.lane !== undefined ? ev.lane : 0;
+            const activeUsersArray = Array.from(activeUsers);
+            let startUserIndex = activeUsersArray.indexOf(ev.userId);
+
+            const duration = viewRange.end - viewRange.start;
+            const blockHeight = 160;
+            const baseTop = 60;
+            const laneSpacing = 35;
+
+            const onMove = (me) => {
+                // Горизонтальное смещение
+                let dx = (me.clientX - startX) / workspace.clientWidth * duration;
+                ev.start = Math.round((startT + dx) * 4) / 4; // snap to 15 min
+
+                // Вертикальное смещение Абсолютное (относительно workspace)
+                let relativeY = me.clientY - rect.top;
+
+                // Ограничиваем скролл по Y рамками контента
+                const maxY = baseTop + activeUsersArray.length * blockHeight;
+                relativeY = Math.max(baseTop, Math.min(relativeY, maxY - 1));
+
+                // Определяем индекс пользователя (этаж)
+                let newUIndex = Math.floor((relativeY - baseTop) / blockHeight);
+                newUIndex = Math.max(0, Math.min(activeUsersArray.length - 1, newUIndex));
+
+                // Меняем владельца события "на лету" 
+                ev.userId = activeUsersArray[newUIndex];
+
+                // Локальный Y внутри блока юзера
+                let localY = (relativeY - baseTop) - (newUIndex * blockHeight);
+
+                // Магия привязки к 4-м линиям (0, 1, 2, 3) 
+                let newLane = Math.round(localY / laneSpacing);
+                ev.lane = Math.max(0, Math.min(3, newLane));
+
+                sync();
+            };
+            const onUp = async () => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                setTimeout(() => isBusy = false, 100);
+
+                // Сохраняем изменения в БД
+                await supabaseClient.from('eatpan_events')
+                    .update({ start_time: ev.start, lane: ev.lane, user_id: ev.userId })
+                    .eq('id', ev.id);
+            };
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        }
+
+        function initEventResize(e, id, dir) {
+            e.stopPropagation();
+            isBusy = true;
+            const ev = events.find(x => x.id === id);
+            let startX = e.clientX;
+            const duration = viewRange.end - viewRange.start;
+
+            const initialVal = dir === 'left' ? ev.start : ev.actionDur;
+
+            const onMove = (me) => {
+                let dx = (me.clientX - startX) / workspace.clientWidth * duration;
+                if (dir === 'left') {
+                    let newStart = Math.round((initialVal + dx) * 4) / 4;
+                    let diff = ev.start - newStart;
+                    ev.start = newStart;
+                    ev.actionDur += diff;
+                } else {
+                    ev.actionDur = Math.max(0.25, Math.round((initialVal + dx) * 4) / 4);
+                }
+                sync();
+            };
+            const onUp = async () => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                setTimeout(() => isBusy = false, 100);
+
+                // Сохраняем изменения (размер и начало) в БД
+                await supabaseClient.from('eatpan_events')
+                    .update({ start_time: ev.start, action_dur: ev.actionDur })
+                    .eq('id', ev.id);
+            };
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        }
+
+        // --- Навигатор ---
+        selector.onmousedown = (e) => {
+            if (e.target.closest('.sel-handle')) return;
+            isBusy = true;
+            let startX = e.clientX;
+            let sRange = { ...viewRange };
+            const onMove = (me) => {
+                let dx = (me.clientX - startX) / minimap.clientWidth * TOTAL_HOURS;
+                let diff = sRange.end - sRange.start;
+                viewRange.start = Math.max(0, Math.min(TOTAL_HOURS - diff, sRange.start + dx));
+                viewRange.end = viewRange.start + diff;
+                sync();
+            };
+            const onUp = () => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                setTimeout(() => isBusy = false, 50);
+            };
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        };
+
+        document.querySelectorAll('.sel-handle').forEach(h => {
+            h.onmousedown = (e) => {
+                e.stopPropagation();
+                isBusy = true;
+                const isLeft = h.classList.contains('sel-l');
+                let startX = e.clientX;
+                let initialVal = isLeft ? viewRange.start : viewRange.end;
+                const onMove = (me) => {
+                    let dx = (me.clientX - startX) / minimap.clientWidth * TOTAL_HOURS;
+                    if (isLeft) viewRange.start = Math.max(0, Math.min(viewRange.end - 1, initialVal + dx));
+                    else viewRange.end = Math.max(viewRange.start + 1, Math.min(TOTAL_HOURS, initialVal + dx));
+                    sync();
+                };
+                const onUp = () => {
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                    setTimeout(() => isBusy = false, 50);
+                };
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            };
+        });
+
+        // --- Обработка клика по пустому месту (Радиальное меню) ---
+        function handleWorkspaceClick(e) {
+            if (isBusy) return;
+            const rect = workspace.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const time = viewRange.start + (x / rect.width) * (viewRange.end - viewRange.start);
+
+            openRadialMenu(e.clientX, e.clientY, time);
+        }
+
+        function openRadialMenu(x, y, time) {
+            pendingClickTime = Math.round(time * 4) / 4;
+            radialMenu.style.display = 'block';
+            radialMenu.style.left = (x - 80) + 'px';
+            radialMenu.style.top = (y - 80) + 'px';
+            radialState = 'main';
+            renderRadialMenu();
+
+            const closeMenu = (ev) => {
+                if (!radialMenu.contains(ev.target)) {
+                    radialMenu.style.display = 'none';
+                    document.removeEventListener('mousedown', closeMenu);
+                }
+            };
+            setTimeout(() => {
+                document.addEventListener('mousedown', closeMenu);
+            }, 10);
+        }
+
+        // Модалка
+        function openModal(id) {
+            activeId = id;
+            const ev = events.find(x => x.id === id);
+            document.getElementById('mTitle').innerText = ev.label;
+            document.getElementById('mLabel').value = ev.label;
+            document.getElementById('mActionDur').value = Math.round(ev.actionDur * 60);
+            document.getElementById('mEffectDur').value = Math.round(ev.effectDur * 60);
+            document.getElementById('mEnergyStart').value = ev.eS;
+            document.getElementById('mEnergyEnd').value = ev.eE;
+
+            const iconEl = document.getElementById('mIcon');
+            iconEl.setAttribute('data-lucide', DEFAULT_CONFIGS[ev.type].icon);
+            lucide.createIcons();
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+        function saveModal() {
+            const ev = events.find(x => x.id === activeId);
+            ev.label = document.getElementById('mLabel').value;
+            ev.actionDur = parseFloat(document.getElementById('mActionDur').value) / 60;
+            ev.effectDur = parseFloat(document.getElementById('mEffectDur').value) / 60;
+            ev.eS = parseInt(document.getElementById('mEnergyStart').value);
+            ev.eE = parseInt(document.getElementById('mEnergyEnd').value);
+            closeModal();
+            sync();
+        }
+        function deleteEvent() {
+            events = events.filter(x => x.id !== activeId);
+            closeModal();
+            sync();
+        }
+
+        // Хелперы
+        function formatT(h) {
+            const hr = Math.floor(h % 24).toString().padStart(2, '0');
+            const mn = Math.round((h % 1) * 60).toString().padStart(2, '0');
+            return `${hr}:${mn}`;
+        }
+        function formatD(h) {
+            const hr = Math.floor(h);
+            const mn = Math.round((h % 1) * 60);
+            return hr > 0 ? `${hr}ч ${mn}м` : `${mn}м`;
+        }
+
+        window.onresize = sync;
+        initControls();
+        setDays(1); // Инициализация на 1 день
+        loadEvents(); // Подгружаем задачи из БД при загрузке страницы
+    </script>
+</body>
+
+</html>
