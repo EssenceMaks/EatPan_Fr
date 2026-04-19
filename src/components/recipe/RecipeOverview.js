@@ -47,30 +47,20 @@ export default class RecipeOverview extends Component {
     }
 
     // Add everything from mediaAssets that is an image
-    if (this.mediaAssets.length > 0 || d.media?.images?.length > 0) {
-      // Specifically look for UUIDs in d.media.images
-      if (d.media?.images?.length > 0) {
-        d.media.images.forEach(ref => {
-          if (String(ref).startsWith('http')) {
-            const rUrl = resolveMediaUrl(ref);
-            if (!resolvedImageUrls.includes(rUrl)) resolvedImageUrls.push(rUrl);
-          } else if (this.mediaAssets.length > 0) {
-            const asset = this.mediaAssets.find(a => a.uuid === ref);
-            if (asset?.url) {
-              const rUrl = resolveMediaUrl(asset.url);
-              if (!resolvedImageUrls.includes(rUrl)) resolvedImageUrls.push(rUrl);
-            }
-          }
-        });
-      } else {
-        // Fallback, just grab all assets ignoring kind
-        this.mediaAssets.forEach(asset => {
-          if (asset.url) {
-            const rUrl = resolveMediaUrl(asset.url);
-            if (!resolvedImageUrls.includes(rUrl)) resolvedImageUrls.push(rUrl);
-          }
-        });
-      }
+    if (this.mediaAssets && this.mediaAssets.length > 0) {
+      this.mediaAssets.forEach(asset => {
+        if (asset.uuid) {
+          const rUrl = resolveMediaUrl(asset.uuid);
+          if (!resolvedImageUrls.includes(rUrl)) resolvedImageUrls.push(rUrl);
+        }
+      });
+    } else if (d.media?.images?.length > 0) {
+      d.media.images.forEach(ref => {
+        const rUrl = resolveMediaUrl(ref);
+        if (!resolvedImageUrls.includes(rUrl)) resolvedImageUrls.push(rUrl);
+      });
+    } else if (d.image_url) {
+      resolvedImageUrls.push(resolveMediaUrl(d.image_url));
     }
 
     // Save for lightbox usage

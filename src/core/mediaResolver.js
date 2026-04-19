@@ -43,8 +43,7 @@ export function resolveMediaUrl(rawUrl) {
   // Backend MediaResolveView will handle the 302 Redirect to the actual storage path
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawUrl);
   if (isUUID) {
-     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-     const apiBase = isLocal ? 'http://localhost:6600/api/v1' : 'https://api.eatpan.com/api/v1';
+     const apiBase = FORCE_OFFLINE_MODE ? 'http://localhost:6600/api/v1' : 'https://api.eatpan.com/api/v1';
      return `${apiBase}/media/${rawUrl}/`;
   }
 
