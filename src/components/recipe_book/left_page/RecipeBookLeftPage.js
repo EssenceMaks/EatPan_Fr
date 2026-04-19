@@ -242,6 +242,15 @@ export default class RecipeBookLeftPage extends Component {
   // Get hierarchical data for List View
   _getListHierarchy(filtered) {
     const hierarchy = {};
+
+    if (this.activeCategory) {
+      // If a specific category is selected, ONLY return that category
+      hierarchy[this.activeCategory] = [];
+      const relevant = filtered.filter(r => this._getRecipeCats(r).includes(this.activeCategory));
+      hierarchy[this.activeCategory] = relevant;
+      return hierarchy;
+    }
+
     const officialCatNames = (this.officialCategories || []).map(c => c.data?.name);
 
     // Only include official categories with fallback
@@ -249,11 +258,7 @@ export default class RecipeBookLeftPage extends Component {
     hierarchy['Забуті категорії'] = [];
     hierarchy['Без категорії'] = [];
 
-    const relevant = this.activeCategory
-        ? filtered.filter(r => this._getRecipeCats(r).includes(this.activeCategory))
-        : filtered;
-
-    relevant.forEach(r => {
+    filtered.forEach(r => {
       const cats = this._getRecipeCats(r);
       for (const cat of cats) {
         if (!hierarchy[cat]) hierarchy[cat] = [];
@@ -369,7 +374,15 @@ export default class RecipeBookLeftPage extends Component {
       } else {
         // List mode: either all categories as accordions, or just one category
         const hierarchy = this._getListHierarchy(filtered);
-        this.cmpList.updateData(hierarchy, this.listAllOpen);
+        const forceOpen = this.activeCategory ? true : this.listAllOpen;
+        
+        // Ensure cmpList exists before using it (it should be defined in constructor, but let's be safe)
+        if (!this.cmpList) {
+          const RecipeCategoryList = (await import('./RecipeCategoryList.js')).default;
+          this.cmpList = new RecipeCategoryList({ hierarchy, allOpen: forceOpen, onRecipeSelect: this.onRecipeSelected });
+        } else {
+          this.cmpList.updateData(hierarchy, forceOpen);
+        }
         await this.cmpList.render(cContainer);
       }
     }
@@ -387,7 +400,15 @@ export default class RecipeBookLeftPage extends Component {
           this.listAllOpen = false;
         } else if (mode === 'list-expand') {
           this.viewMode = 'list';
-          this.listAllOpen = !this.listAllOpen;
+          if (this.activeCategory) {
+            // If inside a specific category, exit it and expand all
+            this.activeCategory = null;
+            if (this.onCategorySelected) this.onCategorySelected(null);
+            this.listAllOpen = true;
+          } else {
+            // Otherwise just toggle expand/collapse
+            this.listAllOpen = !this.listAllOpen;
+          }
         }
 
         this.update();
