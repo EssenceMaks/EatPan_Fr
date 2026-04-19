@@ -202,8 +202,8 @@ export default class RecipeBook extends Component {
   }
 
   async _loadRecipes() {
-    console.log('📖 RecipeBook: loading recipes from API...');
-    const data = await RecipeService.fetchAll();
+    console.log('📖 RecipeBook: loading ALL recipes (lightweight) for counts/list view...');
+    const data = await RecipeService.fetchAll({ limit: 5000, fields: 'light' });
     this.recipes = Array.isArray(data) ? data : [];
     console.log(`📖 RecipeBook: loaded ${this.recipes.length} recipes`);
 

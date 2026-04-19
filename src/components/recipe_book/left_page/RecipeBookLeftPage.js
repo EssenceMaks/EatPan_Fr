@@ -190,33 +190,49 @@ export default class RecipeBookLeftPage extends Component {
     
     this.cmpRecipeGrid.updateData(this.paginatedRecipes, this.hasMoreRecipes, true);
     
+    // Slight delay for UX smoothness
+    await new Promise(resolve => setTimeout(resolve, 150));
+    
     try {
-      const { RecipeService } = await import('../../../core/ApiClient.js');
       const limit = 20;
-      const filters = {
-        limit,
-        offset: this.currentOffset,
-        fields: 'light'
+      const startIndex = this.currentOffset;
+      
+      const officialCatNames = (this.officialCategories || []).map(c => c.data?.name);
+      
+      const getRecipeCats = (r) => {
+        let cats = [];
+        if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
+          cats = r.data.categories;
+        } else if (r.data?.category) {
+          cats = r.data.category.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        if (cats.length === 0) cats = ['Без категорії'];
+        return cats.map(cat => {
+          const hasOfficialData = this.officialCategories && this.officialCategories.length > 0;
+          if (hasOfficialData && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
+            return 'Забуті категорії';
+          }
+          return cat;
+        });
       };
+
+      // Start with recipes filtered by the active group (Особисті, Всі рецепти, etc.)
+      let relevant = this._getGroupFilteredRecipes();
       
-      if (this.activeGroup !== 'all') {
-        filters.group = this.activeGroup;
-      }
-      if (this.activeCategory && this.activeCategory !== 'Без категорії') {
-        filters.category = this.activeCategory;
+      if (this.activeCategory) {
+        relevant = relevant.filter(r => getRecipeCats(r).includes(this.activeCategory));
       }
       
-      const res = await RecipeService.fetchPage(filters);
-      const newRecipes = res?.results || [];
+      const newRecipes = relevant.slice(startIndex, startIndex + limit);
       
       this.paginatedRecipes = [...this.paginatedRecipes, ...newRecipes];
       this.currentOffset += newRecipes.length;
       
-      if (!res?.next || newRecipes.length === 0) {
+      if (this.currentOffset >= relevant.length || newRecipes.length === 0) {
         this.hasMoreRecipes = false;
       }
     } catch (e) {
-      console.error('Failed to load next page', e);
+      console.error('Failed to paginate recipes locally', e);
       this.hasMoreRecipes = false;
     } finally {
       this.isLoadingPage = false;
