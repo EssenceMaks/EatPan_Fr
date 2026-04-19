@@ -36,13 +36,14 @@ export default class TaskBoard extends Component {
       this.state.userId = session.user.id;
     }
 
-    // Завантаження стану
-    this.loadState();
+    // Завантаження стану — ОБОВ'ЯЗКОВО await, інакше компоненти
+    // ініціалізуються з порожнім questsData і ячейки не підсвічуються
+    await this.loadState();
     
-    // Ініціалізація компонентів
-    this.initTimeList();
-    this.initQuestList();
-    this.initQuestSettings();
+    // Ініціалізація компонентів (тепер questsData вже завантажені)
+    await this.initTimeList();
+    await this.initQuestList();
+    await this.initQuestSettings();
   }
 
   // ============================================
