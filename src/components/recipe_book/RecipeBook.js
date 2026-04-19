@@ -213,23 +213,24 @@ export default class RecipeBook extends Component {
       this.leftPage.setAuthMessage(!session);
     }
 
-    // Extract unique categories from loaded recipes (support both array and legacy string)
-    const catSet = new Map();
-    this.recipes.forEach(r => {
-      let cats = [];
-      if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
-        cats = r.data.categories;
-      } else if (r.data?.category) {
-        cats = r.data.category.split(',').map(s => s.trim()).filter(Boolean);
-      }
-      if (cats.length === 0) cats = ['Без категорії'];
-      for (const cat of cats) {
-        if (!catSet.has(cat)) {
-          catSet.set(cat, { id: cat, label: cat, icon: getCategoryIcon(cat) });
-        }
-      }
-    });
-    this.categories = Array.from(catSet.values()).sort((a, b) => a.label.localeCompare(b.label));
+    // Extract unique categories from official categories instead of just the first page of recipes
+    try {
+      const { CategoryService } = await import('../../core/ApiClient.js');
+      const cats = await CategoryService.fetchAll();
+      const officialCats = Array.isArray(cats) ? cats : [];
+      
+      this.categories = officialCats.map(c => {
+        const name = c.data?.name || 'Без категорії';
+        return {
+          id: name,
+          label: name,
+          icon: c.data?.icon || getCategoryIcon(name)
+        };
+      }).sort((a, b) => a.label.localeCompare(b.label));
+    } catch (e) {
+      console.error('Failed to load categories for ribbons', e);
+      this.categories = [];
+    }
 
     // Create and mount side ribbons (even if 0 recipes — show health tabs)
     this.sideRibbons = new RecipeBookSideRibbons({
