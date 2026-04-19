@@ -154,6 +154,7 @@ export const RecipeService = {
   },
   fetchPage: (filters = {}) => {
     const params = new URLSearchParams(filters);
+    params.append('_t', Date.now());
     return apiFetch(`/recipes/?${params}`);
   },
   fetchDetail: (id) => apiFetch(`/recipes/${id}/?_t=${Date.now()}`),

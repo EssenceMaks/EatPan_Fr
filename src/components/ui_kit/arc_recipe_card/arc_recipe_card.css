@@ -47,11 +47,12 @@
 .arc-recipe-info {
   padding: 8px 10px;
   display: grid;
-  grid-template-columns: 4fr 1fr;
+  grid-template-columns: 1fr 34px;
   grid-template-rows: 1fr 1fr;
   gap: 2px 4px;
   background-color: var(--parchment-light, #f5edd6);
-  min-height: 52px;
+  height: 52px;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
