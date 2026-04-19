@@ -71,37 +71,64 @@ export default class TaskBoard extends Component {
           questsData: this.state.questsData,
           activeQuestId: this.state.activeQuestId,
           
-          onCreate: (hour, startM, MathDurH, MathDurM) => {
-              let title = `Квест ${this.state.questCounter}`;
-              const taskId = 'quest-' + Date.now() + Math.random().toString(36).substring(2, 5);
+          onCreate: async (hour, startM, MathDurH, MathDurM) => {
+              const tempId = 'quest-' + Date.now() + Math.random().toString(36).substring(2, 5);
+              const title = `Квест ${this.state.questCounter}`;
               
-              this.state.questsData[taskId] = {
+              const newTask = {
                   title: title, desc: '', hour: hour, startM: startM, 
                   durH: MathDurH, durM: MathDurM, 
                   color: this.timeList.getRandomColor(), 
                   completed: false, archived: false, media_assets: []
               };
+              
+              this.state.questsData[tempId] = newTask;
               this.state.questCounter++;
               
-              this.timeList.injectTaskItemDOM(taskId, this.state.questsData[taskId]);
-              this.setActiveQuest(taskId);
-              this.saveLocalState();
+              this.timeList.injectTaskItemDOM(tempId, newTask);
+              this.setActiveQuest(tempId);
+              
+              try {
+                  const created = await TaskService.create(newTask);
+                  if (created && created.uuid) {
+                      delete this.state.questsData[tempId];
+                      this.state.questsData[created.uuid] = created;
+                      const row = this.element.querySelector(`#${tempId}`);
+                      if (row) row.id = created.uuid;
+                      this.timeList.refreshCells();
+                      this.questList.refreshList();
+                      if (this.state.activeQuestId === tempId) this.setActiveQuest(created.uuid);
+                  }
+              } catch(e) { console.error("API Create Error", e); }
           },
 
-          onCreateText: (text, hour) => {
-              const taskId = 'quest-' + Date.now();
-              this.state.questsData[taskId] = {
+          onCreateText: async (text, hour) => {
+              const tempId = 'quest-' + Date.now();
+              const newTask = {
                   title: text, desc: '', hour: hour, startM: 0, 
                   durH: 1, durM: 0, 
                   color: this.timeList.getRandomColor(), 
                   completed: false, archived: false, media_assets: []
               };
+              this.state.questsData[tempId] = newTask;
               this.state.questCounter++;
               
-              this.timeList.injectTaskItemDOM(taskId, this.state.questsData[taskId]);
-              this.saveLocalState();
+              this.timeList.injectTaskItemDOM(tempId, newTask);
               this.timeList.refreshCells();
               this.questList.refreshList();
+
+              try {
+                  const created = await TaskService.create(newTask);
+                  if (created && created.uuid) {
+                      delete this.state.questsData[tempId];
+                      this.state.questsData[created.uuid] = created;
+                      const row = this.element.querySelector(`#${tempId}`);
+                      if (row) row.id = created.uuid;
+                      this.timeList.refreshCells();
+                      this.questList.refreshList();
+                      if (this.state.activeQuestId === tempId) this.setActiveQuest(created.uuid);
+                  }
+              } catch(e) { console.error("API Create Error", e); }
           },
 
           onSelect: (taskId) => {
@@ -110,20 +137,22 @@ export default class TaskBoard extends Component {
 
           onUpdateHour: (taskId, newHour) => {
               this.state.questsData[taskId].hour = newHour;
-              this.saveLocalState();
               this.timeList.refreshCells();
-              if(this.state.activeQuestId === taskId) {
-                 this.questSettings.renderDetails();
-              }
-              // Квести могли змінити порядок сортування
+              if(this.state.activeQuestId === taskId) this.questSettings.renderDetails();
               this.questList.refreshList();
+              
+              if (!taskId.startsWith('quest-')) {
+                  TaskService.update(taskId, { hour: newHour }).catch(e => console.error(e));
+              }
           },
 
-          onRandomizeColors: () => {
+          onRandomizeColors: async () => {
               for (let key in this.state.questsData) {
                   this.state.questsData[key].color = this.timeList.getRandomColor();
+                  if (!key.startsWith('quest-')) {
+                      TaskService.update(key, { color: this.state.questsData[key].color }).catch(e=>e);
+                  }
               }
-              this.saveLocalState();
               this.timeList.refreshCells();
               this.questList.refreshList();
               if(this.state.activeQuestId) this.questSettings.renderDetails();
@@ -131,25 +160,31 @@ export default class TaskBoard extends Component {
 
           onToggleDone: (taskId) => {
               this.state.questsData[taskId].completed = !this.state.questsData[taskId].completed;
-              this.saveLocalState();
               this.timeList.refreshCells();
               this.questList.refreshList();
+              if (!taskId.startsWith('quest-')) {
+                  TaskService.update(taskId, { completed: this.state.questsData[taskId].completed }).catch(e=>e);
+              }
           },
 
           onArchive: (taskId) => {
               this.state.questsData[taskId].archived = true;
-              this.saveLocalState();
               this.timeList.refreshCells();
               this.questList.refreshList();
               if (this.state.activeQuestId === taskId) this.setActiveQuest(null);
+              if (!taskId.startsWith('quest-')) {
+                  TaskService.update(taskId, { archived: true }).catch(e=>e);
+              }
           },
 
           onTrash: (taskId) => {
               delete this.state.questsData[taskId];
-              this.saveLocalState();
               this.timeList.refreshCells();
               this.questList.refreshList();
               if (this.state.activeQuestId === taskId) this.setActiveQuest(null);
+              if (!taskId.startsWith('quest-')) {
+                  TaskService.delete(taskId).catch(e=>e);
+              }
           }
       });
       await this.timeList.render(this.element.querySelector('#col-timeline'), 'replace');
@@ -172,9 +207,11 @@ export default class TaskBoard extends Component {
               if(!this.state.questsData[taskId]) return;
               Object.assign(this.state.questsData[taskId], updates);
               
-              this.saveLocalState();
               this.timeList.refreshCells();
               this.questList.refreshList();
+              if (!taskId.startsWith('quest-')) {
+                  TaskService.update(taskId, updates).catch(e=>e);
+              }
           }
       });
       await this.questSettings.render(this.element.querySelector('#col-settings'), 'replace');
@@ -210,9 +247,16 @@ export default class TaskBoard extends Component {
          if (data) {
              this.state.questsData = data.items || {};
              
-             // Зворотна сумісність для відсутніх властивостей масиву
+             // Зворотна сумісність для відсутніх властивостей
              for (const [key, q] of Object.entries(this.state.questsData)) {
                  if (!q.media_assets) q.media_assets = [];
+                 if (q.hour === undefined || q.hour === null) q.hour = 0;
+                 if (q.startM === undefined || q.startM === null) q.startM = 0;
+                 if (q.durH === undefined || q.durH === null) q.durH = 1;
+                 if (q.durM === undefined || q.durM === null) q.durM = 0;
+                 if (!q.color) q.color = '#5c7482'; // Default timeline fallback color
+                 if (q.completed === undefined || q.completed === null) q.completed = false;
+                 if (q.archived === undefined || q.archived === null) q.archived = false;
              }
              
              // Кількість квестів для лічильника
