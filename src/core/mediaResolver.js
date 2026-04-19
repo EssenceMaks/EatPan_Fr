@@ -39,20 +39,25 @@ const LOCAL_STORAGE_BASE = 'http://localhost:6500';
 export function resolveMediaUrl(rawUrl) {
   if (!rawUrl) return null;
 
-  // Якщо URL не має нашого проблемного хоста Cloud Supabase, залишаємо як є
-  if (!rawUrl.includes(CLOUD_STORAGE_HOST)) return rawUrl;
-
-  // Шукаємо місце, де починається шлях до фото (після імені старого бакету)
-  const marker = `/public/${CLOUD_BUCKET}/`;
-  const idx = rawUrl.indexOf(marker);
-  if (idx === -1) return rawUrl;
-
-  const pathAfterBucket = rawUrl.substring(idx + marker.length);
-
-  // СМАРТ-РЕСОЛВЕР:
-  // Якщо ми примусово включили офлайн-режим, беремо фотки з локального порту, 
-  // інакше - йдемо через тунель, щоб все було синхронізовано для всієї команди
   const activeBase = FORCE_OFFLINE_MODE ? LOCAL_STORAGE_BASE : TUNNEL_STORAGE_BASE;
 
-  return `${activeBase}/storage/v1/object/public/${TARGET_BUCKET}/${pathAfterBucket}`;
+  // Case 1: Old Cloud Supabase
+  if (rawUrl.includes(CLOUD_STORAGE_HOST)) {
+    const marker = `/public/${CLOUD_BUCKET}/`;
+    const idx = rawUrl.indexOf(marker);
+    if (idx !== -1) {
+      const pathAfterBucket = rawUrl.substring(idx + marker.length);
+      return `${activeBase}/storage/v1/object/public/${TARGET_BUCKET}/${pathAfterBucket}`;
+    }
+  }
+
+  // Case 2: Local Docker or Tunnel URL (needs rewriting based on active mode)
+  if (rawUrl.startsWith(LOCAL_STORAGE_BASE)) {
+    return rawUrl.replace(LOCAL_STORAGE_BASE, activeBase);
+  }
+  if (rawUrl.startsWith(TUNNEL_STORAGE_BASE)) {
+    return rawUrl.replace(TUNNEL_STORAGE_BASE, activeBase);
+  }
+
+  return rawUrl;
 }
