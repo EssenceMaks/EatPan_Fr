@@ -88,6 +88,9 @@ export default class TaskBoard extends Component {
               this.timeList.injectTaskItemDOM(tempId, newTask);
               this.setActiveQuest(tempId);
               
+              this.timeList.refreshCells();
+              this.questList.refreshList();
+              
               try {
                   const created = await TaskService.create(newTask);
                   if (created && created.uuid) {

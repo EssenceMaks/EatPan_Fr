@@ -39,11 +39,11 @@ async function apiFetch(path, options = {}) {
     return null;
   }
 
-  // 1. С локалки спочатку пробуємо локальний докер (щоб уникнути помилок CORS від Cloudflare)
-  // 2. Якщо докер вимкнено - йдемо на api.eatpan.com (Cloudflare Tunnel)
+  // 1. Спочатку йдемо на api.eatpan.com (Cloudflare Tunnel), щоб перевірити тунель
+  // 2. Якщо тунель лежить (або CORS) - йдемо на локальний докер
   // 3. Якщо і він не працює - на Render
   const endpoints = IS_LOCAL 
-      ? [LOCAL_API, CLOUD_API, RENDER_API] 
+      ? [CLOUD_API, LOCAL_API, RENDER_API] 
       : [CLOUD_API, RENDER_API];
 
   let cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
