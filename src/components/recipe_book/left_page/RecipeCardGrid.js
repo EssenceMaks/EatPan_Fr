@@ -50,10 +50,13 @@ export default class RecipeCardGrid extends Component {
       
       let imgHtml = '';
       if (imgUrl) {
-        imgHtml = `<img alt="${title}" class="arc-recipe-img" src="${imgUrl}" onerror="this.onerror=null;this.style.display='none';this.parentElement.innerHTML='<i data-lucide=\\'image-off\\' style=\\'width:32px;height:32px;color:rgba(255,255,255,0.5);\\'></i>';if(window.lucide)lucide.createIcons({root:this.parentElement});" />`;
+        imgHtml = `<img alt="${title}" class="arc-recipe-img" src="${imgUrl}" onerror="const p=this.parentElement; p.innerHTML='<div style=\\'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:10px;background:var(--color-surface-card);color:var(--color-text-muted);\\'><i data-lucide=\\'server-off\\' style=\\'width:24px;height:24px;margin-bottom:8px;\\'></i><span style=\\'font-size:10px;line-height:1.2;font-family:var(--font-primary);\\'>Фото доступне<br>при локальному<br>сервері</span></div>'; if(window.lucide) window.lucide.createIcons({root: p});" />`;
       } else {
         imgHtml = `
-          <i data-lucide="chef-hat" style="width:32px;height:32px;color:rgba(255,255,255,1);"></i>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:10px;background:var(--color-surface-card);color:var(--color-text-muted);">
+            <i data-lucide="camera-off" style="width:24px;height:24px;margin-bottom:8px;"></i>
+            <span style="font-size:10px;line-height:1.2;font-family:var(--font-primary);">Відсутнє фото,<br>добавте</span>
+          </div>
         `;
       }
 

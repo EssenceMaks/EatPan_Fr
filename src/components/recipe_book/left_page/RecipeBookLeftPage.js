@@ -135,7 +135,9 @@ export default class RecipeBookLeftPage extends Component {
 
       for (let cat of cats) {
         // Fallback: If category isn't known in the DB, group it as Forgotten
-        if (this.officialCategories && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
+        // Only do this if officialCategories is populated (i.e., we know the DB is synced)
+        const hasOfficialData = this.officialCategories && this.officialCategories.length > 0;
+        if (hasOfficialData && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
            cat = 'Забуті категорії';
         }
         counts[cat] = (counts[cat] || 0) + 1;
@@ -162,7 +164,8 @@ export default class RecipeBookLeftPage extends Component {
       }
       if (cats.length === 0) cats = ['Без категорії'];
       return cats.map(cat => {
-        if (this.officialCategories && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
+        const hasOfficialData = this.officialCategories && this.officialCategories.length > 0;
+        if (hasOfficialData && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
           return 'Забуті категорії';
         }
         return cat;

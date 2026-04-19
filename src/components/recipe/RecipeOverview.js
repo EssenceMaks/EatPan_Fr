@@ -29,24 +29,7 @@ export default class RecipeOverview extends Component {
     return 'circle-dot';
   }
 
-  /**
-   * Build main gallery image/placeholder.
-   * Type A: recipe has a photo URL → show <img> with onerror fallback "local machine offline".
-   * Type B: recipe has NO photo → decorative Lucide icon placeholder.
-   */
-  _buildMainImage(imageUrl, title) {
-    if (imageUrl) {
-      // Has image URL — show it; if local machine is offline the image fails to load
-      return `<img src="${imageUrl}" alt="${title}"
-        style="width:100%;height:100%;object-fit:cover;"
-        onerror="const p = this.parentElement; p.innerHTML='<div class=\\'gallery-placeholder gallery-placeholder--offline\\'><i data-lucide=\\'server-off\\' style=\\'width:36px;height:36px;opacity:0.5;\\'></i><span>Локальна машина<br>не в мережі</span></div>';if(window.lucide)lucide.createIcons({root:p.parentElement || p});">`;
-    }
-    // No image URL — recipe has no photo
-    return `<div class="gallery-placeholder gallery-placeholder--no-photo">
-      <i data-lucide="image-off" style="width:40px;height:40px;opacity:0.35;"></i>
-      <span>Без фото</span>
-    </div>`;
-  }
+
 
   async template() {
     const d = this.recipeData || {};
@@ -106,14 +89,14 @@ export default class RecipeOverview extends Component {
         
         galleryHtml += `
           <div class="ag-gallery-item ${isMain ? 'ag-main' : ''}" data-index="${i}">
-            <img src="${resolvedImageUrls[i]}" alt="Photo ${i+1}" onerror="this.style.opacity=0.3">
+            <img src="${resolvedImageUrls[i]}" alt="Photo ${i+1}" onerror="const p=this.parentElement; p.innerHTML='<div class=\\'gallery-placeholder gallery-placeholder--offline\\' style=\\'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:10px;background:var(--color-surface-card);color:var(--color-text-muted);\\'><i data-lucide=\\'server-off\\' style=\\'width:36px;height:36px;margin-bottom:8px;\\'></i><span style=\\'font-size:12px;line-height:1.2;font-family:var(--font-primary);\\'>Фото доступне<br>при локальному сервері</span></div>'; if(window.lucide) window.lucide.createIcons({root: p});">
             ${overtext}
           </div>
         `;
       }
       galleryHtml += `</div>`;
     } else {
-      galleryHtml = `<div class="gallery-placeholder gallery-placeholder--no-photo"><i data-lucide="image-off" style="width:40px;height:40px;opacity:0.35;"></i><span>Без фото</span></div>`;
+      galleryHtml = `<div class="gallery-placeholder gallery-placeholder--no-photo" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;padding:20px;background:var(--color-surface-card);color:var(--color-text-muted);min-height:300px;border-radius:12px;"><i data-lucide="camera-off" style="width:48px;height:48px;margin-bottom:12px;"></i><span style="font-size:14px;line-height:1.2;font-family:var(--font-primary);">Відсутнє фото,<br>добавте</span></div>`;
     }
 
     // Ingredients HTML

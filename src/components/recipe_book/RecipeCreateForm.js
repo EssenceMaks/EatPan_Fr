@@ -47,6 +47,9 @@ export default class RecipeCreateForm extends Component {
                   <i data-lucide="camera" style="width:32px;height:32px;opacity:0.4;"></i>
                   <span class="rcf-photo-label">Завантажити фото</span>
                   <span class="rcf-photo-hint">Перетягніть, клікніть або Ctrl+V (до 20 фото, макс. 4MB)</span>
+                  <div style="font-size: 0.75rem; color: var(--gold); margin-top: 6px; opacity: 0.8; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <i data-lucide="server" style="width:12px; height:12px;"></i> Для завантаження необхідний локальний сервер
+                  </div>
                 </div>
                 <button type="button" class="rcf-photo-paste" id="rcf-photo-paste" title="Вставити з буфера">
                   <i data-lucide="clipboard-paste" style="width:24px;height:24px;opacity:0.7;"></i>
