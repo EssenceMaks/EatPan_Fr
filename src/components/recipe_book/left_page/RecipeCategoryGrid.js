@@ -91,7 +91,7 @@ export default class RecipeCategoryGrid extends Component {
     if (this.animationInterval) clearInterval(this.animationInterval);
     this.categories = categories;
     this.recipeCounts = recipeCounts;
-    this.officialCategories = officialCategories;
+    this.officialCategories = officialCategories || [];
     this.update();
   }
 }
