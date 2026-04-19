@@ -14,18 +14,37 @@ const RENDER_API  = 'https://eatpan-back.onrender.com/api/v1';
 
 const API_BASE = IS_LOCAL ? LOCAL_API : CLOUD_API;
 
-/** Get fresh auth token from Supabase SDK (auto-refreshed) */
+/** Cached session to avoid Supabase lock contention */
+let _sessionCache = { session: null, ts: 0 };
+const SESSION_CACHE_TTL = 3000; // 3 sec
+
+/** Get fresh auth token from Supabase SDK (cached to avoid lock spam) */
 async function getAuthHeaders(extra = {}) {
   const headers = { ...extra };
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.access_token) {
-      headers['Authorization'] = `Bearer ${session.access_token}`;
+    const now = Date.now();
+    if (_sessionCache.ts && (now - _sessionCache.ts) < SESSION_CACHE_TTL) {
+      // Use cached session
+      const session = _sessionCache.session;
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+    } else {
+      const { data: { session } } = await supabase.auth.getSession();
+      _sessionCache = { session, ts: now };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
     }
   } catch (e) {
     console.warn('Auth: failed to get session', e.message);
   }
   return headers;
+}
+
+/** Check if user is currently authenticated (no network call) */
+function isAuthenticated() {
+  return !!_sessionCache.session?.access_token;
 }
 
 /** Circuit-breaker: stop retrying when all endpoints are confirmed down */
@@ -39,11 +58,11 @@ async function apiFetch(path, options = {}) {
     return null;
   }
 
-  // 1. Спочатку йдемо на api.eatpan.com (Cloudflare Tunnel), щоб перевірити тунель
-  // 2. Якщо тунель лежить (або CORS) - йдемо на локальний докер
-  // 3. Якщо і він не працює - на Render
+  // Endpoint priority:
+  // LOCAL development: CLOUD_API (Cloudflare tunnel) first, then LOCAL_API as fallback
+  // Production: CLOUD_API only, Render as fallback
   const endpoints = IS_LOCAL 
-      ? [CLOUD_API, LOCAL_API, RENDER_API] 
+      ? [CLOUD_API, LOCAL_API] 
       : [CLOUD_API, RENDER_API];
 
   let cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
@@ -82,24 +101,30 @@ async function apiFetch(path, options = {}) {
   const tryEndpoint = async (base, label) => {
     const authHdrs = await getAuthHeaders();
     const hasToken = !!authHdrs['Authorization'];
-    const r = await doFetch(base, true);
-    if (r.ok || r.status === 204) {
-      console.log(`🟢 API [${base}] ${r.status} ${label}`);
-      return r;
-    }
-    // If 401/403 and we sent a token, retry WITHOUT token (anonymous access)
-    if ((r.status === 401 || r.status === 403) && hasToken) {
-      console.warn(`🟡 API [${base}] ${r.status} with token — retrying anonymous...`);
-      const r2 = await doFetch(base, false);
-      if (r2.ok || r2.status === 204) {
-        console.log(`🟢 API [${base}] ${r2.status} (anonymous) ${label}`);
+    try {
+      const r = await doFetch(base, true);
+      if (r.ok || r.status === 204) {
+        console.log(`%c● API [${base}] ${r.status} ${label}`, 'color:#4ade80');
+        return r;
+      }
+      // If 401/403 and we sent a token, retry WITHOUT token (anonymous access)
+      if ((r.status === 401 || r.status === 403) && hasToken) {
+        const r2 = await doFetch(base, false);
+        if (r2.ok || r2.status === 204) {
+          console.log(`%c● API [${base}] ${r2.status} (anonymous) ${label}`, 'color:#4ade80');
+          return r2;
+        }
         return r2;
       }
-      console.warn(`🟡 API [${base}] ${r2.status} anonymous also failed`);
-      return r2;
+      // For unauthenticated users hitting protected endpoints — don't spam console
+      if ((r.status === 401 || r.status === 403) && !hasToken) {
+        return r; // Return silently, let the cascade handle it
+      }
+      console.warn(`▲ API [${base}] ${r.status} ${label}`);
+      return r;
+    } catch (e) {
+      throw e; // Re-throw network errors for cascade to handle
     }
-    console.warn(`🟡 API [${base}] ${r.status} ${label} — trying next...`);
-    return r;
   };
 
   // Try cached base first
@@ -138,7 +163,12 @@ async function apiFetch(path, options = {}) {
         lastReachable = { base, response: r };
       }
     } catch (e) {
-      console.warn(`🔴 API [${base}] failed:`, e.message);
+      // Network errors — only warn once, not on every endpoint
+      if (IS_LOCAL && base === CLOUD_API) {
+        // Expected: Cloudflare tunnel may be down during local dev
+      } else {
+        console.warn(`API [${base}] unreachable`);
+      }
     }
   }
 
@@ -147,11 +177,13 @@ async function apiFetch(path, options = {}) {
     window._activeApiBase = base;
     localStorage.setItem('eatpan_active_api', base);
     localStorage.setItem('eatpan_active_api_time', Date.now().toString());
-    console.warn(`⚠️ API fallback: ${base} (${r.status})`);
     try { return await r.json(); } catch (e) { return null; }
   }
 
-  console.error(`❌ API [${path}]: all endpoints unreachable`);
+  // Only log error if user is actually authenticated (unauthenticated 403 is expected)
+  if (isAuthenticated()) {
+    console.error(`API [${path}]: all endpoints unreachable`);
+  }
   _circuitBreaker.failedAt = Date.now();
   return null;
 }
