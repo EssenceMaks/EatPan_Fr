@@ -307,6 +307,35 @@ export const TaskService = {
 };
 
 // ============================================================
+// TASK TYPES — Phase 14
+// ============================================================
+export const TaskTypeService = {
+  fetchAll: () => apiFetch('/task-types/'),
+  create: (data) => apiFetch('/task-types/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  update: (uuid, data) => apiFetch(`/task-types/${uuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  delete: (uuid) => apiFetch(`/task-types/${uuid}/`, { method: 'DELETE' }),
+  createSubtype: (typeUuid, data) => apiFetch(`/task-types/${typeUuid}/subtypes/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  updateSubtype: (subtypeUuid, data) => apiFetch(`/task-subtypes/${subtypeUuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  deleteSubtype: (subtypeUuid) => apiFetch(`/task-subtypes/${subtypeUuid}/`, { method: 'DELETE' }),
+};
+
+// ============================================================
 // MEAL PLAN — Phase 5
 // ============================================================
 export const MealPlanService = {

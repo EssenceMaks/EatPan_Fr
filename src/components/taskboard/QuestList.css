@@ -26,7 +26,7 @@
 .tb-list-container {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0px;
 }
 
 .tb-list-item {
