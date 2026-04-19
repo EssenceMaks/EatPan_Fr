@@ -16,6 +16,14 @@ export default class RecipeCardGrid extends Component {
 
   // Get recipe main image from media.images or null
   _getRecipeImage(recipe) {
+    // Light format support
+    if (recipe.image_uuid) {
+      if (String(recipe.image_uuid).startsWith('http')) {
+        return resolveMediaUrl(recipe.image_uuid);
+      }
+      return resolveMediaUrl(recipe.image_uuid); // resolveMediaUrl handles UUID natively
+    }
+
     if (!recipe.data) return null;
     
     if (recipe.data.media && Array.isArray(recipe.data.media.images) && recipe.data.media.images.length > 0) {
@@ -51,8 +59,9 @@ export default class RecipeCardGrid extends Component {
 
     const cards = this.recipes.map(r => {
       const imgUrl = this._getRecipeImage(r);
-      const title = r.data?.title || 'Без назви';
-      const cookTime = r.data?.prep_time ? `${r.data.prep_time} хв` : '15 хв';
+      const title = r.title || r.data?.title || 'Без назви';
+      const cookTimeRaw = r.prep_time || r.data?.prep_time || '15';
+      const cookTime = `${cookTimeRaw} хв`;
       
       let imgHtml = '';
       if (imgUrl) {
