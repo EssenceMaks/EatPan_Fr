@@ -39,18 +39,28 @@ async function apiFetch(path, options = {}) {
     return null;
   }
 
-  // On localhost: CORS blocks api.eatpan.com (allows only https://eatpan.com)
-  // So we go: local Docker → Render (requires auth token)
-  // On production (eatpan.com): Cloudflare → Render
-  const endpoints = IS_LOCAL
-    ? [LOCAL_API, RENDER_API]
-    : [CLOUD_API, RENDER_API];
+  // 1. С локалки на api.eatpan.com (Cloudflare Tunnel)
+  // 2. Если спит — на Render
+  // (Логика Render → локальный Supabase / облачный Supabase управляется самим бэкендом)
+  const endpoints = [CLOUD_API, RENDER_API];
 
   let cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
+  let cachedTime = localStorage.getItem('eatpan_active_api_time');
+
+  // Если мы сидим на фоллбэке (Render) дольше 1 минуты, пробуем вернуться на основной CLOUD_API
+  if (cachedBase === RENDER_API && cachedTime && (Date.now() - parseInt(cachedTime)) > 60000) {
+    console.log('🔄 TTL expired for Render fallback, retrying primary API (Cloudflare)...');
+    cachedBase = null;
+    window._activeApiBase = null;
+    localStorage.removeItem('eatpan_active_api');
+    localStorage.removeItem('eatpan_active_api_time');
+  }
+
   if (cachedBase && !endpoints.includes(cachedBase)) {
     cachedBase = null;
     window._activeApiBase = null;
     localStorage.removeItem('eatpan_active_api');
+    localStorage.removeItem('eatpan_active_api_time');
   }
 
   const isFormData = options.body instanceof FormData;
@@ -117,6 +127,7 @@ async function apiFetch(path, options = {}) {
         _circuitBreaker.failedAt = 0;
         window._activeApiBase = base;
         localStorage.setItem('eatpan_active_api', base);
+        localStorage.setItem('eatpan_active_api_time', Date.now().toString());
         if (rawResponse) return r;
         if (r.status === 204) return null;
         return await r.json();
@@ -133,6 +144,7 @@ async function apiFetch(path, options = {}) {
     const { base, response: r } = lastReachable;
     window._activeApiBase = base;
     localStorage.setItem('eatpan_active_api', base);
+    localStorage.setItem('eatpan_active_api_time', Date.now().toString());
     console.warn(`⚠️ API fallback: ${base} (${r.status})`);
     try { return await r.json(); } catch (e) { return null; }
   }
@@ -214,20 +226,37 @@ export const CategoryService = {
 };
 
 // ============================================================
-// USER PROFILE (planned — for UserProfile endpoints)
+// USER PROFILE — Phase 3
 // ============================================================
 export const ProfileService = {
   getMe: () => apiFetch('/profile/me/'),
   updateMe: (data) => apiFetch('/profile/me/', {
-    method: 'PUT',
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   }),
-  getStats: () => apiFetch('/profile/me/stats/'),
+  getPublic: (uuid) => apiFetch(`/profile/${uuid}/public/`),
 };
 
 // ============================================================
-// TASKS (planned — stored in UserProfile.tasks JSON)
+// ACCOUNT — Phase 3
+// ============================================================
+export const AccountService = {
+  updateTier: (tier) => apiFetch('/account/tier/', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tier }),
+  }),
+  createReferral: () => apiFetch('/account/referral/create/', { method: 'POST' }),
+  activateReferral: (code) => apiFetch('/account/referral/activate/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  }),
+};
+
+// ============================================================
+// TASKS — Phase 4
 // ============================================================
 export const TaskService = {
   fetchAll: () => apiFetch('/tasks/'),
@@ -236,24 +265,242 @@ export const TaskService = {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(task),
   }),
-  update: (uuid, task) => apiFetch(`/tasks/${uuid}/`, {
-    method: 'PUT',
+  get: (uuid) => apiFetch(`/tasks/${uuid}/`),
+  update: (uuid, data) => apiFetch(`/tasks/${uuid}/`, {
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(task),
+    body: JSON.stringify(data),
   }),
   delete: (uuid) => apiFetch(`/tasks/${uuid}/`, { method: 'DELETE' }),
+  // Comments
+  addComment: (taskUuid, text) => apiFetch(`/tasks/${taskUuid}/comments/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  }),
+  editComment: (taskUuid, cid, text) => apiFetch(`/tasks/${taskUuid}/comments/${cid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  }),
+  deleteComment: (taskUuid, cid) => apiFetch(`/tasks/${taskUuid}/comments/${cid}/`, { method: 'DELETE' }),
+  // Groups
+  fetchGroups: () => apiFetch('/task-groups/'),
+  createGroup: (data) => apiFetch('/task-groups/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  updateGroup: (uuid, data) => apiFetch(`/task-groups/${uuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  deleteGroup: (uuid) => apiFetch(`/task-groups/${uuid}/`, { method: 'DELETE' }),
+  shareGroup: (uuid, userUuid) => apiFetch(`/task-groups/${uuid}/share/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_uuid: userUuid }),
+  }),
 };
 
 // ============================================================
-// PREFERENCES (planned)
+// MEAL PLAN — Phase 5
 // ============================================================
-export const PreferencesService = {
-  get: () => apiFetch('/preferences/'),
-  save: (prefs) => apiFetch('/preferences/', {
-    method: 'PUT',
+export const MealPlanService = {
+  fetchAll: (params = {}) => {
+    const qs = new URLSearchParams(params);
+    return apiFetch(`/meal-plan/?${qs}`);
+  },
+  create: (data) => apiFetch('/meal-plan/', {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(prefs),
+    body: JSON.stringify(data),
   }),
+  get: (uuid) => apiFetch(`/meal-plan/${uuid}/`),
+  update: (uuid, data) => apiFetch(`/meal-plan/${uuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  delete: (uuid) => apiFetch(`/meal-plan/${uuid}/`, { method: 'DELETE' }),
+  bindRecipe: (entryUuid, recipeUuid) => apiFetch(`/meal-plan/${entryUuid}/bind-recipe/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ recipe_uuid: recipeUuid }),
+  }),
+  unbindRecipe: (entryUuid, recipeUuid) => apiFetch(`/meal-plan/${entryUuid}/unbind-recipe/${recipeUuid}/`, {
+    method: 'DELETE',
+  }),
+  // Labels
+  fetchLabels: () => apiFetch('/meal-plan/labels/'),
+  createLabel: (data) => apiFetch('/meal-plan/labels/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  updateLabel: (uuid, data) => apiFetch(`/meal-plan/labels/${uuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  deleteLabel: (uuid) => apiFetch(`/meal-plan/labels/${uuid}/`, { method: 'DELETE' }),
+};
+
+// ============================================================
+// PANTRY — Phase 6
+// ============================================================
+export const PantryService = {
+  fetchAll: () => apiFetch('/pantry/'),
+  addItem: (data) => apiFetch('/pantry/items/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  updateItem: (uuid, data) => apiFetch(`/pantry/items/${uuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  deleteItem: (uuid) => apiFetch(`/pantry/items/${uuid}/`, { method: 'DELETE' }),
+  fetchLocations: () => apiFetch('/pantry/locations/'),
+  addLocation: (data) => apiFetch('/pantry/locations/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  updateLocation: (uuid, data) => apiFetch(`/pantry/locations/${uuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  deleteLocation: (uuid) => apiFetch(`/pantry/locations/${uuid}/`, { method: 'DELETE' }),
+  expirationReport: () => apiFetch('/pantry/expiration-report/'),
+};
+
+// ============================================================
+// SHOPPING — Phase 7
+// ============================================================
+export const ShoppingService = {
+  fetchAll: () => apiFetch('/shopping/'),
+  createList: (data) => apiFetch('/shopping/lists/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  updateList: (uuid, data) => apiFetch(`/shopping/lists/${uuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  deleteList: (uuid) => apiFetch(`/shopping/lists/${uuid}/`, { method: 'DELETE' }),
+  shareList: (uuid, userUuid) => apiFetch(`/shopping/lists/${uuid}/share/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_uuid: userUuid }),
+  }),
+  addItem: (listUuid, data) => apiFetch(`/shopping/lists/${listUuid}/items/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  updateItem: (listUuid, itemUuid, data) => apiFetch(`/shopping/lists/${listUuid}/items/${itemUuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  deleteItem: (listUuid, itemUuid) => apiFetch(`/shopping/lists/${listUuid}/items/${itemUuid}/`, {
+    method: 'DELETE',
+  }),
+};
+
+// ============================================================
+// SOCIAL — Phase 8
+// ============================================================
+export const SocialService = {
+  follow: (uuid) => apiFetch(`/social/follow/${uuid}/`, { method: 'POST' }),
+  unfollow: (uuid) => apiFetch(`/social/follow/${uuid}/`, { method: 'DELETE' }),
+  addFriend: (uuid, nickname = '') => apiFetch(`/social/friends/${uuid}/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nickname }),
+  }),
+  updateFriend: (uuid, data) => apiFetch(`/social/friends/${uuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  removeFriend: (uuid) => apiFetch(`/social/friends/${uuid}/`, { method: 'DELETE' }),
+  fetchGroups: () => apiFetch('/social/friend-groups/'),
+  createGroup: (data) => apiFetch('/social/friend-groups/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  updateGroup: (uuid, data) => apiFetch(`/social/friend-groups/${uuid}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  deleteGroup: (uuid) => apiFetch(`/social/friend-groups/${uuid}/`, { method: 'DELETE' }),
+  fetchFollowers: () => apiFetch('/social/followers/'),
+  fetchFollowing: () => apiFetch('/social/following/'),
+  fetchAllUsers: () => apiFetch('/social/all-users/'),
+};
+
+// ============================================================
+// MESSAGES — Phase 9
+// ============================================================
+export const MessageService = {
+  fetchConversations: () => apiFetch('/messages/'),
+  getConversation: (convId) => apiFetch(`/messages/${convId}/`),
+  sendDM: (userUuid, text, mediaUuid = '') => apiFetch(`/messages/${userUuid}/send/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, media_uuid: mediaUuid }),
+  }),
+  editMessage: (convId, msgId, text) => apiFetch(`/messages/${convId}/${msgId}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  }),
+  deleteMessage: (convId, msgId) => apiFetch(`/messages/${convId}/${msgId}/`, { method: 'DELETE' }),
+  createGroup: (data) => apiFetch('/messages/groups/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  editGroup: (groupId, data) => apiFetch(`/messages/groups/${groupId}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  sendToGroup: (groupId, text, mediaUuid = '') => apiFetch(`/messages/groups/${groupId}/send/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, media_uuid: mediaUuid }),
+  }),
+};
+
+// ============================================================
+// PROMO CODES — Phase 10
+// ============================================================
+export const PromoService = {
+  fetchAll: () => apiFetch('/promo-codes/'),
+  get: (code) => apiFetch(`/promo-codes/${code}/`),
+  create: (data) => apiFetch('/promo-codes/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  update: (code, data) => apiFetch(`/promo-codes/${code}/`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }),
+  deactivate: (code) => apiFetch(`/promo-codes/${code}/`, { method: 'DELETE' }),
+  use: (code) => apiFetch(`/promo-codes/${code}/use/`, { method: 'POST' }),
+  gift: (code, userUuid) => apiFetch(`/promo-codes/${code}/gift/${userUuid}/`, { method: 'POST' }),
 };
 
 // ============================================================

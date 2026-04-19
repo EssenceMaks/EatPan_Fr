@@ -8,6 +8,10 @@
 import Component from '../../core/Component.js';
 import RecipeBook from '../recipe_book/RecipeBook.js';
 import TaskBoard from '../taskboard/TaskBoard.js';
+import PantryStub from '../pantry_stub/PantryStub.js';
+import ShoppingStub from '../shopping_stub/ShoppingStub.js';
+import MealPlanStub from '../meal_plan_stub/MealPlanStub.js';
+import SocialSector from '../social_sector/SocialSector.js';
 
 // ============================================================
 // SECTOR REGISTRY — easy to add/remove/reorder
@@ -130,18 +134,11 @@ export default class SectorCarousel extends Component {
 
   async onMount() {
     this.carousel = this.element;
-    this._initInfiniteScroll();
-    this._setupScrollListener();
-    this._setupWheelListener();
-    this._setupTouchListeners();
-    this._setupClickListener();
-    this._setupKeyboardListener();
-    this._setupResizeListener();
-    this._setupHistoryListener();
 
     if (window.lucide) lucide.createIcons({ root: this.element });
 
-    // Mount complex blocks inside the original blocks
+    // Mount complex blocks BEFORE infinite scroll cloning,
+    // so clones also get the rendered content
     const originalRecipeBookContainer = this.carousel.querySelector('.original-block[data-sector-id="recipe-book"] .sector-content');
     if (originalRecipeBookContainer) {
       originalRecipeBookContainer.innerHTML = '';
@@ -155,6 +152,45 @@ export default class SectorCarousel extends Component {
       this.taskBoardComponent = new TaskBoard();
       await this.taskBoardComponent.render(originalTaskBoardContainer, 'innerHTML');
     }
+
+    // Phase 13: Mount stub components into sectors
+    const storageContainer = this.carousel.querySelector('.original-block[data-sector-id="storage"] .sector-content');
+    if (storageContainer) {
+      storageContainer.innerHTML = '';
+      this.pantryStub = new PantryStub();
+      await this.pantryStub.render(storageContainer, 'innerHTML');
+    }
+
+    const listsContainer = this.carousel.querySelector('.original-block[data-sector-id="lists"] .sector-content');
+    if (listsContainer) {
+      listsContainer.innerHTML = '';
+      this.shoppingStub = new ShoppingStub();
+      await this.shoppingStub.render(listsContainer, 'innerHTML');
+    }
+
+    const kitchenContainer = this.carousel.querySelector('.original-block[data-sector-id="kitchen"] .sector-content');
+    if (kitchenContainer) {
+      kitchenContainer.innerHTML = '';
+      this.mealPlanStub = new MealPlanStub();
+      await this.mealPlanStub.render(kitchenContainer, 'innerHTML');
+    }
+
+    const contactsContainer = this.carousel.querySelector('.original-block[data-sector-id="contacts"] .sector-content');
+    if (contactsContainer) {
+      contactsContainer.innerHTML = '';
+      this.socialSector = new SocialSector();
+      await this.socialSector.render(contactsContainer, 'innerHTML');
+    }
+
+    // NOW init infinite scroll (clones will include mounted content)
+    this._initInfiniteScroll();
+    this._setupScrollListener();
+    this._setupWheelListener();
+    this._setupTouchListeners();
+    this._setupClickListener();
+    this._setupKeyboardListener();
+    this._setupResizeListener();
+    this._setupHistoryListener();
   }
 
   onDestroy() {

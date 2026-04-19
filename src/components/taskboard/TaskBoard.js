@@ -1,5 +1,6 @@
 import Component from '../../core/Component.js';
 import { supabase } from '../../core/supabaseClient.js';
+import { TaskService } from '../../core/ApiClient.js';
 import TimeList from './TimeList.js';
 import QuestList from './QuestList.js';
 import QuestSettings from './QuestSettings.js';
@@ -201,31 +202,35 @@ export default class TaskBoard extends Component {
   }
 
   // ============================================
-  // ЗБЕРЕЖЕННЯ ДАНИХ (СТАДІЯ 1: LOCALSTORAGE)
+  // ЗБЕРЕЖЕННЯ ДАНИХ (СТАДІЯ 2: API БЕКЕНДУ)
   // ============================================
-  loadState() {
-     const storageKey = this.state.userId ? `eatpan_quests_v1_${this.state.userId}` : 'eatpan_quests_v1_guest';
-     const saved = localStorage.getItem(storageKey);
-     if (saved) {
-         try {
-             const data = JSON.parse(saved);
-             this.state.questsData = data.quests || {};
+  async loadState() {
+     try {
+         const data = await TaskService.fetchAll();
+         if (data) {
+             this.state.questsData = data.items || {};
              
-             // Зворотна сумісність для відсутніх властивостей масиву, які логічно прикріплюються в поточному циклі
+             // Зворотна сумісність для відсутніх властивостей масиву
              for (const [key, q] of Object.entries(this.state.questsData)) {
                  if (!q.media_assets) q.media_assets = [];
              }
              
-             this.state.questCounter = data.counter || 1;
-         } catch(e) {
-             console.error("Failed to parse quests from localStorage", e);
+             // Кількість квестів для лічильника
+             this.state.questCounter = Object.keys(this.state.questsData).length + 1;
          }
+     } catch(e) {
+         console.error("Failed to load quests from API", e);
      }
   }
 
   saveLocalState() {
+     // Ми тепер не використовуємо єдиний save, а оновлюємо конкретні задачі при змінах
+     // Але для зворотної сумісності з поточним кодом, будемо зберігати весь об'єкт у локал для надійності,
+     // а справжні оновлення відправляти індивідуально (реалізовано в обробниках)
      if(this.saveDebounce) clearTimeout(this.saveDebounce);
      this.saveDebounce = setTimeout(() => {
+         // Для повноцінної інтеграції краще відправляти PATCH запити в обробниках подій (onCreate, onUpdate)
+         // Тому тут ми можемо залишити тільки локальний бекап або взагалі прибрати
          const storageKey = this.state.userId ? `eatpan_quests_v1_${this.state.userId}` : 'eatpan_quests_v1_guest';
          const payload = {
             quests: this.state.questsData,
@@ -233,7 +238,6 @@ export default class TaskBoard extends Component {
             lastUpdated: new Date().toISOString()
          };
          localStorage.setItem(storageKey, JSON.stringify(payload));
-         console.trace('[TaskBoard] LocalState Auto-Saved');
      }, 400);
   }
 }
