@@ -39,10 +39,12 @@ async function apiFetch(path, options = {}) {
     return null;
   }
 
-  // 1. С локалки на api.eatpan.com (Cloudflare Tunnel)
-  // 2. Если спит — на Render
-  // (Логика Render → локальный Supabase / облачный Supabase управляется самим бэкендом)
-  const endpoints = [CLOUD_API, RENDER_API];
+  // 1. С локалки спочатку пробуємо локальний докер (щоб уникнути помилок CORS від Cloudflare)
+  // 2. Якщо докер вимкнено - йдемо на api.eatpan.com (Cloudflare Tunnel)
+  // 3. Якщо і він не працює - на Render
+  const endpoints = IS_LOCAL 
+      ? [LOCAL_API, CLOUD_API, RENDER_API] 
+      : [CLOUD_API, RENDER_API];
 
   let cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
   let cachedTime = localStorage.getItem('eatpan_active_api_time');
