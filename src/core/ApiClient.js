@@ -28,8 +28,17 @@ async function getAuthHeaders(extra = {}) {
   return headers;
 }
 
+/** Circuit-breaker: stop retrying when all endpoints are confirmed down */
+const _circuitBreaker = { failedAt: 0, cooldownMs: 30000 };
+
 /** Fetch with failover: Cloudflare tunnel → local Docker → Render */
 async function apiFetch(path, options = {}) {
+  // Circuit-breaker: if all endpoints failed recently, return null immediately
+  if (_circuitBreaker.failedAt && (Date.now() - _circuitBreaker.failedAt < _circuitBreaker.cooldownMs)) {
+    console.warn(`⏸️ API circuit-breaker active (${Math.round((_circuitBreaker.cooldownMs - (Date.now() - _circuitBreaker.failedAt))/1000)}s remaining)`);
+    return null;
+  }
+
   // On localhost: CORS blocks api.eatpan.com (allows only https://eatpan.com)
   // So we go: local Docker → Render (requires auth token)
   // On production (eatpan.com): Cloudflare → Render
@@ -86,6 +95,7 @@ async function apiFetch(path, options = {}) {
     try {
       const r = await tryEndpoint(cachedBase, '(cached)');
       if (r.ok) {
+        _circuitBreaker.failedAt = 0;
         if (rawResponse) return r;
         if (r.status === 204) return null;
         return await r.json();
@@ -104,6 +114,7 @@ async function apiFetch(path, options = {}) {
     try {
       const r = await tryEndpoint(base, '');
       if (r.ok) {
+        _circuitBreaker.failedAt = 0;
         window._activeApiBase = base;
         localStorage.setItem('eatpan_active_api', base);
         if (rawResponse) return r;
@@ -127,6 +138,7 @@ async function apiFetch(path, options = {}) {
   }
 
   console.error(`❌ API [${path}]: all endpoints unreachable`);
+  _circuitBreaker.failedAt = Date.now();
   return null;
 }
 

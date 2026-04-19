@@ -54,9 +54,13 @@ export default class RecipeBookLeftPage extends Component {
     });
 
     this.officialCategories = null; // To store official DB categories
+    this._categoriesLoading = false; // Guard against infinite retry loop
     
     // Listen for category deletions/creations globally
-    this._onCatsChanged = () => this._loadOfficialCategories();
+    this._onCatsChanged = () => {
+      this._categoriesLoading = false; // Allow reload on explicit event
+      this._loadOfficialCategories();
+    };
     window.addEventListener('eatpan-categories-changed', this._onCatsChanged);
   }
 
@@ -66,13 +70,26 @@ export default class RecipeBookLeftPage extends Component {
   }
 
   _loadOfficialCategories() {
+    // Prevent re-entry: if already loading or already loaded, skip
+    if (this._categoriesLoading) return;
+    this._categoriesLoading = true;
+
     import('../../../core/ApiClient.js').then(async ({ CategoryService }) => {
       try {
         const cats = await CategoryService.fetchAll();
-        this.officialCategories = cats;
+        if (Array.isArray(cats)) {
+          this.officialCategories = cats;
+        } else {
+          // API returned null/error — treat as empty, don't retry on next mount
+          console.warn('Categories API returned non-array, using empty fallback');
+          this.officialCategories = [];
+        }
         this.update(); // re-render grid/list with new fallback grouping
       } catch (e) {
         console.error('Failed to load official categories', e);
+        this.officialCategories = []; // Fallback to empty — prevents infinite retry
+      } finally {
+        this._categoriesLoading = false;
       }
     });
   }

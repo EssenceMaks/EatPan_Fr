@@ -50,7 +50,7 @@ export default class RecipeCardGrid extends Component {
       
       let imgHtml = '';
       if (imgUrl) {
-        imgHtml = `<img alt="${title}" class="arc-recipe-img" src="${imgUrl}" />`;
+        imgHtml = `<img alt="${title}" class="arc-recipe-img" src="${imgUrl}" onerror="this.onerror=null;this.style.display='none';this.parentElement.innerHTML='<i data-lucide=\\'image-off\\' style=\\'width:32px;height:32px;color:rgba(255,255,255,0.5);\\'></i>';if(window.lucide)lucide.createIcons({root:this.parentElement});" />`;
       } else {
         imgHtml = `
           <i data-lucide="chef-hat" style="width:32px;height:32px;color:rgba(255,255,255,1);"></i>
