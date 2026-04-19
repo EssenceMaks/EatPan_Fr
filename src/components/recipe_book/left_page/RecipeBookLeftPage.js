@@ -146,29 +146,47 @@ export default class RecipeBookLeftPage extends Component {
     });
   }
 
+  // Helper: get resolved categories for any recipe format
+  _getRecipeCats(r) {
+    let cats = [];
+    
+    if (r.category !== undefined) {
+      // Lightweight recipe
+      if (Array.isArray(r.category)) {
+        cats = r.category;
+      } else if (typeof r.category === 'string') {
+        cats = r.category.split(',').map(s => s.trim()).filter(Boolean);
+      }
+    } else if (r.data) {
+      // Full recipe
+      if (Array.isArray(r.data.categories) && r.data.categories.length > 0) {
+        cats = r.data.categories;
+      } else if (typeof r.data.category === 'string') {
+        cats = r.data.category.split(',').map(s => s.trim()).filter(Boolean);
+      }
+    }
+
+    if (cats.length === 0) cats = ['Без категорії'];
+
+    const officialCatNames = (this.officialCategories || []).map(c => c.data?.name);
+    const hasOfficialData = this.officialCategories && this.officialCategories.length > 0;
+
+    return cats.map(cat => {
+      if (hasOfficialData && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
+        return 'Забуті категорії';
+      }
+      return cat;
+    });
+  }
+
   // Get categories and their counts for Grid View
   _getCategoriesData(filtered) {
     const counts = {};
     const officialCatNames = (this.officialCategories || []).map(c => c.data?.name);
 
     filtered.forEach(r => {
-      // Determine which categories this recipe belongs to
-      let cats = [];
-      if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
-        cats = r.data.categories;
-      } else if (r.data?.category) {
-        // Legacy: comma-separated string
-        cats = r.data.category.split(',').map(s => s.trim()).filter(Boolean);
-      }
-      if (cats.length === 0) cats = ['Без категорії'];
-
-      for (let cat of cats) {
-        // Fallback: If category isn't known in the DB, group it as Forgotten
-        // Only do this if officialCategories is populated (i.e., we know the DB is synced)
-        const hasOfficialData = this.officialCategories && this.officialCategories.length > 0;
-        if (hasOfficialData && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
-           cat = 'Забуті категорії';
-        }
+      const cats = this._getRecipeCats(r);
+      for (const cat of cats) {
         counts[cat] = (counts[cat] || 0) + 1;
       }
     });
@@ -197,30 +215,11 @@ export default class RecipeBookLeftPage extends Component {
       const limit = 20;
       const startIndex = this.currentOffset;
       
-      const officialCatNames = (this.officialCategories || []).map(c => c.data?.name);
-      
-      const getRecipeCats = (r) => {
-        let cats = [];
-        if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
-          cats = r.data.categories;
-        } else if (r.data?.category) {
-          cats = r.data.category.split(',').map(s => s.trim()).filter(Boolean);
-        }
-        if (cats.length === 0) cats = ['Без категорії'];
-        return cats.map(cat => {
-          const hasOfficialData = this.officialCategories && this.officialCategories.length > 0;
-          if (hasOfficialData && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
-            return 'Забуті категорії';
-          }
-          return cat;
-        });
-      };
-
       // Start with recipes filtered by the active group (Особисті, Всі рецепти, etc.)
       let relevant = this._getGroupFilteredRecipes();
       
       if (this.activeCategory) {
-        relevant = relevant.filter(r => getRecipeCats(r).includes(this.activeCategory));
+        relevant = relevant.filter(r => this._getRecipeCats(r).includes(this.activeCategory));
       }
       
       const newRecipes = relevant.slice(startIndex, startIndex + limit);
@@ -245,30 +244,17 @@ export default class RecipeBookLeftPage extends Component {
     const hierarchy = {};
     const officialCatNames = (this.officialCategories || []).map(c => c.data?.name);
 
-    // Helper: get resolved categories for a recipe
-    const getRecipeCats = (r) => {
-      let cats = [];
-      if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
-        cats = r.data.categories;
-      } else if (r.data?.category) {
-        cats = r.data.category.split(',').map(s => s.trim()).filter(Boolean);
-      }
-      if (cats.length === 0) cats = ['Без категорії'];
-      return cats.map(cat => {
-        const hasOfficialData = this.officialCategories && this.officialCategories.length > 0;
-        if (hasOfficialData && cat !== 'Без категорії' && !officialCatNames.includes(cat)) {
-          return 'Забуті категорії';
-        }
-        return cat;
-      });
-    };
+    // Only include official categories with fallback
+    officialCatNames.forEach(name => hierarchy[name] = []);
+    hierarchy['Забуті категорії'] = [];
+    hierarchy['Без категорії'] = [];
 
     const relevant = this.activeCategory
-        ? filtered.filter(r => getRecipeCats(r).includes(this.activeCategory))
+        ? filtered.filter(r => this._getRecipeCats(r).includes(this.activeCategory))
         : filtered;
 
     relevant.forEach(r => {
-      const cats = getRecipeCats(r);
+      const cats = this._getRecipeCats(r);
       for (const cat of cats) {
         if (!hierarchy[cat]) hierarchy[cat] = [];
         hierarchy[cat].push(r);
