@@ -146,9 +146,14 @@ async function apiFetch(path, options = {}) {
 // RECIPES
 // ============================================================
 export const RecipeService = {
-  fetchAll: (filters = {}) => {
+  fetchAll: async (filters = {}) => {
     const params = new URLSearchParams(filters);
     params.append('_t', Date.now());
+    const res = await apiFetch(`/recipes/?${params}`);
+    return res?.results ? res.results : res;
+  },
+  fetchPage: (filters = {}) => {
+    const params = new URLSearchParams(filters);
     return apiFetch(`/recipes/?${params}`);
   },
   fetchDetail: (id) => apiFetch(`/recipes/${id}/?_t=${Date.now()}`),
@@ -170,7 +175,10 @@ export const RecipeService = {
 // RECIPE BOOKS
 // ============================================================
 export const BookService = {
-  fetchAll: () => apiFetch('/recipe-books/'),
+  fetchAll: async () => {
+    const res = await apiFetch('/recipe-books/');
+    return res?.results ? res.results : res;
+  },
   create: (name, data = {}) => apiFetch('/recipe-books/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -187,7 +195,10 @@ export const BookService = {
 // CATEGORIES
 // ============================================================
 export const CategoryService = {
-  fetchAll: () => apiFetch('/categories/'),
+  fetchAll: async () => {
+    const res = await apiFetch('/categories/');
+    return res?.results ? res.results : res;
+  },
   create: (data) => apiFetch('/categories/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

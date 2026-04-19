@@ -6,6 +6,12 @@ export default class RecipeCardGrid extends Component {
     super(props);
     this.recipes = props.recipes || [];
     this.onSelectRecipe = props.onSelectRecipe || (() => {});
+    
+    // Infinite scroll props
+    this.hasMore = props.hasMore || false;
+    this.isLoadingMore = props.isLoadingMore || false;
+    this.onLoadMore = props.onLoadMore || null;
+    this._observer = null;
   }
 
   // Get recipe main image from media.images or null
@@ -80,6 +86,11 @@ export default class RecipeCardGrid extends Component {
       <div class="rb-categories-grid">
         ${cards.join('')}
       </div>
+      ${this.hasMore ? `
+        <div id="rb-infinite-scroll-trigger" style="height: 40px; display: flex; justify-content: center; align-items: center; opacity: 0.5; margin-top: 20px;">
+          ${this.isLoadingMore ? '<i data-lucide="loader" style="animation: spin 1s linear infinite;"></i>' : ''}
+        </div>
+      ` : ''}
     `;
   }
 
@@ -108,11 +119,36 @@ export default class RecipeCardGrid extends Component {
         }, 1500);
       }, 2000);
     }
+
+    if (this.hasMore && this.onLoadMore) {
+      const trigger = this.$('#rb-infinite-scroll-trigger');
+      if (trigger) {
+        this._observer = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting && !this.isLoadingMore) {
+            this.onLoadMore();
+          }
+        }, { rootMargin: '200px' });
+        this._observer.observe(trigger);
+      }
+    }
+    
+    if (window.lucide) window.lucide.createIcons({ root: this.element });
   }
 
-  updateData(recipes) {
+  destroy() {
+    if (this._observer) {
+      this._observer.disconnect();
+      this._observer = null;
+    }
+    if (this.animationInterval) clearInterval(this.animationInterval);
+    super.destroy();
+  }
+
+  updateData(recipes, hasMore = false, isLoadingMore = false) {
     if (this.animationInterval) clearInterval(this.animationInterval);
     this.recipes = recipes;
+    this.hasMore = hasMore;
+    this.isLoadingMore = isLoadingMore;
     this.update();
   }
 }

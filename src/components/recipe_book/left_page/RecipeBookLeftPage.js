@@ -18,6 +18,12 @@ export default class RecipeBookLeftPage extends Component {
     this.recipes = props.recipes || [];
     this.needsAuth = false;
 
+    // Dynamic Pagination State
+    this.paginatedRecipes = [];
+    this.currentOffset = 0;
+    this.hasMoreRecipes = true;
+    this.isLoadingPage = false;
+
     // Subcomponents
     this.cmpGroups = new RecipeGroups({
       groups: [],
@@ -28,6 +34,13 @@ export default class RecipeBookLeftPage extends Component {
         if (this.onCategorySelected) this.onCategorySelected(null);
         this.viewMode = 'grid';
         this.listAllOpen = false;
+        
+        // Reset pagination
+        this.paginatedRecipes = [];
+        this.currentOffset = 0;
+        this.hasMoreRecipes = true;
+        this.isLoadingPage = false;
+        
         this.update();
       }
     });
@@ -38,6 +51,13 @@ export default class RecipeBookLeftPage extends Component {
       onSelectCategory: (cat) => {
         this.activeCategory = cat;
         if (this.onCategorySelected) this.onCategorySelected(cat);
+        
+        // Reset pagination
+        this.paginatedRecipes = [];
+        this.currentOffset = 0;
+        this.hasMoreRecipes = true;
+        this.isLoadingPage = false;
+        
         // STAY in grid mode, but now it will render the RecipeCardGrid!
         this.update();
       }
@@ -45,7 +65,8 @@ export default class RecipeBookLeftPage extends Component {
 
     this.cmpRecipeGrid = new RecipeCardGrid({
       recipes: [],
-      onSelectRecipe: this.onRecipeSelected
+      onSelectRecipe: this.onRecipeSelected,
+      onLoadMore: () => this._loadNextPage()
     });
 
     this.cmpList = new RecipeCategoryList({
@@ -143,10 +164,56 @@ export default class RecipeBookLeftPage extends Component {
         counts[cat] = (counts[cat] || 0) + 1;
       }
     });
+
+    // Ensure all official categories are shown, even if 0 recipes are currently loaded locally
+    for (const catName of officialCatNames) {
+      if (!counts[catName]) counts[catName] = 0;
+    }
+
     return {
       categories: Object.keys(counts).sort((a, b) => a.localeCompare(b)),
       recipeCounts: counts
     };
+  }
+
+  async _loadNextPage() {
+    if (this.isLoadingPage || !this.hasMoreRecipes) return;
+    this.isLoadingPage = true;
+    
+    this.cmpRecipeGrid.updateData(this.paginatedRecipes, this.hasMoreRecipes, true);
+    
+    try {
+      const { RecipeService } = await import('../../../core/ApiClient.js');
+      const limit = 20;
+      const filters = {
+        limit,
+        offset: this.currentOffset,
+        fields: 'light'
+      };
+      
+      if (this.activeGroup !== 'all') {
+        filters.group = this.activeGroup;
+      }
+      if (this.activeCategory && this.activeCategory !== 'Без категорії') {
+        filters.category = this.activeCategory;
+      }
+      
+      const res = await RecipeService.fetchPage(filters);
+      const newRecipes = res?.results || [];
+      
+      this.paginatedRecipes = [...this.paginatedRecipes, ...newRecipes];
+      this.currentOffset += newRecipes.length;
+      
+      if (!res?.next || newRecipes.length === 0) {
+        this.hasMoreRecipes = false;
+      }
+    } catch (e) {
+      console.error('Failed to load next page', e);
+      this.hasMoreRecipes = false;
+    } finally {
+      this.isLoadingPage = false;
+      this.cmpRecipeGrid.updateData(this.paginatedRecipes, this.hasMoreRecipes, false);
+    }
   }
 
   // Get hierarchical data for List View
@@ -281,20 +348,12 @@ export default class RecipeBookLeftPage extends Component {
           this.cmpCatGrid.updateData(gridData.categories, gridData.recipeCounts);
           await this.cmpCatGrid.render(cContainer);
         } else {
-          // Category active: show grid of ACTUAL RECIPES
-          const specificRecipes = filtered.filter(r => {
-            // Check modern categories array first
-            if (r.data?.categories && Array.isArray(r.data.categories) && r.data.categories.length > 0) {
-              return r.data.categories.includes(this.activeCategory);
-            }
-            // Legacy: comma-separated category string
-            if (r.data?.category) {
-              const cats = r.data.category.split(',').map(s => s.trim());
-              return cats.includes(this.activeCategory);
-            }
-            return this.activeCategory === 'Без категорії';
-          });
-          this.cmpRecipeGrid.updateData(specificRecipes);
+          // Category active: show dynamic paginated grid of ACTUAL RECIPES
+          if (this.paginatedRecipes.length === 0 && this.hasMoreRecipes && !this.isLoadingPage) {
+            this._loadNextPage(); // Start fetching
+          } else {
+            this.cmpRecipeGrid.updateData(this.paginatedRecipes, this.hasMoreRecipes, this.isLoadingPage);
+          }
           await this.cmpRecipeGrid.render(cContainer);
         }
       } else {
