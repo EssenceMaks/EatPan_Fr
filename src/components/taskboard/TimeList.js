@@ -237,7 +237,7 @@ export default class TimeList extends Component {
     for (const key in questsData) {
         const task = questsData[key];
         if (task.archived) continue;
-        const row = this.element.querySelector(`#${key}`);
+        const row = this.element.querySelector(`[id="${key}"]`);
         if (row) {
             const currentLine = row.closest('.time_list_current_line');
             if (currentLine && parseInt(currentLine.dataset.hour) !== task.hour) {
@@ -312,7 +312,7 @@ export default class TimeList extends Component {
   updateActiveQuestHighlight() {
      this.element.querySelectorAll('.task-item').forEach(el => el.classList.remove('active-quest'));
      if(this.props.activeQuestId) {
-         const row = this.element.querySelector(`#${this.props.activeQuestId}`);
+         const row = this.element.querySelector(`[id="${this.props.activeQuestId}"]`);
          if(row) row.classList.add('active-quest');
      }
   }
@@ -369,7 +369,7 @@ export default class TimeList extends Component {
   updateTaskLabels() {
     for (const key in this.props.questsData) {
         const task = this.props.questsData[key];
-        const row = this.element.querySelector(`#${key}`);
+        const row = this.element.querySelector(`[id="${key}"]`);
         if (!row) continue;
 
         let startTotal = task.hour * 60 + task.startM;
@@ -449,7 +449,7 @@ export default class TimeList extends Component {
   }
 
   createTaskItemDOM(taskId, task) {
-    const existing = this.element.querySelector(`#${taskId}`);
+    const existing = this.element.querySelector(`[id="${taskId}"]`);
     if (existing) return; // Запобігання дублюванню
 
     const row = this.createRow('task-item');

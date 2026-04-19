@@ -96,7 +96,7 @@ export default class TaskBoard extends Component {
                   if (created && created.uuid) {
                       delete this.state.questsData[tempId];
                       this.state.questsData[created.uuid] = created;
-                      const row = this.element.querySelector(`#${tempId}`);
+                      const row = this.element.querySelector(`[id="${tempId}"]`);
                       if (row) row.id = created.uuid;
                       this.timeList.refreshCells();
                       this.questList.refreshList();
@@ -125,7 +125,7 @@ export default class TaskBoard extends Component {
                   if (created && created.uuid) {
                       delete this.state.questsData[tempId];
                       this.state.questsData[created.uuid] = created;
-                      const row = this.element.querySelector(`#${tempId}`);
+                      const row = this.element.querySelector(`[id="${tempId}"]`);
                       if (row) row.id = created.uuid;
                       this.timeList.refreshCells();
                       this.questList.refreshList();
