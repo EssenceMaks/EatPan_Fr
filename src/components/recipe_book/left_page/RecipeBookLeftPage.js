@@ -118,21 +118,29 @@ export default class RecipeBookLeftPage extends Component {
   // Helper method: get groups array from recipes
   _getDynamicGroups() {
     const uniqueGroupsSet = new Set(['Особисті', 'Гості', 'Заклади']); // Default order / guarantees
+    let hasUngrouped = false;
     (this.recipes || []).forEach(r => {
-      if (r.data && Array.isArray(r.data.books)) {
+      if (r.data && Array.isArray(r.data.books) && r.data.books.length > 0) {
         r.data.books.forEach(b => {
           if (b !== 'Всі рецепти' && b.trim() !== '') {
             uniqueGroupsSet.add(b);
           }
         });
+      } else {
+        hasUngrouped = true;
       }
     });
-    return Array.from(uniqueGroupsSet);
+    const arr = Array.from(uniqueGroupsSet);
+    if (hasUngrouped) arr.push('Без групи');
+    return arr;
   }
 
   // Filter recipes by currently active group
   _getGroupFilteredRecipes() {
     if (this.activeGroup === 'all') return this.recipes;
+    if (this.activeGroup === 'Без групи') {
+      return this.recipes.filter(r => !r.data || !Array.isArray(r.data.books) || r.data.books.length === 0);
+    }
     return this.recipes.filter(r => {
       return r.data && Array.isArray(r.data.books) && r.data.books.includes(this.activeGroup);
     });
@@ -345,7 +353,7 @@ export default class RecipeBookLeftPage extends Component {
         if (!this.activeCategory) {
           // No category active: show tiles of Categories
           const gridData = this._getCategoriesData(filtered);
-          this.cmpCatGrid.updateData(gridData.categories, gridData.recipeCounts);
+          this.cmpCatGrid.updateData(gridData.categories, gridData.recipeCounts, this.officialCategories);
           await this.cmpCatGrid.render(cContainer);
         } else {
           // Category active: show dynamic paginated grid of ACTUAL RECIPES

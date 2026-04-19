@@ -5,6 +5,7 @@ export default class RecipeCategoryGrid extends Component {
     super(props);
     this.categories = props.categories || [];
     this.recipeCounts = props.recipeCounts || {};
+    this.officialCategories = props.officialCategories || [];
     this.onSelectCategory = props.onSelectCategory || (() => {});
     
     this.catImgs = {
@@ -29,8 +30,17 @@ export default class RecipeCategoryGrid extends Component {
   }
 
   async template() {
+    const { resolveMediaUrl } = await import('../../../core/mediaResolver.js');
+
     const cards = this.categories.map(cat => {
-      const img = this.catImgs[cat] || this.catImgs["Супи"]; // fallback
+      let img = this.catImgs[cat] || this.catImgs["Супи"]; // fallback
+      
+      // Attempt to resolve image_uuid from official DB categories
+      const officialCat = this.officialCategories.find(c => c.data?.name === cat);
+      if (officialCat?.data?.image_uuid) {
+         img = resolveMediaUrl(officialCat.data.image_uuid);
+      }
+
       const count = this.recipeCounts[cat] || 0;
       const countText = `${count} ${this.getRecipeWord(count)}`;
       
@@ -77,10 +87,11 @@ export default class RecipeCategoryGrid extends Component {
     }
   }
 
-  updateData(categories, recipeCounts) {
+  updateData(categories, recipeCounts, officialCategories = []) {
     if (this.animationInterval) clearInterval(this.animationInterval);
     this.categories = categories;
     this.recipeCounts = recipeCounts;
+    this.officialCategories = officialCategories;
     this.update();
   }
 }
