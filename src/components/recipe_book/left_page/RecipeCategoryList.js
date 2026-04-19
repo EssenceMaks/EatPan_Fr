@@ -30,7 +30,7 @@ export default class RecipeCategoryList extends Component {
           ${list.map(r => `
             <div class="arc-list-item" data-id="${r.id}">
               <span class="arc-list-item-bullet">•</span>
-              <span class="arc-list-item-text">${r.data?.title || 'Без назви'}</span>
+              <span class="arc-list-item-text">${r.title || r.data?.title || 'Без назви'}</span>
             </div>
           `).join('')}
         </div>
