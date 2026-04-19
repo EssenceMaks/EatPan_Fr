@@ -410,6 +410,13 @@ export default class RecipeBookLeftPage extends Component {
   setActiveCategory(catId) {
     this.activeCategory = catId;
     this.viewMode = 'grid'; // Let it default to grid showing recipes now, per new UX logic!
+    
+    // Reset pagination so that clicking a new ribbon triggers a fresh load
+    this.paginatedRecipes = [];
+    this.currentOffset = 0;
+    this.hasMoreRecipes = true;
+    this.isLoadingPage = false;
+    
     this.update();
   }
 
