@@ -472,6 +472,7 @@ export const PantryService = {
 // ============================================================
 export const ShoppingService = {
   fetchAll: () => apiFetch('/shopping/'),
+  fetchList: (uuid) => apiFetch(`/shopping/lists/${uuid}/`),
   createList: (data) => apiFetch('/shopping/lists/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

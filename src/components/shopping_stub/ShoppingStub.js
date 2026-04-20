@@ -3,7 +3,7 @@
  * Показывает списки покупок с товарами. CRUD через ShoppingService.
  */
 import Component from '../../core/Component.js';
-import { ShoppingService } from '../../core/ApiClient.js';
+import { ShoppingService, RecipeService } from '../../core/ApiClient.js';
 
 export default class ShoppingStub extends Component {
   constructor(props = {}) {
@@ -25,6 +25,12 @@ export default class ShoppingStub extends Component {
             <i data-lucide="refresh-cw" style="width:16px;height:16px; vertical-align: middle; margin-right: 4px;"></i> Оновити
           </button>
         </div>
+        <style>
+          .list-item-row .list-actions { opacity: 0; pointer-events: none; }
+          .list-item-row:hover .list-actions { opacity: 1 !important; pointer-events: auto; }
+          .qty-btn { background:rgba(26,15,4,0.05); border:1px solid rgba(26,15,4,0.1); border-radius:3px; color:#1a0f04; font-family:var(--font-title); padding:2px 6px; cursor:pointer; font-size:0.8rem; font-weight:bold; transition:all 0.1s; }
+          .qty-btn:hover { background:rgba(26,15,4,0.15); border-color:rgba(26,15,4,0.3); }
+        </style>
         <div id="shopping-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
           <div style="text-align:center; font-style:italic; padding: 40px; color: var(--c-ink-light);">Завантаження...</div>
         </div>
@@ -35,6 +41,21 @@ export default class ShoppingStub extends Component {
   async onMount() {
     if (window.lucide) lucide.createIcons({ root: this.element });
     this.element.addEventListener('click', (e) => this._handleAction(e));
+    this.allIngredients = new Set();
+    try {
+      const recipesRes = await RecipeService.fetchAll();
+      if (recipesRes && recipesRes.results) {
+        recipesRes.results.forEach(r => {
+          if (r.data && r.data.ingredients) {
+            r.data.ingredients.forEach(i => {
+              if (i.name) this.allIngredients.add(i.name.trim().toLowerCase());
+            });
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Failed to load recipes for ingredients list', e);
+    }
     await this._loadData();
   }
 
@@ -49,6 +70,26 @@ export default class ShoppingStub extends Component {
     }
     el.innerHTML = this._renderContent();
     if (window.lucide) lucide.createIcons({ root: el });
+    if (this.activeList) {
+      await this._loadActiveListDetails();
+    }
+  }
+
+  async _loadActiveListDetails() {
+    if (!this.activeList) return;
+    try {
+      const listDetails = await ShoppingService.fetchList(this.activeList);
+      if (listDetails && this.data?.lists) {
+        this.data.lists[this.activeList] = listDetails;
+      }
+    } catch (e) {
+      console.error('Failed to fetch specific list details', e);
+    }
+    const el = this.$('#shopping-content');
+    if (el) {
+      el.innerHTML = this._renderContent();
+      if (window.lucide) lucide.createIcons({ root: el });
+    }
   }
 
   _renderContent() {
@@ -83,7 +124,7 @@ export default class ShoppingStub extends Component {
                       const isActive = this.activeList === id;
                       const activeStyle = isActive ? 'background: rgba(26,15,4,0.1); border-color: rgba(26,15,4,0.3); transform: translateX(2px);' : 'background: rgba(255,255,255,0.4); border-color: rgba(26,15,4,0.1);';
                       return `
-                      <div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 12px; border: 1px solid transparent; border-radius: 6px; cursor:pointer; transition: all 0.2s; ${activeStyle}" data-action="select-list" data-id="${id}">
+                      <div class="list-item-row" style="display:flex; justify-content:space-between; align-items:center; padding: 10px 12px; border: 1px solid transparent; border-radius: 6px; cursor:pointer; transition: all 0.2s; ${activeStyle}" data-action="select-list" data-id="${id}">
                         <div style="display:flex; flex-direction:column; overflow:hidden;">
                           <strong style="font-size: 1.05rem; color: #1a0f04; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-title);">
                             ${lst.name}
@@ -92,7 +133,7 @@ export default class ShoppingStub extends Component {
                             Товарів: ${lst.total_items || Object.keys(lst.items || {}).length || 0}
                           </span>
                         </div>
-                        <div style="display:flex; gap:2px; flex-shrink: 0;" onclick="event.stopPropagation()">
+                        <div class="list-actions" style="display:flex; gap:2px; flex-shrink: 0; transition: opacity 0.2s;">
                           <button data-action="edit-list" data-id="${id}" style="background:none; border:none; color:rgba(26,15,4,0.6); cursor:pointer; padding: 4px;" title="Редагувати">
                             <i data-lucide="edit-2" style="width:14px;height:14px;"></i>
                           </button>
@@ -163,6 +204,12 @@ export default class ShoppingStub extends Component {
                     <div style="display:flex; align-items:center; gap: 6px; color:${textColor};">
                        <i data-lucide="${imgIcon}" style="width:14px;height:14px; opacity:0.7;"></i>
                        <span style="font-weight:bold; font-size:0.95rem;">x${item.quantity || 1}</span>
+                       <div style="display:flex; gap: 2px; margin-left: 4px;">
+                         <button class="qty-btn" data-action="mod-qty" data-mod="/2" data-listid="${this.activeList}" data-id="${id}">/2</button>
+                         <button class="qty-btn" data-action="mod-qty" data-mod="-1" data-listid="${this.activeList}" data-id="${id}">-1</button>
+                         <button class="qty-btn" data-action="mod-qty" data-mod="+1" data-listid="${this.activeList}" data-id="${id}">+1</button>
+                         <button class="qty-btn" data-action="mod-qty" data-mod="x2" data-listid="${this.activeList}" data-id="${id}">x2</button>
+                       </div>
                     </div>
                     <div style="display:flex; gap:6px;">
                       <button data-action="edit-item" data-listid="${this.activeList}" data-id="${id}" style="background:none; border:none; color:rgba(26,15,4,0.6); cursor:pointer; padding:2px;" title="Редагувати">
@@ -181,8 +228,13 @@ export default class ShoppingStub extends Component {
 
       <div style="display:flex;gap:8px; align-items:center; padding-top: 12px; border-top: 1px solid rgba(26,15,4,0.1); margin-top:auto;">
         <input type="hidden" id="item-list-uuid" value="${this.activeList || ''}" />
-        <input id="item-name" placeholder="Назва товару..." style="flex:1; padding: 8px 12px; border: 1px solid rgba(26,15,4,0.2); background: rgba(255,255,255,0.5); font-family: var(--font-body); font-size: 1rem; color: #1a0f04; border-radius: 4px; outline:none;" />
-        <input id="item-qty" type="number" value="1" min="1" style="width:60px; padding: 8px; border: 1px solid rgba(26,15,4,0.2); background: rgba(255,255,255,0.5); font-family: var(--font-body); font-size: 1rem; color: #1a0f04; border-radius: 4px; outline:none; text-align:center;" />
+        
+        <datalist id="all-ingredients-list">
+          ${Array.from(this.allIngredients || []).map(ing => `<option value="${ing}">`).join('')}
+        </datalist>
+        <input id="item-name" list="all-ingredients-list" placeholder="Назва товару..." style="flex:1; padding: 8px 12px; border: 1px solid rgba(26,15,4,0.2); background: rgba(255,255,255,0.5); font-family: var(--font-body); font-size: 1rem; color: #1a0f04; border-radius: 4px; outline:none;" />
+        
+        <input id="item-qty" type="number" value="1" min="0.1" step="0.1" style="width:60px; padding: 8px; border: 1px solid rgba(26,15,4,0.2); background: rgba(255,255,255,0.5); font-family: var(--font-body); font-size: 1rem; color: #1a0f04; border-radius: 4px; outline:none; text-align:center;" />
         <button data-action="add-item" style="background:#1a0f04; color:#f8f1e3; border:none; padding:8px 16px; font-family:var(--font-title); font-weight:bold; border-radius:4px; cursor:pointer;">
           + Додати
         </button>
@@ -217,7 +269,7 @@ export default class ShoppingStub extends Component {
         }
       } else if (action === 'select-list') {
         this.activeList = btn.dataset.id;
-        await this._loadData();
+        await this._loadActiveListDetails();
       } else if (action === 'edit-list') {
         const newName = prompt("Нова назва списку:");
         if (newName) {
@@ -259,8 +311,37 @@ export default class ShoppingStub extends Component {
         const newName = prompt("Нова назва товару:");
         if (newName) {
             await ShoppingService.updateItem(btn.dataset.listid, btn.dataset.id, { name: newName });
-            await this._loadData();
+            await this._loadActiveListDetails();
         }
+      } else if (action === 'mod-qty') {
+        e.stopPropagation();
+        const mod = btn.dataset.mod;
+        const currentItem = this.data?.lists?.[btn.dataset.listid]?.items?.[btn.dataset.id];
+        if (!currentItem) return;
+        
+        let currentQty = parseFloat(currentItem.quantity || 1);
+        if (isNaN(currentQty)) currentQty = 1;
+        
+        let newQty = currentQty;
+        if (mod === '/2') newQty = currentQty / 2;
+        else if (mod === 'x2') newQty = currentQty * 2;
+        else if (mod === '+1') newQty = currentQty + 1;
+        else if (mod === '-1') newQty = currentQty - 1;
+        
+        if (newQty < 0.1) newQty = 0.1;
+        // round to 1 decimal to avoid long floats like 0.3333333333
+        newQty = Math.round(newQty * 10) / 10;
+        
+        // Optimistic UI
+        currentItem.quantity = newQty;
+        const el = this.$('#shopping-content');
+        if (el) {
+          el.innerHTML = this._renderContent();
+          if (window.lucide) lucide.createIcons({ root: el });
+        }
+        
+        // Update in background
+        await ShoppingService.updateItem(btn.dataset.listid, btn.dataset.id, { quantity: newQty });
       } else if (action === 'export-image') {
         if (!window.html2canvas) {
           alert('Функція генерації зображень завантажується, спробуйте ще раз через секунду.');
