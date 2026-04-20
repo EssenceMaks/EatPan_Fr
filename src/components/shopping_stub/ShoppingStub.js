@@ -12,6 +12,9 @@ export default class ShoppingStub extends Component {
     this.data = null;
     this.activeList = null; // selected list UUID
     this.activeListData = null;
+    this.allIngredients = [];
+    this.editingListId = null;
+    this.deletingListId = null;
     this._error = null;
   }
 
@@ -31,6 +34,60 @@ export default class ShoppingStub extends Component {
           .list-item-row:hover .list-actions { opacity: 1 !important; pointer-events: auto; }
           .qty-btn { background:rgba(26,15,4,0.05); border:1px solid rgba(26,15,4,0.1); border-radius:3px; color:#1a0f04; font-family:var(--font-title); padding:2px 6px; cursor:pointer; font-size:0.8rem; font-weight:bold; transition:all 0.1s; }
           .qty-btn:hover { background:rgba(26,15,4,0.15); border-color:rgba(26,15,4,0.3); }
+          .autocomplete-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            color: #f8f1e3;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            transition: background 0.1s;
+          }
+          .autocomplete-item:hover {
+            background: rgba(255,255,255,0.1);
+          }
+          .autocomplete-item-img {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+          }
+          .alpha-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #f8f1e3;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-title);
+            font-size: 0.85rem;
+            transition: all 0.1s;
+          }
+          .alpha-btn:hover {
+            background: rgba(255,255,255,0.2);
+          }
+          #custom-autocomplete-dropdown::-webkit-scrollbar {
+            width: 8px;
+          }
+          #custom-autocomplete-dropdown::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+          }
+          #custom-autocomplete-dropdown::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+          }
+          #custom-autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+          }
         </style>
         <div id="shopping-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
           <div style="text-align:center; font-style:italic; padding: 40px; color: var(--c-ink-light);">Завантаження...</div>
@@ -42,18 +99,41 @@ export default class ShoppingStub extends Component {
   async onMount() {
     if (window.lucide) lucide.createIcons({ root: this.element });
     this.element.addEventListener('click', (e) => this._handleAction(e));
-    this.allIngredients = new Set();
-    try {
-      const recipesRes = await RecipeService.fetchAll();
-      if (recipesRes && recipesRes.results) {
-        recipesRes.results.forEach(r => {
-          if (r.data && r.data.ingredients) {
-            r.data.ingredients.forEach(i => {
-              if (i.name) this.allIngredients.add(i.name.trim().toLowerCase());
-            });
-          }
-        });
+    
+    // Prevent input blur when clicking inside the dropdown
+    this.element.addEventListener('mousedown', (e) => {
+      if (e.target.closest('#custom-autocomplete-dropdown')) {
+        if (e.target.closest('.alpha-btn')) {
+          e.preventDefault(); 
+        }
       }
+    });
+
+    // Autocomplete events using event delegation
+    this.element.addEventListener('input', (e) => {
+      if (e.target.id === 'item-name') {
+        this._updateAutocomplete(e.target.value);
+      }
+    });
+    this.element.addEventListener('focusin', (e) => {
+      if (e.target.id === 'item-name') {
+        this._updateAutocomplete(e.target.value);
+        const dd = this.$('#custom-autocomplete-dropdown');
+        if (dd) dd.style.display = 'block';
+      }
+    });
+    this.element.addEventListener('focusout', (e) => {
+      if (e.target.id === 'item-name') {
+        setTimeout(() => {
+          const dd = this.$('#custom-autocomplete-dropdown');
+          if (dd) dd.style.display = 'none';
+        }, 150);
+      }
+    });
+
+    try {
+      const ings = await RecipeService.fetchIngredients();
+      this.allIngredients = Array.isArray(ings) ? ings : (ings?.ingredients || []);
     } catch (e) {
       console.warn('Failed to load recipes for ingredients list', e);
     }
@@ -61,19 +141,16 @@ export default class ShoppingStub extends Component {
   }
 
   async _loadData() {
-    const el = this.$('#shopping-content');
-    if (!el) return;
     try {
       this.data = await ShoppingService.fetchAll();
       this._error = null;
+      if (this.activeList) {
+        await this._loadActiveListDetails();
+      }
     } catch (err) {
       this._error = err.message || 'Помилка API';
     }
-    el.innerHTML = this._renderContent();
-    if (window.lucide) lucide.createIcons({ root: el });
-    if (this.activeList) {
-      await this._loadActiveListDetails();
-    }
+    this._reRenderLists();
   }
 
   async _loadActiveListDetails() {
@@ -84,8 +161,11 @@ export default class ShoppingStub extends Component {
         this.data.lists[this.activeList] = listDetails;
       }
     } catch (e) {
-      console.error('Failed to fetch specific list details', e);
+      console.error(e);
     }
+  }
+
+  _reRenderLists() {
     const el = this.$('#shopping-content');
     if (el) {
       el.innerHTML = this._renderContent();
@@ -97,8 +177,6 @@ export default class ShoppingStub extends Component {
     if (this._error) return `<div class="stub-section"><div class="stub-json">${this._error}</div></div>`;
 
     const lists = this.data?.lists || {};
-    // Sort lists by creation date descending (assuming UUID v4 or simple string fallback, 
-    // ideally we'd sort by created_at if API provides it. For now, just object entries).
     const entries = Object.entries(lists).reverse();
 
     return `
@@ -123,28 +201,58 @@ export default class ShoppingStub extends Component {
                   ? '<div style="font-style:italic; color:rgba(26,15,4,0.5); padding: 8px;">Немає списків</div>'
                   : entries.map(([id, lst]) => {
                       const isActive = this.activeList === id;
-                      const activeStyle = isActive ? 'background: rgba(26,15,4,0.1); border-color: rgba(26,15,4,0.3); transform: translateX(2px);' : 'background: rgba(255,255,255,0.4); border-color: rgba(26,15,4,0.1);';
+                      const activeStyle = isActive 
+                        ? 'background: rgba(26,15,4,0.05); border-color: rgba(26,15,4,0.2);' 
+                        : '';
+                        
+                      let innerContent = '';
+                      if (this.editingListId === id) {
+                        innerContent = `
+                          <div style="display:flex; flex-direction:column; width:100%; gap: 6px;">
+                            <input type="text" id="edit-list-input-${id}" value="${lst.name}" style="padding: 6px; border: 1px solid rgba(26,15,4,0.3); border-radius: 4px; font-family: var(--font-body); font-size: 0.95rem; background: rgba(255,255,255,0.8); color: #1a0f04; width: 100%; box-sizing: border-box; outline: none;" />
+                            <div style="display:flex; gap: 6px;">
+                              <button data-action="save-list-name" data-id="${id}" style="background: #166534; color: #f8f1e3; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-family: var(--font-title); font-size: 0.85rem; flex: 1;">Зберегти</button>
+                              <button data-action="cancel-edit-list" style="background: #991b1b; color: #f8f1e3; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-family: var(--font-title); font-size: 0.85rem; flex: 1;">Скасувати</button>
+                            </div>
+                          </div>
+                        `;
+                      } else if (this.deletingListId === id) {
+                        innerContent = `
+                          <div style="display:flex; flex-direction:column; width:100%; gap: 6px;">
+                            <span style="font-size: 0.9rem; color: #991b1b; font-family: var(--font-body); text-align: center; line-height: 1.2;">Ви дійсно бажаєте видалити цей список?</span>
+                            <div style="display:flex; gap: 6px;">
+                              <button data-action="confirm-delete-list" data-id="${id}" style="background: #991b1b; color: #f8f1e3; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-family: var(--font-title); font-size: 0.85rem; flex: 1;">Видалити</button>
+                              <button data-action="cancel-delete-list" style="background: rgba(26,15,4,0.1); color: #1a0f04; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-family: var(--font-title); font-size: 0.85rem; flex: 1;">Ні</button>
+                            </div>
+                          </div>
+                        `;
+                      } else {
+                        innerContent = `
+                          <div style="display:flex; flex-direction:column; overflow:hidden;">
+                            <strong style="font-size: 1.05rem; color: #1a0f04; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-title);">
+                              ${lst.name}
+                            </strong>
+                            <span style="opacity:0.6; font-size:0.8rem; font-style:italic;">
+                              Товарів: ${lst.total_items || Object.keys(lst.items || {}).length || 0}
+                            </span>
+                          </div>
+                          <div class="list-actions" style="display:flex; gap:2px; flex-shrink: 0; transition: opacity 0.2s;">
+                            <button data-action="edit-list-inline" data-id="${id}" style="background:none; border:none; color:rgba(26,15,4,0.6); cursor:pointer; padding: 4px;" title="Редагувати">
+                              <i data-lucide="edit-2" style="width:14px;height:14px;"></i>
+                            </button>
+                            <button data-action="delete-list-inline" data-id="${id}" style="background:none; border:none; color:#991b1b; cursor:pointer; padding: 4px;" title="Видалити">
+                              <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+                            </button>
+                          </div>
+                        `;
+                      }
+
                       return `
                       <div class="list-item-row" style="display:flex; justify-content:space-between; align-items:center; padding: 10px 12px; border: 1px solid transparent; border-radius: 6px; cursor:pointer; transition: all 0.2s; ${activeStyle}" data-action="select-list" data-id="${id}">
-                        <div style="display:flex; flex-direction:column; overflow:hidden;">
-                          <strong style="font-size: 1.05rem; color: #1a0f04; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-title);">
-                            ${lst.name}
-                          </strong>
-                          <span style="opacity:0.6; font-size:0.8rem; font-style:italic;">
-                            Товарів: ${lst.total_items || Object.keys(lst.items || {}).length || 0}
-                          </span>
-                        </div>
-                        <div class="list-actions" style="display:flex; gap:2px; flex-shrink: 0; transition: opacity 0.2s;">
-                          <button data-action="edit-list" data-id="${id}" style="background:none; border:none; color:rgba(26,15,4,0.6); cursor:pointer; padding: 4px;" title="Редагувати">
-                            <i data-lucide="edit-2" style="width:14px;height:14px;"></i>
-                          </button>
-                          <button data-action="delete-list" data-id="${id}" style="background:none; border:none; color:#991b1b; cursor:pointer; padding: 4px;" title="Видалити">
-                            <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
-                          </button>
-                        </div>
+                        ${innerContent}
                       </div>
-                    `;
-                  }).join('')}
+                      `;
+                    }).join('')}
               </div>
           </div>
           
@@ -231,10 +339,12 @@ export default class ShoppingStub extends Component {
       <div style="display:flex;gap:8px; align-items:center; padding-top: 12px; border-top: 1px solid rgba(26,15,4,0.1); margin-top:auto;">
         <input type="hidden" id="item-list-uuid" value="${this.activeList || ''}" />
         
-        <datalist id="all-ingredients-list">
-          ${Array.from(this.allIngredients || []).map(ing => `<option value="${ing}">`).join('')}
-        </datalist>
-        <input id="item-name" list="all-ingredients-list" placeholder="Назва товару..." style="flex:1; padding: 8px 12px; border: 1px solid rgba(26,15,4,0.2); background: rgba(255,255,255,0.5); font-family: var(--font-body); font-size: 1rem; color: #1a0f04; border-radius: 4px; outline:none;" />
+        <div style="position:relative; flex:1; display:flex;">
+          <input id="item-name" autocomplete="off" placeholder="Назва товару..." style="flex:1; padding: 8px 12px; border: 1px solid rgba(26,15,4,0.2); background: rgba(255,255,255,0.5); font-family: var(--font-body); font-size: 1rem; color: #1a0f04; border-radius: 4px; outline:none;" />
+          <div id="custom-autocomplete-dropdown" style="display:none; position:absolute; bottom:100%; left:0; right:0; margin-bottom:4px; max-height:40vh; overflow-y:auto; background: var(--c-ink-primary, #1a0f04); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; box-shadow: 0 -4px 12px rgba(0,0,0,0.15); z-index: 1000; padding: 4px 0;">
+             <!-- populated by JS -->
+          </div>
+        </div>
         
         <input id="item-qty" type="number" value="1" min="0.1" step="0.1" style="width:60px; padding: 8px; border: 1px solid rgba(26,15,4,0.2); background: rgba(255,255,255,0.5); font-family: var(--font-body); font-size: 1rem; color: #1a0f04; border-radius: 4px; outline:none; text-align:center;" />
         <button data-action="add-item" style="background:#1a0f04; color:#f8f1e3; border:none; padding:8px 16px; font-family:var(--font-title); font-weight:bold; border-radius:4px; cursor:pointer;">
@@ -244,12 +354,75 @@ export default class ShoppingStub extends Component {
     `;
   }
 
+  _updateAutocomplete(query = '') {
+    const dd = this.$('#custom-autocomplete-dropdown');
+    if (!dd) return;
+    const lowerQuery = query.toLowerCase().trim();
+    
+    // Sort all ingredients alphabetically
+    let filtered = [...(this.allIngredients || [])].sort((a, b) => a.localeCompare(b));
+    
+    if (lowerQuery) {
+      filtered = filtered.filter(ing => ing.toLowerCase().includes(lowerQuery));
+    }
+    
+    if (filtered.length === 0) {
+      dd.innerHTML = `<div style="padding: 8px 12px; color: rgba(255,255,255,0.5); font-size: 0.9rem; font-style: italic;">Нічого не знайдено</div>`;
+      return;
+    }
+
+    const letters = [...new Set(filtered.map(i => i.charAt(0).toUpperCase()))];
+    
+    const alphaBarHtml = `
+      <div style="position: sticky; top: 0; background: var(--c-ink-primary, #1a0f04); z-index: 10; padding: 6px 8px; display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 4px;">
+         ${letters.map(l => `<button data-action="scroll-to-letter" data-letter="${l}" class="alpha-btn">${l}</button>`).join('')}
+      </div>
+    `;
+
+    let currentLetter = '';
+    let itemsHtml = '';
+    
+    filtered.forEach(ing => {
+       const letter = ing.charAt(0).toUpperCase();
+       if (letter !== currentLetter) {
+          currentLetter = letter;
+          itemsHtml += `<div id="alpha-group-${letter}" style="padding: 4px 12px; font-weight: bold; color: rgba(255,255,255,0.5); font-size: 0.8rem; background: rgba(255,255,255,0.05); margin-top: 4px; font-family: var(--font-title);">${letter}</div>`;
+       }
+       itemsHtml += `
+         <div class="autocomplete-item" data-action="select-ingredient" data-value="${ing}">
+           <div class="autocomplete-item-img">
+             <i data-lucide="image" style="width:16px;height:16px;opacity:0.5;"></i>
+           </div>
+           <span>${ing}</span>
+         </div>
+       `;
+    });
+
+    dd.innerHTML = alphaBarHtml + itemsHtml;
+    // Initialize icons in the newly created HTML
+    if (window.lucide) lucide.createIcons({ root: dd });
+  }
+
   async _handleAction(e) {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const action = btn.dataset.action;
     try {
-      if (action === 'refresh') {
+      if (action === 'select-ingredient') {
+        const input = this.$('#item-name');
+        if (input) {
+          input.value = btn.dataset.value;
+          const dd = this.$('#custom-autocomplete-dropdown');
+          if (dd) dd.style.display = 'none';
+        }
+      } else if (action === 'scroll-to-letter') {
+        const letter = btn.dataset.letter;
+        const target = this.$(`#alpha-group-${letter}`);
+        const dd = this.$('#custom-autocomplete-dropdown');
+        if (target && dd) {
+          dd.scrollTop = target.offsetTop - 40;
+        }
+      } else if (action === 'refresh') {
         await this._loadData();
       } else if (action === 'create-list') {
         const name = this.$('#shopping-list-name')?.value;
@@ -257,9 +430,37 @@ export default class ShoppingStub extends Component {
           await ShoppingService.createList({ name });
           await this._loadData();
         }
-      } else if (action === 'delete-list') {
+      } else if (action === 'edit-list-inline') {
+        e.stopPropagation();
+        this.editingListId = btn.dataset.id;
+        this.deletingListId = null;
+        this._reRenderLists();
+      } else if (action === 'cancel-edit-list') {
+        e.stopPropagation();
+        this.editingListId = null;
+        this._reRenderLists();
+      } else if (action === 'save-list-name') {
+        e.stopPropagation();
+        const input = this.$(`#edit-list-input-${btn.dataset.id}`);
+        if (input && input.value.trim()) {
+          await ShoppingService.updateList(btn.dataset.id, { name: input.value.trim() });
+          this.editingListId = null;
+          await this._loadData();
+        }
+      } else if (action === 'delete-list-inline') {
+        e.stopPropagation();
+        this.deletingListId = btn.dataset.id;
+        this.editingListId = null;
+        this._reRenderLists();
+      } else if (action === 'cancel-delete-list') {
+        e.stopPropagation();
+        this.deletingListId = null;
+        this._reRenderLists();
+      } else if (action === 'confirm-delete-list') {
+        e.stopPropagation();
         await ShoppingService.deleteList(btn.dataset.id);
         if (this.activeList === btn.dataset.id) this.activeList = null;
+        this.deletingListId = null;
         await this._loadData();
       } else if (action === 'add-item') {
         const listUuid = this.$('#item-list-uuid')?.value;
@@ -270,8 +471,11 @@ export default class ShoppingStub extends Component {
           await this._loadData();
         }
       } else if (action === 'select-list') {
-        this.activeList = btn.dataset.id;
-        await this._loadActiveListDetails();
+        if (this.editingListId !== btn.dataset.id && this.deletingListId !== btn.dataset.id) {
+          this.activeList = btn.dataset.id;
+          await this._loadActiveListDetails();
+          this._reRenderLists();
+        }
       } else if (action === 'edit-list') {
         const newName = prompt("Нова назва списку:");
         if (newName) {

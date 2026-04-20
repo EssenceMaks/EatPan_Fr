@@ -84,8 +84,8 @@ export default class RecipeBook extends Component {
 
           <!-- RIGHT BOTTOM RIBBONS — absolute over right page area, left-aligned -->
           <div class="rb-overlay rb-overlay--right-bottom">
-            <button class="bm-bottom bm-prepared active" onclick="this.classList.toggle('active')"><i data-lucide="soup" style="width:20px;height:20px;"></i></button>
-            <button class="bm-bottom bm-planned" onclick="this.classList.toggle('active')"><i data-lucide="timer" style="width:20px;height:20px;"></i></button>
+            <button class="bm-bottom bm-prepared" id="rb-ribbon-prepared" title="В наявності"><i data-lucide="soup" style="width:20px;height:20px;"></i></button>
+            <button class="bm-bottom bm-planned" id="rb-ribbon-planned" title="Треба готувати"><i data-lucide="timer" style="width:20px;height:20px;"></i></button>
           </div>
 
           <!-- RIGHT SIDE INTERACTION TABS — absolute on right edge -->
@@ -159,6 +159,12 @@ export default class RecipeBook extends Component {
         }
       });
     }
+
+    // Handle Ribbons
+    const ribbonPrep = this.$('#rb-ribbon-prepared');
+    const ribbonPlan = this.$('#rb-ribbon-planned');
+    if (ribbonPrep) ribbonPrep.addEventListener('click', () => this._handleRibbonClick(true));
+    if (ribbonPlan) ribbonPlan.addEventListener('click', () => this._handleRibbonClick(false));
   }
 
   _setupSwipeToClose() {
@@ -287,6 +293,114 @@ export default class RecipeBook extends Component {
       wrapper.classList.remove('mode-create'); // Remove create mode when showing recipe
     }
     this.rightPage.loadRecipe(id);
+    this._initRibbonState(id);
+  }
+
+  async _initRibbonState(recipeId) {
+    const ribbonPrep = this.$('#rb-ribbon-prepared');
+    const ribbonPlan = this.$('#rb-ribbon-planned');
+    if (!ribbonPrep || !ribbonPlan) return;
+
+    ribbonPrep.classList.remove('active');
+    ribbonPlan.classList.remove('active');
+    ribbonPrep.style.pointerEvents = 'none';
+    ribbonPlan.style.pointerEvents = 'none';
+    ribbonPrep.style.opacity = '0.5';
+    ribbonPlan.style.opacity = '0.5';
+
+    try {
+      const { MealPlanService } = await import('../../core/ApiClient.js');
+      const res = await MealPlanService.fetchLabels();
+      const labels = res?.labels || {};
+      
+      this._currentMealPlanLabelId = null;
+
+      // Find if this recipe has a label
+      for (const [uuid, label] of Object.entries(labels)) {
+        if (label.recipe_uuid === String(recipeId)) {
+          this._currentMealPlanLabelId = uuid;
+          if (label.inStock) {
+            ribbonPrep.classList.add('active');
+          } else {
+            ribbonPlan.classList.add('active');
+          }
+          break;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to fetch meal plan labels for ribbons', e);
+    } finally {
+      ribbonPrep.style.pointerEvents = 'auto';
+      ribbonPlan.style.pointerEvents = 'auto';
+      ribbonPrep.style.opacity = '1';
+      ribbonPlan.style.opacity = '1';
+    }
+  }
+
+  async _handleRibbonClick(isPrepared) {
+    const recipeId = this.rightPage?.currentRecipeId;
+    if (!recipeId) return;
+
+    const ribbonPrep = this.$('#rb-ribbon-prepared');
+    const ribbonPlan = this.$('#rb-ribbon-planned');
+    
+    // Disable temporarily
+    ribbonPrep.style.pointerEvents = 'none';
+    ribbonPlan.style.pointerEvents = 'none';
+
+    try {
+      const { MealPlanService } = await import('../../core/ApiClient.js');
+      
+      const recipeTitle = this.rightPage?.recipeComponent?.recipeData?.title || 'Рецепт';
+
+      if (this._currentMealPlanLabelId) {
+        // Chip exists
+        const currentlyPrepared = ribbonPrep.classList.contains('active');
+        const currentlyPlanned = ribbonPlan.classList.contains('active');
+
+        // If clicking the currently active one -> DELETE
+        if ((isPrepared && currentlyPrepared) || (!isPrepared && currentlyPlanned)) {
+          await MealPlanService.deleteLabel(this._currentMealPlanLabelId);
+          this._currentMealPlanLabelId = null;
+          ribbonPrep.classList.remove('active');
+          ribbonPlan.classList.remove('active');
+          window.dispatchEvent(new Event('mealplan-updated'));
+        } else {
+          // If clicking the OTHER one -> PATCH to change inStock
+          await MealPlanService.updateLabel(this._currentMealPlanLabelId, { inStock: isPrepared });
+          if (isPrepared) {
+            ribbonPrep.classList.add('active');
+            ribbonPlan.classList.remove('active');
+          } else {
+            ribbonPrep.classList.remove('active');
+            ribbonPlan.classList.add('active');
+          }
+          window.dispatchEvent(new Event('mealplan-updated'));
+        }
+      } else {
+        // Chip does not exist -> CREATE
+        const data = {
+          name: recipeTitle,
+          color: isPrepared ? '#166534' : '#991b1b', // Green for prepared, Red for planned
+          icon: isPrepared ? 'soup' : 'timer',
+          inStock: isPrepared,
+          recipe_uuid: String(recipeId),
+          location_uuid: ''
+        };
+        const res = await MealPlanService.createLabel(data);
+        if (res && res.uuid) {
+          this._currentMealPlanLabelId = res.uuid;
+          if (isPrepared) ribbonPrep.classList.add('active');
+          else ribbonPlan.classList.add('active');
+          window.dispatchEvent(new Event('mealplan-updated'));
+        }
+      }
+    } catch (e) {
+      console.error('Ribbon click failed:', e);
+    } finally {
+      ribbonPrep.style.pointerEvents = 'auto';
+      ribbonPlan.style.pointerEvents = 'auto';
+    }
   }
 
   _hideRightSide() {

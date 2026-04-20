@@ -38,8 +38,7 @@ export default class MealPlanStub extends Component {
   constructor(props = {}) {
     super(props);
     this.chips = [];
-    this.chipMeta = JSON.parse(localStorage.getItem('eatpan_chip_meta') || '{}');
-    this.schedule = {};
+        this.schedule = {};
     this.recipes = {};
     this.shoppingListObj = null;
     this.shoppingList = [];
@@ -119,7 +118,21 @@ export default class MealPlanStub extends Component {
       }
     });
 
+    // Listen for global mealplan updates (e.g. from RecipeBook ribbons)
+    this._onMealPlanUpdated = () => {
+      this._loadData();
+    };
+    window.addEventListener('mealplan-updated', this._onMealPlanUpdated);
+
     await this._loadData();
+  }
+
+  onDestroy() {
+    if (this._onMealPlanUpdated) {
+      window.removeEventListener('mealplan-updated', this._onMealPlanUpdated);
+    }
+    if (this._renderTimer) cancelAnimationFrame(this._renderTimer);
+    super.onDestroy();
   }
 
   async _loadData() {
@@ -154,6 +167,21 @@ export default class MealPlanStub extends Component {
             } catch (err) {
               // Silently skip — recipe may have been deleted
             }
+          }
+        }
+      }
+
+      // Also ensure we have recipe details for ALL chips in the left sidebar
+      for (const c of this.chips) {
+        if (c.recipe_uuid && !this.recipes[c.recipe_uuid]) {
+          const cached = this.allRecipes.find(r => r.uuid === c.recipe_uuid);
+          if (cached) {
+            this.recipes[c.recipe_uuid] = cached;
+          } else {
+            try {
+              const detail = await RecipeService.fetchDetail(c.recipe_uuid);
+              if (detail) this.recipes[c.recipe_uuid] = detail;
+            } catch (err) {}
           }
         }
       }
@@ -194,7 +222,7 @@ export default class MealPlanStub extends Component {
   }
 
   _renderScheduleItem(m) {
-    const mMeta = this.chipMeta[m.notes] || {};
+    const mMeta = this.chips.find(c => c.id === m.notes) || {};
     const mIcon = mMeta.icon || 'utensils';
     const hasRecipe = !!m.recipe_uuid;
     const rImg = hasRecipe ? this._getRecipeImageUrl(m.recipe_uuid) : null;
@@ -238,9 +266,6 @@ export default class MealPlanStub extends Component {
     `;
   }
 
-  _saveChipMeta() {
-    localStorage.setItem('eatpan_chip_meta', JSON.stringify(this.chipMeta));
-  }
 
   _saveShoppingList() {
     localStorage.setItem('eatpan_shopping_list', JSON.stringify(this.shoppingList));
@@ -298,14 +323,14 @@ export default class MealPlanStub extends Component {
   _buildContentHTML() {
     if (this._error) return `<div style="color:red; grid-column: 1 / -1; text-align: center; font-size: 1.2rem;">${this._error}</div>`;
 
-    const inStockChips = this.chips.filter(c => this.chipMeta[c.id]?.inStock !== false);
-    const outStockChips = this.chips.filter(c => this.chipMeta[c.id]?.inStock === false);
+    const inStockChips = this.chips.filter(c => c.inStock !== false);
+    const outStockChips = this.chips.filter(c => c.inStock === false);
 
     const requiredItems = [];
     Object.values(this.schedule).forEach(day => {
       Object.values(day).forEach(meals => {
         meals.forEach(m => {
-          const meta = this.chipMeta[m.notes];
+          const meta = this.chips.find(c => c.id === m.notes);
           const inStock = meta ? meta.inStock : false;
           const labelName = m.recipe_title || 'Страва без назви';
           const icon = meta?.icon || 'utensils';
@@ -550,14 +575,14 @@ export default class MealPlanStub extends Component {
   }
 
   _renderChip(chip, inStock) {
-    const meta = this.chipMeta[chip.id] || {};
-    const icon = meta.icon || 'utensils';
-    const color = meta.color || '';
+    
+    const icon = chip.icon || 'utensils';
+    const color = chip.color || '';
     const cssClass = inStock ? 'in-stock' : 'out-stock';
     const customStyle = color ? `background-color: ${color}; border-color: rgba(0,0,0,0.1);` : '';
 
     let rImg = null;
-    if (meta.recipe_uuid) rImg = this._getRecipeImageUrl(meta.recipe_uuid);
+    if (chip.recipe_uuid) rImg = this._getRecipeImageUrl(chip.recipe_uuid);
 
     return `
       <div class="chip ${cssClass}" style="${customStyle}" draggable="true" data-drag-type="chip" data-id="${chip.id}" data-name="${chip.name}" data-action="edit-chip">
@@ -621,10 +646,9 @@ export default class MealPlanStub extends Component {
     const chip = this.chips.find(c => c.id === this.editingChip);
     if (!chip) return '';
 
-    const meta = this.chipMeta[chip.id] || {};
-    const icon = meta.icon || 'utensils';
-    const color = meta.color || '#ffffff';
-    const hasRecipe = !!meta.recipe_uuid;
+    const icon = chip.icon || 'utensils';
+    const color = chip.color || '#ffffff';
+    const hasRecipe = !!chip.recipe_uuid;
 
     return `
       <div class="arc-popup-block" style="${this._calculatePopupPosition()} width: 340px;">
@@ -684,7 +708,7 @@ export default class MealPlanStub extends Component {
             <label style="display:block; font-size:0.85rem; font-family:var(--font-title); font-weight:bold; margin-bottom:6px; color:#2b1a08;">Рецепт:</label>
             <div style="display:flex; align-items:center; gap:8px;">
               <span class="arc-popup-input" style="flex:1; cursor:default; background:rgba(0,0,0,0.03); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                ${hasRecipe ? (meta.recipe_title || 'Прив\'язано') : 'Немає'}
+                ${hasRecipe ? (chip.name || 'Прив\'язано') : 'Немає'}
               </span>
               ${hasRecipe ? `
                 <button data-action="unbind-chip-recipe" style="background:rgba(153,27,27,0.1); color:#991b1b; border:1px solid rgba(153,27,27,0.3); border-radius:4px; padding:0 12px; height:44px; cursor:pointer; font-family:var(--font-title); font-weight:bold; font-size:1.1rem; display:flex; align-items:center; justify-content:center;" title="Видалити рецепт">
@@ -716,11 +740,12 @@ export default class MealPlanStub extends Component {
       chip.name = newName; // update local instantly
     }
 
-    const meta = this.chipMeta[chip.id] || {};
-    meta.color = newColor !== '#ffffff' ? newColor : '';
-
-    this.chipMeta[chip.id] = meta;
-    this._saveChipMeta();
+    const finalColor = newColor !== '#ffffff' ? newColor : '';
+    if (finalColor !== chip.color) {
+      await MealPlanService.updateLabel(chip.id, { color: finalColor });
+      chip.color = finalColor;
+    }
+    
   }
 
   async _handleAction(e) {
@@ -834,7 +859,7 @@ export default class MealPlanStub extends Component {
       Object.values(this.schedule).forEach(day => {
         Object.values(day).forEach(meals => {
           meals.forEach(m => {
-            const meta = this.chipMeta[m.notes];
+            const meta = this.chips.find(c => c.id === m.notes);
             const inStock = meta ? meta.inStock : false;
             let ingredients = [];
             if (m.recipe_uuid && (this.recipes[m.recipe_uuid] || this.allRecipes.find(r => r.uuid === m.recipe_uuid))) {
@@ -954,12 +979,12 @@ export default class MealPlanStub extends Component {
       const name = nameInp?.value.trim();
       if (name) {
         try {
-          const res = await MealPlanService.createLabel({ name, color: '#dddddd' });
+          const inStock = btn.dataset.stock === 'true';
+          const icon = this.selectedIcon || 'utensils';
+          const res = await MealPlanService.createLabel({ name, color: '#dddddd', icon, inStock });
           if (res && res.uuid) {
-            this.chipMeta[res.uuid] = { icon: this.selectedIcon || 'utensils', inStock: btn.dataset.stock === 'true' };
-            this._saveChipMeta();
             // Optimistic: add chip locally instead of full reload
-            this.chips.push({ id: res.uuid, name, color: '#dddddd' });
+            this.chips.push({ id: res.uuid, name, color: '#dddddd', icon, inStock });
           }
           this.showAddChip = null;
           this._render();
@@ -999,13 +1024,12 @@ export default class MealPlanStub extends Component {
       const rTitle = btn.dataset.recipeTitle;
 
       if (id && rId) {
-        if (this.chips.find(c => c.id === id)) {
-          // Binding to a chip (Auto-save)
-          const meta = this.chipMeta[id] || {};
-          meta.recipe_uuid = rId;
-          meta.recipe_title = rTitle;
-          this.chipMeta[id] = meta;
-          this._saveChipMeta();
+        const c = this.chips.find(chip => chip.id === id);
+        if (c) {
+          c.recipe_uuid = rId;
+          c.name = rTitle;
+          MealPlanService.updateLabel(id, { recipe_uuid: rId, name: rTitle });
+          
 
           this.editingChip = id; // Reopen chip modal
           this.recipeModalOpen = false;
@@ -1031,12 +1055,11 @@ export default class MealPlanStub extends Component {
       }
     } else if (action === 'unbind-chip-recipe') {
       const id = this.editingChip;
-      if (id) {
-        const meta = this.chipMeta[id] || {};
-        meta.recipe_uuid = null;
-        meta.recipe_title = null;
-        this.chipMeta[id] = meta;
-        this._saveChipMeta();
+      const c = this.chips.find(chip => chip.id === id);
+      if (c) {
+        c.recipe_uuid = null;
+        MealPlanService.updateLabel(id, { recipe_uuid: '' });
+        
         this._render();
       }
     } else if (action === 'unbind-recipe') {
@@ -1072,10 +1095,11 @@ export default class MealPlanStub extends Component {
       this._render();
     } else if (action === 'select-edit-icon') {
       if (this.editingChip) {
-        const meta = this.chipMeta[this.editingChip] || {};
-        meta.icon = btn.dataset.icon;
-        this.chipMeta[this.editingChip] = meta;
-        this._saveChipMeta();
+        const c = this.chips.find(chip => chip.id === this.editingChip);
+        if (c) {
+          c.icon = btn.dataset.icon;
+          MealPlanService.updateLabel(c.id, { icon: c.icon });
+        }
       }
       this.editChipIconOpen = false;
       this._render();
@@ -1088,8 +1112,6 @@ export default class MealPlanStub extends Component {
     } else if (action === 'delete-chip') {
       if (confirm('Видалити страву з бази?')) {
         await MealPlanService.deleteLabel(this.editingChip);
-        delete this.chipMeta[this.editingChip];
-        this._saveChipMeta();
         this.editingChip = null;
         await this._loadData();
       }
@@ -1152,24 +1174,25 @@ export default class MealPlanStub extends Component {
       if (data.type === 'chip') {
         if (targetType === 'chip-in' || targetType === 'chip-out') {
           const inStock = targetType === 'chip-in';
-          if (this.chipMeta[data.id]) {
-            this.chipMeta[data.id].inStock = inStock;
-            this._saveChipMeta();
+          const c = this.chips.find(chip => chip.id === data.id);
+          if (c) {
+            c.inStock = inStock;
+            MealPlanService.updateLabel(c.id, { inStock });
             this._render();
           }
         } else if (targetType === 'schedule') {
           const date = dropzone.dataset.date;
           const mealType = dropzone.dataset.type;
 
-          const chipMeta = this.chipMeta[data.id] || {};
+          const c = this.chips.find(chip => chip.id === data.id) || {};
 
           await MealPlanService.create({
             date: date,
             meal_type: mealType,
             portions: 2,
             notes: data.id,
-            recipe_title: chipMeta.recipe_title || data.name,
-            recipe_uuid: chipMeta.recipe_uuid || null
+            recipe_title: c.name || data.name,
+            recipe_uuid: c.recipe_uuid || null
           });
           await this._loadData();
         }

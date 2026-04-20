@@ -238,6 +238,7 @@ export const RecipeService = {
   }),
   delete: (id) => apiFetch(`/recipes/${id}/`, { method: 'DELETE' }),
   toggleLike: (id) => apiFetch(`/recipes/${id}/toggle_like/`, { method: 'POST' }),
+  fetchIngredients: () => apiFetch('/recipes/ingredients/'),
 };
 
 // ============================================================
@@ -434,6 +435,22 @@ export const MealPlanService = {
     body: JSON.stringify(data),
   }),
   deleteLabel: (uuid) => apiFetch(`/meal-plan/labels/${uuid}/`, { method: 'DELETE' }),
+  
+  // Locations
+  locations: {
+    fetchAll: () => apiFetch('/meal-plan/locations/'),
+    create: (data) => apiFetch('/meal-plan/locations/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }),
+    update: (uuid, data) => apiFetch(`/meal-plan/locations/${uuid}/`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    }),
+    delete: (uuid) => apiFetch(`/meal-plan/locations/${uuid}/`, { method: 'DELETE' }),
+  }
 };
 
 // ============================================================

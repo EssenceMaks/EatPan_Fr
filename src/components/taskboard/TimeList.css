@@ -9,6 +9,8 @@
   padding: 10px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  height: 100%;
 }
 
 .tb-timeline-col::-webkit-scrollbar {
@@ -23,6 +25,9 @@
 .time_list_wrapper {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .time_list_current_line {
