@@ -4,6 +4,7 @@
  */
 import Component from '../../core/Component.js';
 import { ShoppingService, RecipeService } from '../../core/ApiClient.js';
+import ShoppingExport from './ShoppingExport.js';
 
 export default class ShoppingStub extends Component {
   constructor(props = {}) {
@@ -166,9 +167,10 @@ export default class ShoppingStub extends Component {
           ${listData.name || 'Список покупок'}
         </div>
         <div style="display:flex; gap:8px;">
-          <button data-action="export-image" style="background: #1a0f04; color:#f8f1e3; border:none; border-radius:4px; padding:6px 12px; font-size:0.9rem; font-family:var(--font-title); cursor:pointer; display:flex; align-items:center; gap:6px;">
-            <i data-lucide="camera" style="width:14px;height:14px;"></i> Копіювати як картинку
-          </button>
+          <button data-action="export-copy-img" title="Копіювати як картинку" style="background: #1a0f04; color:#f8f1e3; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;"><i data-lucide="image" style="width:14px;height:14px;"></i></button>
+          <button data-action="export-dl-img" title="Завантажити картинку" style="background: #1a0f04; color:#f8f1e3; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;"><i data-lucide="download" style="width:14px;height:14px;"></i></button>
+          <button data-action="export-copy-txt" title="Копіювати текст" style="background: #1a0f04; color:#f8f1e3; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;"><i data-lucide="clipboard-copy" style="width:14px;height:14px;"></i></button>
+          <button data-action="export-dl-txt" title="Завантажити текст" style="background: #1a0f04; color:#f8f1e3; border:none; border-radius:4px; padding:6px 10px; cursor:pointer;"><i data-lucide="file-text" style="width:14px;height:14px;"></i></button>
         </div>
       </div>
       
@@ -192,18 +194,18 @@ export default class ShoppingStub extends Component {
                         <input type="checkbox" ${isChecked ? 'checked' : ''} data-action="toggle-item" data-listid="${this.activeList}" data-id="${id}" style="width: 18px; height: 18px; accent-color: #1a0f04; cursor:pointer;">
                       </div>
                       <div style="display:flex; flex-direction:column;">
-                        <span style="font-family:var(--font-body); font-size:1.1rem; font-weight:600; color:${textColor}; line-height:1.2; ${isChecked ? 'text-decoration:line-through;' : ''}">
+                        <span class="item-name-text" style="font-family:var(--font-body); font-size:1.1rem; font-weight:600; color:${textColor}; line-height:1.2; ${isChecked ? 'text-decoration:line-through;' : 'text-decoration:none;'}">
                           ${item.name}
                         </span>
-                        ${item.notes ? `<span style="font-size:0.75rem; color:rgba(26,15,4,0.6); font-family:var(--font-title); margin-top:2px;">${item.notes}</span>` : ''}
+                        ${item.notes ? `<span class="item-info-text" style="font-size:0.75rem; color:${textColor}; font-family:var(--font-title); margin-top:2px;">${item.notes}</span>` : ''}
                       </div>
                     </label>
                   </div>
 
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(26,15,4,0.05);">
                     <div style="display:flex; align-items:center; gap: 6px; color:${textColor};">
-                       <i data-lucide="${imgIcon}" style="width:14px;height:14px; opacity:0.7;"></i>
-                       <span style="font-weight:bold; font-size:0.95rem;">x${item.quantity || 1}</span>
+                       <i class="item-info-text" data-lucide="${imgIcon}" style="width:14px;height:14px; opacity:0.7; color:${textColor};"></i>
+                       <span class="item-info-text" style="font-weight:bold; font-size:0.95rem; color:${textColor};">x${item.quantity || 1}</span>
                        <div style="display:flex; gap: 2px; margin-left: 4px;">
                          <button class="qty-btn" data-action="mod-qty" data-mod="/2" data-listid="${this.activeList}" data-id="${id}">/2</button>
                          <button class="qty-btn" data-action="mod-qty" data-mod="-1" data-listid="${this.activeList}" data-id="${id}">-1</button>
@@ -286,12 +288,12 @@ export default class ShoppingStub extends Component {
         if (card) {
           card.style.background = isChecked ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.6)';
           card.style.borderColor = isChecked ? 'rgba(26,15,4,0.05)' : 'rgba(26,15,4,0.15)';
-          const textSpan = card.querySelector('span[style*="font-family:var(--font-body)"]');
+          const textSpan = card.querySelector('.item-name-text');
           if (textSpan) {
             textSpan.style.textDecoration = isChecked ? 'line-through' : 'none';
             textSpan.style.color = isChecked ? 'rgba(26,15,4,0.4)' : '#1a0f04';
           }
-          const infoElements = card.querySelectorAll('span[style*="font-size:0.75rem"], i, span[style*="font-size:0.95rem"]');
+          const infoElements = card.querySelectorAll('.item-info-text');
           infoElements.forEach(el => el.style.color = isChecked ? 'rgba(26,15,4,0.4)' : '#1a0f04');
         }
         
@@ -342,67 +344,18 @@ export default class ShoppingStub extends Component {
         
         // Update in background
         await ShoppingService.updateItem(btn.dataset.listid, btn.dataset.id, { quantity: newQty });
-      } else if (action === 'export-image') {
-        if (!window.html2canvas) {
-          alert('Функція генерації зображень завантажується, спробуйте ще раз через секунду.');
-          return;
-        }
+      } else if (action === 'export-copy-img') {
         const container = this.element.querySelector('#export-list-container');
-        if (!container) return;
-        
-        // Temporarily style for clean export
-        const originalOverflow = container.style.overflowY;
-        const originalMaxHeight = container.style.maxHeight;
-        container.style.overflowY = 'visible';
-        container.style.maxHeight = 'none';
-        
-        // Also hide edit/delete buttons for export
-        const actionButtons = container.querySelectorAll('button');
-        actionButtons.forEach(b => b.style.display = 'none');
-        
-        const oldBtnText = btn.innerHTML;
-        btn.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px;" class="lucide-spin"></i> Генерую...';
-        if (window.lucide) lucide.createIcons({root: btn});
-
-        try {
-          const canvas = await html2canvas(container, {
-            backgroundColor: '#f4e8d1', // Parchment color background for image
-            scale: 2, // High DPI
-            logging: false,
-            useCORS: true
-          });
-          
-          canvas.toBlob(async (blob) => {
-            if (!blob) throw new Error('Blob is null');
-            try {
-              // Write to clipboard
-              const item = new ClipboardItem({ "image/png": blob });
-              await navigator.clipboard.write([item]);
-              alert("Список скопійовано як картинку! Тепер ви можете вставити його в Telegram (Ctrl+V / Cmd+V).");
-            } catch (err) {
-              // Fallback to download if clipboard fails (e.g. not HTTPS)
-              console.warn("Clipboard API failed, falling back to download", err);
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `shopping-list-${this.activeList}.png`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-            }
-          });
-        } catch (e) {
-          console.error("Export failed", e);
-          alert("Не вдалося згенерувати картинку: " + e.message);
-        } finally {
-          // Restore styles
-          container.style.overflowY = originalOverflow;
-          container.style.maxHeight = originalMaxHeight;
-          actionButtons.forEach(b => b.style.display = '');
-          btn.innerHTML = oldBtnText;
-          if (window.lucide) lucide.createIcons({root: btn});
-        }
+        if (container) await ShoppingExport.copyAsImage(container, btn);
+      } else if (action === 'export-dl-img') {
+        const container = this.element.querySelector('#export-list-container');
+        if (container) await ShoppingExport.downloadAsImage(container, this.activeList, btn);
+      } else if (action === 'export-copy-txt') {
+        const items = this.data?.lists?.[this.activeList]?.items;
+        await ShoppingExport.copyAsText(items);
+      } else if (action === 'export-dl-txt') {
+        const items = this.data?.lists?.[this.activeList]?.items;
+        await ShoppingExport.downloadAsText(items, this.activeList);
       }
     } catch (err) {
       console.warn('[ShoppingStub]', err);
