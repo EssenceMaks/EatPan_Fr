@@ -137,7 +137,21 @@ export default class ShoppingStub extends Component {
     } catch (e) {
       console.warn('Failed to load recipes for ingredients list', e);
     }
+    
+    // Listen for global shopping list updates (e.g. from MealPlanner)
+    this._onShoppingListUpdated = () => {
+      this._loadData();
+    };
+    window.addEventListener('shopping-list-updated', this._onShoppingListUpdated);
+
     await this._loadData();
+  }
+
+  onDestroy() {
+    if (this._onShoppingListUpdated) {
+      window.removeEventListener('shopping-list-updated', this._onShoppingListUpdated);
+    }
+    super.onDestroy();
   }
 
   async _loadData() {

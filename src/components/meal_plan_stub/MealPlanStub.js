@@ -964,6 +964,7 @@ export default class MealPlanStub extends Component {
           );
           await Promise.all(promises);
           alert(`Список "${listName}" успішно створено та збережено в секторі "Списки покупок"!`);
+          window.dispatchEvent(new CustomEvent('shopping-list-updated'));
         }
       } catch (err) {
         console.error('Помилка створення списку покупок', err);

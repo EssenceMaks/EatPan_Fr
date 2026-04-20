@@ -44,7 +44,21 @@ export default class PantryStub extends Component {
     if (window.lucide) lucide.createIcons({ root: this.element });
     this.element.addEventListener('click', (e) => this._handleAction(e));
     this.element.addEventListener('change', (e) => this._handleChange(e));
+    
+    // Listen for global mealplan updates (e.g. from RecipeBook ribbons)
+    this._onMealPlanUpdated = () => {
+      this._loadData();
+    };
+    window.addEventListener('mealplan-updated', this._onMealPlanUpdated);
+
     await this._loadData();
+  }
+
+  onDestroy() {
+    if (this._onMealPlanUpdated) {
+      window.removeEventListener('mealplan-updated', this._onMealPlanUpdated);
+    }
+    super.onDestroy();
   }
 
   async _loadData() {
