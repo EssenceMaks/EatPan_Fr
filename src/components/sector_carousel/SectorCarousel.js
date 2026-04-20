@@ -20,7 +20,7 @@ const SECTORS = [
   { id: 'hero',        title: 'Hero',         icon: 'swords',       subtitle: 'Your adventure starts here' },
   { id: 'dashboard',   title: 'My Dashboard', icon: 'layout-dashboard', subtitle: 'Overview' },
   { id: 'taskboard',   title: 'Taskboard',    icon: 'clipboard-list', subtitle: 'Plan & organize' },
-  { id: 'kitchen',     title: 'My Kitchen',   icon: 'cooking-pot',  subtitle: 'Cooking workspace' },
+  { id: 'kitchen',     title: 'Meal Planner & My Kitchen',   icon: 'cooking-pot',  subtitle: 'Cooking workspace' },
   { id: 'recipe-book', title: 'Recipe Book',  icon: 'book-open',    subtitle: 'Collection of recipes' },
   { id: 'storage',     title: 'Storage',      icon: 'package-open', subtitle: 'Pantry / Larder / Cellar / Fridge' },
   { id: 'lists',       title: 'Lists',        icon: 'list-todo',    subtitle: 'Grocery List, Shop List' },
@@ -459,6 +459,10 @@ export default class SectorCarousel extends Component {
   // BLOCK ACTIVATION / DEACTIVATION
   // ============================================================
   activateBlock(element) {
+    if (this.props.onBeforeActivate && !this.props.onBeforeActivate(element)) {
+      return;
+    }
+
     this.savedBlockIndex = this.getCurrentBlockIndex();
     const index = element.dataset.index;
 

@@ -38,6 +38,15 @@ export default class AppShell extends Component {
 
     // 2. Mount SectorCarousel
     this.carousel = new SectorCarousel({
+      onBeforeActivate: (el) => {
+        // У неавторизованому стані дозволяємо входити тільки в Recipe Book
+        const sectorId = el.dataset.sectorId;
+        if (!this.header?.state?.isAuth && sectorId !== 'recipe-book') {
+          if (this.authPanel) this.authPanel.open();
+          return false;
+        }
+        return true;
+      },
       onBlockActivated: (el) => this._onBlockActivated(el),
       onBlockDeactivated: () => this._onBlockDeactivated(),
     });

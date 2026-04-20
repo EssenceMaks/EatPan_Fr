@@ -30,10 +30,10 @@ export default class SocialSector extends Component {
 
         <!-- TABS -->
         <div class="social-tabs">
-          <div class="social-tab ${this.activeTab === 'all' ? 'active' : ''}" data-action="tab" data-tab="all">Глобальна Мережа</div>
-          <div class="social-tab ${this.activeTab === 'friends' ? 'active' : ''}" data-action="tab" data-tab="friends">Союзники</div>
-          <div class="social-tab ${this.activeTab === 'groups' ? 'active' : ''}" data-action="tab" data-tab="groups">Гільдії</div>
-          <div class="social-tab ${this.activeTab === 'chats' ? 'active' : ''}" data-action="tab" data-tab="chats">Пошта</div>
+          <div class="social-tab ${this.activeTab === 'all' ? 'active' : ''}" data-action="tab" data-tab="all">Всі контакти</div>
+          <div class="social-tab ${this.activeTab === 'friends' ? 'active' : ''}" data-action="tab" data-tab="friends">Друзі</div>
+          <div class="social-tab ${this.activeTab === 'subs' ? 'active' : ''}" data-action="tab" data-tab="subs">Підписки</div>
+          <div class="social-tab ${this.activeTab === 'messages' ? 'active' : ''}" data-action="tab" data-tab="messages">Повідомлення</div>
         </div>
 
         <!-- CONTENT AREA -->
@@ -75,8 +75,8 @@ export default class SocialSector extends Component {
   _renderActiveTab() {
       if (this.activeTab === 'all') return this._renderAllUsers();
       if (this.activeTab === 'friends') return this._renderFriends();
-      if (this.activeTab === 'groups') return this._renderGroups();
-      if (this.activeTab === 'chats') return this._renderChats();
+      if (this.activeTab === 'subs') return this._renderSubs();
+      if (this.activeTab === 'messages') return this._renderMessages();
       return '';
   }
 
@@ -115,15 +115,98 @@ export default class SocialSector extends Component {
   }
 
   _renderFriends() {
-      return `<div class="social-empty">Тут будуть твої союзники та підписники.</div>`;
+      const users = this.allUsers?.users || [];
+      const followingList = this.following?.following || [];
+      
+      const friends = users.filter(u => followingList.includes(u.uuid));
+      if (friends.length === 0) return `<div class="social-empty">У вас немає союзників.</div>`;
+
+      return `
+        <div class="social-grid">
+            ${friends.map(u => {
+                const tierColor = u.tier === 'Premium' ? 'var(--c-accent-gold)' : '#ccc';
+                return `
+                <div class="social-card">
+                    <div class="social-card__avatar" style="border-color: ${tierColor}">
+                        ${u.avatar_url ? `<img src="${u.avatar_url}" />` : `<i data-lucide="user"></i>`}
+                    </div>
+                    <div class="social-card__info">
+                        <div class="social-card__name">${u.display_name}</div>
+                        <div class="social-card__tier" style="color: ${tierColor}">${u.tier}</div>
+                    </div>
+                    <div class="social-card__actions">
+                        <button class="social-btn social-btn--danger" data-action="unfollow" data-uuid="${u.uuid}">Видалити</button>
+                    </div>
+                </div>
+                `;
+            }).join('')}
+        </div>
+      `;
   }
 
-  _renderGroups() {
-      return `<div class="social-empty">Тут будуть твої гільдії (Групи друзів).</div>`;
+  _renderSubs() {
+      const users = this.allUsers?.users || [];
+      const followersList = this.followers?.followers || [];
+      const followingList = this.following?.following || [];
+      
+      const followers = users.filter(u => followersList.includes(u.uuid));
+      
+      if (followers.length === 0) return `<div class="social-empty">У вас немає підписників.</div>`;
+
+      return `
+        <div class="social-grid">
+            ${followers.map(u => {
+                const isFollowing = followingList.includes(u.uuid);
+                const tierColor = u.tier === 'Premium' ? 'var(--c-accent-gold)' : '#ccc';
+                return `
+                <div class="social-card">
+                    <div class="social-card__avatar" style="border-color: ${tierColor}">
+                        ${u.avatar_url ? `<img src="${u.avatar_url}" />` : `<i data-lucide="user"></i>`}
+                    </div>
+                    <div class="social-card__info">
+                        <div class="social-card__name">${u.display_name}</div>
+                        <div class="social-card__tier" style="color: ${tierColor}">${u.tier}</div>
+                    </div>
+                    <div class="social-card__actions">
+                        ${isFollowing 
+                            ? `<button class="social-btn social-btn--danger" data-action="unfollow" data-uuid="${u.uuid}">Відписатись</button>`
+                            : `<button class="social-btn social-btn--primary" data-action="follow" data-uuid="${u.uuid}">Підписатись</button>`
+                        }
+                    </div>
+                </div>
+                `;
+            }).join('')}
+        </div>
+      `;
   }
 
-  _renderChats() {
-      return `<div class="social-empty">Тут буде твоя поштова скринька (Діалоги).</div>`;
+  _renderMessages() {
+      const convs = this.conversations?.conversations || {};
+      const entries = Object.entries(convs);
+      
+      if (entries.length === 0) return `<div class="social-empty">У вас немає повідомлень.</div>`;
+
+      return `
+        <div class="social-grid">
+            ${entries.map(([cid, conv]) => {
+                const title = conv.type === 'group' ? conv.group_name : 'Приватний діалог';
+                return `
+                <div class="social-card" style="width:100%; flex-direction:row;">
+                    <div class="social-card__avatar" style="border-color: #888">
+                        <i data-lucide="${conv.type === 'group' ? 'users' : 'message-square'}"></i>
+                    </div>
+                    <div class="social-card__info" style="flex:1;">
+                        <div class="social-card__name">${title}</div>
+                        <div class="social-card__tier" style="color: #ccc">${conv.last_message || 'Немає повідомлень'}</div>
+                    </div>
+                    <div class="social-card__actions">
+                        <button class="social-btn social-btn--primary" data-action="open-chat" data-uuid="${cid}">Відкрити</button>
+                    </div>
+                </div>
+                `;
+            }).join('')}
+        </div>
+      `;
   }
 
   async _handleAction(e) {

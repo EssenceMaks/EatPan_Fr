@@ -1,0 +1,465 @@
+/**
+ * MealPlanStub — CSS Styles
+ * Extracted from inline <style> in MealPlanStub.js template
+ */
+
+/* ============================================================
+   GRID & COLUMN LAYOUT
+   ============================================================ */
+.mp-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1.2fr 1fr;
+  gap: 6px;
+  flex: 1;
+  min-height: 0;
+  min-width: 1200px;
+  height: 100%;
+}
+
+.mp-col {
+  background: rgba(255,255,255,0.4);
+  border: 1px solid var(--c-ink-light, #d2b48c);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+  height: 100%;
+  max-height: 100%;
+}
+
+.mp-col-header {
+  padding: 12px 16px;
+  border-bottom: 2px solid rgba(26,15,4,0.2);
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  background: rgba(26,15,4,0.08);
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #1a0f04;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.05);
+}
+
+.mp-col-body {
+  padding: 6px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+}
+
+/* ============================================================
+   CHIPS
+   ============================================================ */
+.chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  width: fit-content;
+  font-family: var(--font-title);
+  max-width: 100%;
+}
+
+.chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.chip.greyed {
+  opacity: 0.6;
+  border: 1px dashed rgba(0,0,0,0.2);
+}
+
+.chip.in-stock {
+  border-color: #4ade80;
+  background: rgba(220, 252, 231, 0.3);
+}
+
+/* ============================================================
+   DROPZONES
+   ============================================================ */
+.dropzone {
+  min-height: 80px;
+  padding: 8px;
+  border: 2px dashed transparent;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.dropzone.drag-over {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: var(--c-accent-gold);
+  box-shadow: inset 0 0 10px rgba(184, 134, 11, 0.2);
+}
+
+/* ============================================================
+   SCHEDULE (WEEKLY PLAN)
+   ============================================================ */
+.schedule-day {
+  border: 1px solid var(--c-ink-light);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.4);
+  margin-bottom: 16px;
+}
+
+.day-header {
+  background: rgba(255,255,255,0.6);
+  padding: 8px 12px;
+  font-family: var(--font-title);
+  font-weight: bold;
+  border-bottom: 1px solid var(--c-ink-light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.05rem;
+}
+
+.day-grid-cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px dashed rgba(0,0,0,0.1);
+}
+
+.meal-col {
+  min-height: 60px;
+  border-right: 1px dashed rgba(0,0,0,0.1);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.meal-col:last-child {
+  border-right: none;
+}
+
+.meal-col-header {
+  font-size: 0.75rem;
+  font-weight: 700;
+  opacity: 0.5;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* ============================================================
+   MEAL ITEMS
+   ============================================================ */
+.meal-slot {
+  display: flex;
+  min-height: 40px;
+}
+
+.meal-name {
+  padding: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.meal-content {
+  flex: 1;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.meal-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  padding: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  font-family: var(--font-title);
+  font-weight: 500;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: grab;
+}
+
+.meal-item:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+.meal-item-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  justify-content: space-between;
+}
+
+.meal-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 60px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f3f4f6;
+  margin-top: 4px;
+}
+
+.meal-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Text mode: hide image, show on hover */
+.meal-item.mode-text .meal-img-wrapper {
+  display: none !important;
+}
+
+.meal-item.mode-text:hover .meal-img-wrapper {
+  display: block !important;
+  position: absolute;
+  z-index: 50;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  border: 1px solid var(--c-ink-light);
+}
+
+/* ============================================================
+   SHOPPING LIST
+   ============================================================ */
+.shopping-trash {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.shopping-row:hover .shopping-trash {
+  opacity: 1;
+}
+
+/* ============================================================
+   INGREDIENTS
+   ============================================================ */
+.ing-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  transition: transform 0.1s, background 0.2s;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.ing-item:hover {
+  background: rgba(255,255,255,0.8);
+}
+
+.ing-arrow-btn.hide-unless-hover {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ing-item:hover .ing-arrow-btn.hide-unless-hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ing-list {
+  font-size: 0.9rem;
+  margin-top: 8px;
+  margin-bottom: 0;
+  color: var(--c-ink-primary);
+  font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ============================================================
+   RECIPE BUTTON
+   ============================================================ */
+.recipe-btn {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.2s;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+}
+
+.recipe-btn:hover {
+  opacity: 1;
+  background: rgba(0,0,0,0.05);
+}
+
+.recipe-btn.bound {
+  background: var(--c-accent-gold);
+  color: white;
+  border-color: var(--c-accent-gold);
+  opacity: 1;
+}
+
+/* ============================================================
+   ICON DROPDOWN
+   ============================================================ */
+.icon-dropdown {
+  position: absolute;
+  background: var(--bg-parchment);
+  border: 2px solid var(--c-ink-light);
+  border-radius: 4px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  z-index: 1001;
+  box-shadow: inset 0 0 20px rgba(107, 81, 30, 0.2), 0 8px 24px rgba(0,0,0,0.3);
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.icon-option {
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.icon-option:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+/* ============================================================
+   RECIPE CATEGORY ACCORDION
+   ============================================================ */
+details.recipe-category-acc > summary {
+  list-style: none;
+}
+
+details.recipe-category-acc > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* ============================================================
+   CUSTOM SCROLLBAR
+   ============================================================ */
+.mp-col-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mp-col-body::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+  border-radius: 3px;
+}
+
+.mp-col-body::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 3px;
+}
+
+/* ============================================================
+   ARC DIALOG STYLES FOR POPUPS
+   ============================================================ */
+.arc-popup-block {
+  position: fixed;
+  z-index: 1000;
+  background: radial-gradient(circle at center, var(--parchment-light, #f8f1e3) 0%, var(--parchment-dark, #e6d3b3) 120%);
+  border: 2px solid #24160a;
+  box-shadow: inset 0 0 30px rgba(107, 81, 30, 0.4), 0 8px 20px rgba(0, 0, 0, 0.6);
+  padding: 24px;
+  width: 400px;
+  max-width: 90vw;
+  color: #2b1a08;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.arc-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: #a67c38;
+  border-style: solid;
+  border-width: 0;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+.arc-corner--tl { top: 4px; left: 4px; border-top-width: 2px; border-left-width: 2px; }
+.arc-corner--tr { top: 4px; right: 4px; border-top-width: 2px; border-right-width: 2px; }
+.arc-corner--bl { bottom: 4px; left: 4px; border-bottom-width: 2px; border-left-width: 2px; }
+.arc-corner--br { bottom: 4px; right: 4px; border-bottom-width: 2px; border-right-width: 2px; }
+
+.arc-popup-input {
+  width: 100%;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(0,0,0,0.3);
+  border-radius: 4px;
+  padding: 10px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box;
+  color: #2b1a08;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.arc-popup-input:focus {
+  background: rgba(255,255,255,0.6);
+  border-color: var(--c-accent-gold);
+}
+
+/* ============================================================
+   VIEW TOGGLE BUTTON
+   ============================================================ */
+.mp-view-toggle {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.mp-view-toggle:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.mp-view-toggle.active {
+  background: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  border-color: var(--c-accent-gold);
+}

@@ -47,22 +47,41 @@ function isAuthenticated() {
   return !!_sessionCache.session?.access_token;
 }
 
+/** Reset session cache — must be called when auth state changes */
+export function invalidateSessionCache() {
+  _sessionCache = { session: null, ts: 0 };
+}
+
 /** Circuit-breaker: stop retrying when all endpoints are confirmed down */
-const _circuitBreaker = { failedAt: 0, cooldownMs: 30000 };
+const _circuitBreaker = { failedAt: 0, cooldownMs: 30000, logged: false };
+
+/** Reset circuit-breaker — must be called when auth state changes,
+ *  so that new JWT can be tried immediately after login */
+export function resetCircuitBreaker() {
+  _circuitBreaker.failedAt = 0;
+  _circuitBreaker.logged = false;
+}
 
 /** Fetch with failover: Cloudflare tunnel → local Docker → Render */
 async function apiFetch(path, options = {}) {
   // Circuit-breaker: if all endpoints failed recently, return null immediately
+  // BUG-5 fix: логируем только один раз при активации, потом тихо
   if (_circuitBreaker.failedAt && (Date.now() - _circuitBreaker.failedAt < _circuitBreaker.cooldownMs)) {
-    console.warn(`⏸️ API circuit-breaker active (${Math.round((_circuitBreaker.cooldownMs - (Date.now() - _circuitBreaker.failedAt))/1000)}s remaining)`);
+    if (!_circuitBreaker.logged) {
+      const remaining = Math.round((_circuitBreaker.cooldownMs - (Date.now() - _circuitBreaker.failedAt))/1000);
+      console.warn(`⏸️ API circuit-breaker active (${remaining}s cooldown). Suppressing further logs.`);
+      _circuitBreaker.logged = true;
+    }
     return null;
   }
+  // Сброс флага логирования при деактивации circuit-breaker
+  _circuitBreaker.logged = false;
 
   // Endpoint priority:
-  // LOCAL development: CLOUD_API (Cloudflare tunnel) first, then LOCAL_API as fallback
+  // LOCAL development: LOCAL_API first (no CORS), then CLOUD_API as fallback
   // Production: CLOUD_API only, Render as fallback
   const endpoints = IS_LOCAL 
-      ? [CLOUD_API, LOCAL_API] 
+      ? [LOCAL_API, CLOUD_API] 
       : [CLOUD_API, RENDER_API];
 
   let cachedBase = window._activeApiBase || localStorage.getItem('eatpan_active_api');
@@ -97,7 +116,7 @@ async function apiFetch(path, options = {}) {
     return fetch(`${base}${path}`, fetchOpts);
   };
 
-  // Try a single endpoint: with auth → if 401/403 → retry anonymous
+  // Try a single endpoint
   const tryEndpoint = async (base, label) => {
     const authHdrs = await getAuthHeaders();
     const hasToken = !!authHdrs['Authorization'];
@@ -107,18 +126,9 @@ async function apiFetch(path, options = {}) {
         console.log(`%c● API [${base}] ${r.status} ${label}`, 'color:#4ade80');
         return r;
       }
-      // If 401/403 and we sent a token, retry WITHOUT token (anonymous access)
-      if ((r.status === 401 || r.status === 403) && hasToken) {
-        const r2 = await doFetch(base, false);
-        if (r2.ok || r2.status === 204) {
-          console.log(`%c● API [${base}] ${r2.status} (anonymous) ${label}`, 'color:#4ade80');
-          return r2;
-        }
-        return r2;
-      }
-      // For unauthenticated users hitting protected endpoints — don't spam console
-      if ((r.status === 401 || r.status === 403) && !hasToken) {
-        return r; // Return silently, let the cascade handle it
+      // Auth error — return silently, no anonymous retry (prevents CORS spam)
+      if (r.status === 401 || r.status === 403) {
+        return r;
       }
       console.warn(`▲ API [${base}] ${r.status} ${label}`);
       return r;
@@ -136,6 +146,10 @@ async function apiFetch(path, options = {}) {
         if (rawResponse) return r;
         if (r.status === 204) return null;
         return await r.json();
+      }
+      if (r.status === 401 || r.status === 403) {
+        if (rawResponse) return r;
+        try { return await r.json(); } catch (e) { return null; }
       }
       window._activeApiBase = null;
     } catch (e) {
@@ -159,7 +173,15 @@ async function apiFetch(path, options = {}) {
         if (r.status === 204) return null;
         return await r.json();
       }
-      if (r.status >= 200 && r.status < 500) {
+      if (r.status === 401 || r.status === 403) {
+        window._activeApiBase = base;
+        localStorage.setItem('eatpan_active_api', base);
+        localStorage.setItem('eatpan_active_api_time', Date.now().toString());
+        if (rawResponse) return r;
+        try { return await r.json(); } catch (e) { return null; }
+      }
+      // A1 FIX: НЕ считать 401/403 как lastReachable — это auth-ошибка, не рабочий ответ
+      if (r.status >= 200 && r.status < 500 && r.status !== 401 && r.status !== 403) {
         lastReachable = { base, response: r };
       }
     } catch (e) {
@@ -180,11 +202,11 @@ async function apiFetch(path, options = {}) {
     try { return await r.json(); } catch (e) { return null; }
   }
 
-  // Only log error if user is actually authenticated (unauthenticated 403 is expected)
+  // Only activate circuit-breaker for authenticated users — guest 403 is expected
   if (isAuthenticated()) {
     console.error(`API [${path}]: all endpoints unreachable`);
+    _circuitBreaker.failedAt = Date.now();
   }
-  _circuitBreaker.failedAt = Date.now();
   return null;
 }
 
@@ -293,7 +315,11 @@ export const AccountService = {
 // TASKS — Phase 4
 // ============================================================
 export const TaskService = {
-  fetchAll: () => apiFetch('/tasks/'),
+  fetchAll: (params = {}) => {
+    const qs = new URLSearchParams(params);
+    const queryStr = qs.toString();
+    return apiFetch(`/tasks/${queryStr ? '?' + queryStr : ''}`);
+  },
   create: (task) => apiFetch('/tasks/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

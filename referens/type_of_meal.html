@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Категории продуктов</title>
+
+    <!-- Подключение Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Подключение иконок Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Небольшие базовые настройки для плавности */
+        body {
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-white flex items-center justify-center p-8 font-sans">
+
+    <div class="max-w-5xl w-full">
+
+        <h2 class="text-2xl font-bold text-gray-800 mb-8 pl-2">Категории продуктов</h2>
+
+        <!-- Сетка колонок -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-start">
+
+            <!-- Первая колонка (7 элементов) -->
+            <div class="flex flex-col items-start gap-3 w-full">
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-green-100 text-green-700">
+                    <i data-lucide="apple" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Фрукты и овощи</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-blue-100 text-blue-700">
+                    <i data-lucide="milk" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Молочные продукты</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-red-100 text-red-700">
+                    <i data-lucide="beef" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Мясо и птица</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-cyan-100 text-cyan-700">
+                    <i data-lucide="fish" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Рыба и морепродукты</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-amber-100 text-amber-800">
+                    <i data-lucide="croissant" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Выпечка и хлеб</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-orange-100 text-orange-700">
+                    <i data-lucide="package" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Бакалея</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-sky-100 text-sky-700">
+                    <i data-lucide="snowflake" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Заморозка</span>
+                </div>
+
+            </div>
+
+            <!-- Вторая колонка (7 элементов) -->
+            <div class="flex flex-col items-start gap-3 w-full">
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-purple-100 text-purple-700">
+                    <i data-lucide="cup-soda" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Напитки</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-yellow-100 text-yellow-800">
+                    <i data-lucide="cookie" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Снеки и чипсы</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-pink-100 text-pink-700">
+                    <i data-lucide="candy" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Сладости</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-stone-100 text-stone-700">
+                    <i data-lucide="coffee" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Готовые завтраки</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-rose-100 text-rose-700">
+                    <i data-lucide="heart" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Здоровье и красота</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-indigo-100 text-indigo-700">
+                    <i data-lucide="baby" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Детские товары</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-teal-100 text-teal-700">
+                    <i data-lucide="cat" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Зоотовары</span>
+                </div>
+
+            </div>
+
+            <!-- Третья колонка (3 элемента) -->
+            <div class="flex flex-col items-start gap-3 w-full">
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-slate-100 text-slate-700">
+                    <i data-lucide="home" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Для дома</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-emerald-100 text-emerald-700">
+                    <i data-lucide="leaf" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Органика</span>
+                </div>
+
+                <div
+                    class="flex items-center justify-start gap-3 w-fit px-5 py-3 rounded-full cursor-pointer transition-all duration-200 hover:opacity-80 hover:shadow-sm hover:-translate-y-0.5 bg-lime-100 text-lime-700">
+                    <i data-lucide="carrot" class="w-5 h-5" stroke-width="2.5"></i>
+                    <span class="font-semibold text-[15px] tracking-tight">Веганские продукты</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Инициализация иконок Lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

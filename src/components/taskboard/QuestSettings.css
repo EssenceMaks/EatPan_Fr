@@ -2,14 +2,13 @@
    COLUMN 3: QUEST DETAILS
    ======================================= */
 .tb-details-col {
-  background: var(--bg-panel);
-  border: 1px solid #1a3240;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(0, 0, 0, 0.5);
-  padding: 20px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  overflow-y: auto;
+  gap: 10px;
 }
 
 .tb-details-col.empty-state, .tb-details-col .empty-state {
@@ -28,16 +27,16 @@
 
 .tb-detail-row label {
   font-size: 11px;
-  color: var(--text-gold);
+  color: var(--text-accent);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .tb-input {
   width: 100%;
-  background: #0b1a22;
-  border: 1px solid var(--square-border);
-  color: var(--text-main);
+  background: rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-sector);
+  color: var(--text-primary);
   padding: 8px;
   font-size: 14px;
   border-radius: 4px;
@@ -69,8 +68,8 @@ input[type=number].tb-num-input {
 .seamless-input {
   background: transparent;
   border: none;
-  border-bottom: 1px dashed rgba(198, 155, 80, 0.4);
-  color: inherit;
+  border-bottom: 1px dashed rgba(var(--gold-rgb), 0.4);
+  color: var(--text-primary);
   font: inherit;
   text-align: center;
   padding: 0;
@@ -81,17 +80,18 @@ input[type=number].tb-num-input {
 
 .seamless-input:focus,
 .seamless-input:hover {
-  border-bottom: 1px solid var(--border-gold);
-  background: rgba(198, 155, 80, 0.1);
+  border-bottom: 1px solid var(--text-accent);
+  background: rgba(var(--gold-rgb), 0.1);
 }
 
 .seamless-time {
   background: transparent;
   border: none;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
-  color: white;
+  border-bottom: 1px dashed rgba(var(--gold-rgb), 0.4);
+  color: var(--text-accent);
   font-family: inherit;
   font-size: inherit;
+  font-weight: bold;
   outline: none;
   cursor: text;
   padding: 0 2px;
@@ -100,12 +100,11 @@ input[type=number].tb-num-input {
 
 .seamless-time:focus,
 .seamless-time:hover {
-  border-bottom: 1px solid white;
-  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--text-accent);
+  background: rgba(var(--gold-rgb), 0.1);
 }
 
 .seamless-time::-webkit-calendar-picker-indicator {
-  filter: invert(1);
   opacity: 0.5;
   cursor: pointer;
 }
@@ -120,7 +119,7 @@ input[type=number].tb-num-input {
 .tb-setup-label {
   width: 70px;
   font-size: 10px;
-  color: #5c7482;
+  color: var(--text-secondary, #5c7482);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1.2;
@@ -130,14 +129,14 @@ input[type=number].tb-num-input {
   position: relative;
   width: 100%;
   height: 8px;
-  background-color: var(--square-bg);
+  background-color: rgba(0, 0, 0, 0.08);
   border-radius: 4px;
 }
 
 .range-track {
   position: absolute;
   height: 100%;
-  background-color: var(--text-gold);
+  background-color: var(--text-accent);
   border-radius: 4px;
   z-index: 1;
 }
@@ -160,25 +159,22 @@ input[type=number].tb-num-input {
 }
 
 .range-input::-webkit-slider-thumb {
-  height: 18px;
+  height: 16px;
   width: 16px;
-  background-color: transparent;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 34'%3E%3Cpolygon fill='%23c69b50' points='15,0 30,8.5 30,25.5 15,34 0,25.5 0,8.5' /%3E%3Cpolygon fill='%230b1a22' points='15,3 27,10 27,24 15,31 3,24 3,10' /%3E%3Cpolygon fill='%23ecd487' points='15,6 24,11.5 24,22.5 15,28 6,22.5 6,11.5' /%3E%3C/svg%3E");
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 0;
+  background: radial-gradient(circle at 50% 50%, var(--t-color-glare, #298d9e) 0%, var(--t-color-mid, #154c5e) 60%, var(--t-color-bottom, #0d3644) 100%);
+  border: 1px solid var(--text-accent);
+  border-radius: 50%;
   pointer-events: auto;
   -webkit-appearance: none;
   cursor: pointer;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
 }
 
 .single-slider {
   -webkit-appearance: none;
   width: 100%;
   height: 8px;
-  background: var(--square-bg);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   outline: none;
 }
@@ -192,23 +188,19 @@ input[type=number].tb-num-input {
   -webkit-appearance: none;
   appearance: none;
   width: 16px;
-  height: 18px;
-  border-radius: 0;
-  background-color: transparent;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 34'%3E%3Cpolygon fill='%23c69b50' points='15,0 30,8.5 30,25.5 15,34 0,25.5 0,8.5' /%3E%3Cpolygon fill='%230b1a22' points='15,3 27,10 27,24 15,31 3,24 3,10' /%3E%3Cpolygon fill='%23ecd487' points='15,6 24,11.5 24,22.5 15,28 6,22.5 6,11.5' /%3E%3C/svg%3E");
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--text-accent);
+  background: radial-gradient(circle at 50% 50%, var(--t-color-glare, #298d9e) 0%, var(--t-color-mid, #154c5e) 60%, var(--t-color-bottom, #0d3644) 100%);
   cursor: pointer;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
 }
 
 .tb-setup-results {
   margin-top: 20px;
   padding-top: 15px;
-  border-top: 1px solid var(--square-border);
+  border-top: 1px solid var(--border-sector, rgba(0,0,0,0.15));
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--bg-panel);
 }

@@ -233,12 +233,26 @@ export default class TimeList extends Component {
     let globalAssignments = Array.from({ length: 144 }, () => []);
     const questsData = this.props.questsData;
     
+    const activeDate = this.props.currentDateStr;
+
     // Переконатися, що квести знаходяться у правильному DOM-контейнері під час зміни їхньої години
     for (const key in questsData) {
         const task = questsData[key];
         if (task.archived) continue;
         const row = this.element.querySelector(`[id="${key}"]`);
         if (row) {
+            // BUG FIX: Show only tasks for the active date
+            const d = task.due_date;
+            const taskDate = d ? (d.includes('T') ? d.split('T')[0] : d) : null;
+            const cleanActiveDate = activeDate ? (activeDate.includes('T') ? activeDate.split('T')[0] : activeDate) : null;
+
+            if (cleanActiveDate && taskDate !== cleanActiveDate) {
+                row.style.display = 'none';
+                continue;
+            } else {
+                row.style.display = '';
+            }
+            
             const currentLine = row.closest('.time_list_current_line');
             if (currentLine && parseInt(currentLine.dataset.hour) !== task.hour) {
                 const newArea = this.element.querySelector(`.time_list_current_line[data-hour="${task.hour}"] .tasks-area`);
@@ -257,6 +271,12 @@ export default class TimeList extends Component {
     for (const key in questsData) {
         const task = questsData[key];
         if (task.archived) continue;
+
+        const d = task.due_date;
+        const taskDate = d ? (d.includes('T') ? d.split('T')[0] : d) : null;
+        const cleanActiveDate = activeDate ? (activeDate.includes('T') ? activeDate.split('T')[0] : activeDate) : null;
+
+        if (cleanActiveDate && taskDate !== cleanActiveDate) continue;
 
         let startI = task.hour * 6 + Math.floor(task.startM / 10);
         let count = Math.max(1, Math.ceil((task.durH * 60 + task.durM) / 10));

@@ -30,81 +30,81 @@ export default class QuestSettings extends Component {
       container.innerHTML = `
         <div class="tb-sidebar-header">ДЕТАЛІ КВЕСТУ</div>
         
-        <div class="tb-detail-row" style="margin-bottom: 15px;">
-            <label>НАЗВА</label>
-            <input type="text" class="tb-input" id="det-title" value="${quest.title}" style="margin-bottom: 5px;">
-            <textarea class="tb-input" id="det-desc" placeholder="Опис">${quest.desc || ''}</textarea>
-        </div>
-
-        <!-- Слайдер 1: Хвилини ПОЧАТКУ -->
-        <div class="tb-setup-row">
-            <span class="tb-setup-label">Хвилини<br/>(Початок)</span>
-            <div style="flex-grow: 1;">
-               <input type="range" id="rangeStartMin" min="0" max="55" step="5" class="single-slider" />
+            <div class="tb-detail-row" style="margin-bottom: 15px;">
+                <label style="color: var(--text-accent);">НАЗВА</label>
+                <input type="text" class="tb-input" id="det-title" value="${quest.title}" style="margin-bottom: 5px;">
+                <textarea class="tb-input" id="det-desc" placeholder="Опис">${quest.desc || ''}</textarea>
             </div>
-            <div style="width: 45px; display: flex; justify-content: flex-end;">
-               <input type="number" id="inputStartMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 30px; text-align: right; color: var(--text-gold); font-weight: bold; font-size: 13px;" />
-            </div>
-        </div>
 
-        <!-- Слайдер 2: Діапазон ГОДИН -->
-        <div class="tb-setup-row">
-            <span class="tb-setup-label">Години</span>
-            <div style="flex-grow: 1; display: flex; align-items: center;">
-                <div class="range-slider">
-                    <div id="rangeTrack" class="range-track"></div>
-                    <input type="range" id="rangeStartHour" min="0" max="23" step="1" class="range-input" />
-                    <input type="range" id="rangeEndHour" min="0" max="23" step="1" class="range-input" />
+            <!-- Слайдер 1: Хвилини ПОЧАТКУ -->
+            <div class="tb-setup-row">
+                <span class="tb-setup-label">Хвилини<br/>(Початок)</span>
+                <div style="flex-grow: 1;">
+                   <input type="range" id="rangeStartMin" min="0" max="55" step="5" class="single-slider" />
+                </div>
+                <div style="width: 45px; display: flex; justify-content: flex-end;">
+                   <input type="number" id="inputStartMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 30px; text-align: right; color: var(--text-accent); font-weight: bold; font-size: 13px;" />
                 </div>
             </div>
-            <div style="display: flex; align-items: center; justify-content: flex-end; min-width: 85px; color: var(--text-gold); font-weight: bold; font-size: 13px;">
-                <input type="number" id="inputStartHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 20px;" />
-                <span style="font-size: 11px;">:</span><input type="number" id="inputStartMinSec" min="0" max="59" class="seamless-input tb-num-input" style="width: 20px;" />
-                <span style="font-size: 10px; margin: 0 4px;">-</span>
-                <input type="number" id="inputEndHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 20px;" />
-                <span style="font-size: 11px;">:</span><input type="number" id="inputEndMinSec" min="0" max="59" class="seamless-input tb-num-input" style="width: 20px;" />
-            </div>
-        </div>
 
-        <!-- Слайдер 3: Хвилини ЗАКІНЧЕННЯ -->
-        <div class="tb-setup-row" style="margin-bottom: 10px;">
-            <span class="tb-setup-label">Хвилини<br/>(Кінець)</span>
-            <div style="flex-grow: 1;">
-               <input type="range" id="rangeEndMin" min="0" max="55" step="5" class="single-slider" />
+            <!-- Слайдер 2: Діапазон ГОДИН -->
+            <div class="tb-setup-row">
+                <span class="tb-setup-label">Години</span>
+                <div style="flex-grow: 1; display: flex; align-items: center;">
+                    <div class="range-slider">
+                        <div id="rangeTrack" class="range-track"></div>
+                        <input type="range" id="rangeStartHour" min="0" max="23" step="1" class="range-input" />
+                        <input type="range" id="rangeEndHour" min="0" max="23" step="1" class="range-input" />
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: flex-end; min-width: 85px; color: var(--text-accent); font-weight: bold; font-size: 13px;">
+                    <input type="number" id="inputStartHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 20px;" />
+                    <span style="font-size: 11px;">:</span><input type="number" id="inputStartMinSec" min="0" max="59" class="seamless-input tb-num-input" style="width: 20px;" />
+                    <span style="font-size: 10px; margin: 0 4px;">-</span>
+                    <input type="number" id="inputEndHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 20px;" />
+                    <span style="font-size: 11px;">:</span><input type="number" id="inputEndMinSec" min="0" max="59" class="seamless-input tb-num-input" style="width: 20px;" />
+                </div>
             </div>
-            <div style="width: 45px; display: flex; justify-content: flex-end;">
-               <input type="number" id="inputEndMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 30px; text-align: right; color: var(--text-gold); font-weight: bold; font-size: 13px;" />
-            </div>
-        </div>
 
-        <!-- Результати -->
-        <div class="tb-setup-results">
-            <div>
-               <div style="font-size: 9px; color: #5c7482; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Час квесту</div>
-               <div style="color: var(--text-gold); font-family: 'Cinzel', serif; font-size: 16px; font-weight: bold; display: flex; align-items: baseline;">
-                  <input type="number" id="manualStartHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 28px; text-align: right; color: var(--text-gold); margin: 0; padding: 0" />:
-                  <input type="number" id="manualStartMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 28px; text-align: left; color: var(--text-gold); margin: 0; padding: 0" />
-                  <span style="margin: 0 5px;">-</span>
-                  <input type="number" id="manualEndHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 28px; text-align: right; color: var(--text-gold); margin: 0; padding: 0" />:
-                  <input type="number" id="manualEndMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 28px; text-align: left; color: var(--text-gold); margin: 0; padding: 0" />
-               </div>
+            <!-- Слайдер 3: Хвилини ЗАКІНЧЕННЯ -->
+            <div class="tb-setup-row" style="margin-bottom: 10px;">
+                <span class="tb-setup-label">Хвилини<br/>(Кінець)</span>
+                <div style="flex-grow: 1;">
+                   <input type="range" id="rangeEndMin" min="0" max="55" step="5" class="single-slider" />
+                </div>
+                <div style="width: 45px; display: flex; justify-content: flex-end;">
+                   <input type="number" id="inputEndMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 30px; text-align: right; color: var(--text-accent); font-weight: bold; font-size: 13px;" />
+                </div>
             </div>
-            <div style="text-align: right;">
-               <div style="font-size: 9px; color: #5c7482; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Тривалість</div>
-               <div style="color: white; font-family: 'Cinzel', serif; font-size: 16px; display: inline-flex; align-items: baseline;">
-                  <span id="durHourWrapper"><input type="number" id="inputDurHour" min="0" max="24" class="seamless-input tb-num-input" style="width: 25px; text-align: right; color: white;" /> год</span>
-                  <input type="number" id="inputDurMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 25px; text-align: right; color: white; margin-left: 5px;" /> хв
-               </div>
+
+            <!-- Результати -->
+            <div class="tb-setup-results">
+                <div>
+                   <div style="font-size: 9px; color: #5c7482; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Час квесту</div>
+                   <div style="color: var(--text-accent); font-family: 'Cinzel', serif; font-size: 16px; font-weight: bold; display: flex; align-items: baseline;">
+                      <input type="number" id="manualStartHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 28px; text-align: right; color: var(--text-accent); margin: 0; padding: 0" />:
+                      <input type="number" id="manualStartMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 28px; text-align: left; color: var(--text-accent); margin: 0; padding: 0" />
+                      <span style="margin: 0 5px;">-</span>
+                      <input type="number" id="manualEndHour" min="0" max="23" class="seamless-input tb-num-input" style="width: 28px; text-align: right; color: var(--text-accent); margin: 0; padding: 0" />:
+                      <input type="number" id="manualEndMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 28px; text-align: left; color: var(--text-accent); margin: 0; padding: 0" />
+                   </div>
+                </div>
+                <div style="text-align: right;">
+                   <div style="font-size: 9px; color: #5c7482; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Тривалість</div>
+                   <div style="color: var(--text-accent); font-family: 'Cinzel', serif; font-size: 16px; display: inline-flex; align-items: baseline;">
+                      <span id="durHourWrapper"><input type="number" id="inputDurHour" min="0" max="24" class="seamless-input tb-num-input" style="width: 25px; text-align: right; color: var(--text-accent);" /> год</span>
+                      <input type="number" id="inputDurMin" min="0" max="59" class="seamless-input tb-num-input" style="width: 25px; text-align: right; color: var(--text-accent); margin-left: 5px;" /> хв
+                   </div>
+                </div>
             </div>
-        </div>
-        
-        <div class="tb-detail-row" style="margin-top: 10px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <label>КОЛІР КВЕСТУ</label>
-                <div id="det-current-color" style="width: 14px; height: 14px; border-radius: 2px; background: ${quest.color}; border: 1px solid var(--gold-dark); box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>
+            
+            <div class="tb-detail-row" style="margin-top: 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label>КОЛІР КВЕСТУ</label>
+                    <div id="det-current-color" style="width: 14px; height: 14px; border-radius: 2px; background: ${quest.color}; border: 1px solid var(--gold-dark); box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>
+                </div>
+                <div id="palette-mount" style="padding: 10px 0;"></div>
             </div>
-            <div id="palette-mount" style="padding: 10px 0;"></div>
-        </div>
       `;
 
       const paletteMount = container.querySelector('#palette-mount');
@@ -179,7 +179,7 @@ export default class QuestSettings extends Component {
           durHourWrapper: container.querySelector('#durHourWrapper')
       };
 
-      const updateUI = () => {
+      const updateUI = (skipNotify = false) => {
           if(state.endH < state.startH || (state.endH === state.startH && state.endM < state.startM)) {
               state.endH = state.startH;
               state.endM = state.startM;
@@ -236,15 +236,20 @@ export default class QuestSettings extends Component {
           if(document.activeElement !== els.inputDurMin || parseInt(els.inputDurMin.value) >= 60) els.inputDurMin.value = dM;
           if(els.durHourWrapper) els.durHourWrapper.style.display = (dH === 0) ? 'none' : 'inline';
 
-          this.updateQuest({
-             hour: state.startH,
-             startM: state.startM,
-             durH: dH,
-             durM: dM
-          });
+          // CRITICAL FIX: НЕ вызываем updateQuest при первоначальной синхронизации UI,
+          // иначе возникает бесконечный цикл: updateUI → updateQuest → onUpdate → _refreshAll → renderDetails → updateUI ...
+          if (!skipNotify) {
+              this.updateQuest({
+                 hour: state.startH,
+                 startM: state.startM,
+                 durH: dH,
+                 durM: dM
+              });
+          }
       };
 
-      updateUI();
+      // Первый вызов — только синхронизация UI без уведомления (skipNotify = true)
+      updateUI(true);
 
       els.rangeStartHour.addEventListener('input', (e) => {
           state.startH = parseInt(e.target.value);

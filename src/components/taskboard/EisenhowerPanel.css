@@ -54,8 +54,8 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-main);
-  opacity: 0.6;
+  color: #e2e8f0;
+  opacity: 0.9;
   margin-bottom: 4px;
   white-space: nowrap;
 }
@@ -152,8 +152,8 @@
   font-size: 0.55rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: var(--text-main);
-  opacity: 0.4;
+  color: var(--text-gold);
+  opacity: 0.8;
   margin-bottom: 4px;
 }
 

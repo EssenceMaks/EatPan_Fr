@@ -1,6 +1,6 @@
 import Component from '../../core/Component.js';
 import { supabase } from '../../core/supabaseClient.js';
-import { TaskService } from '../../core/ApiClient.js';
+import { TaskService, ProfileService, resetCircuitBreaker, invalidateSessionCache } from '../../core/ApiClient.js';
 import TimeList from './TimeList.js';
 import QuestList from './QuestList.js';
 import QuestSettings from './QuestSettings.js';
@@ -36,13 +36,138 @@ export default class TaskBoard extends Component {
 
   async onMount() {
     const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user?.id) this.state.userId = session.user.id;
-    await this.loadState();
+    if (session?.user?.id) {
+      this.state.userId = session.user.id;
+      await this.loadState();
+    }
+
+    // Always init UI components (skeleton visible even without auth)
     this._initTopBar();
     this._initDayNav();
     await this.initTimeList();
     await this.initQuestList();
     await this.initRightPanel();
+    
+    if (this.state.userId) {
+      this._initBlocksDragAndDrop();
+      await this._loadLayoutOrder();
+    }
+
+    // BUG-1 fix: слушаем смену auth-состояния (логин/логаут)
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const newUserId = session?.user?.id || null;
+      const oldUserId = this.state.userId;
+
+      if (newUserId !== oldUserId) {
+        this.state.userId = newUserId;
+        invalidateSessionCache();
+        resetCircuitBreaker();
+        
+        if ((oldUserId && !newUserId) || (!oldUserId && newUserId)) {
+          console.log(`%c[TaskBoard] Auth transition → ${event}, full update!`, 'color:#4ade80');
+          this.update();
+        } else {
+          await this.loadState();
+          this._refreshAll();
+          console.log(`%c[TaskBoard] Auth changed → ${event}, userId: ${newUserId || 'guest'}`, 'color:#4ade80');
+        }
+      }
+    });
+
+    this.authSubscription = authListener.subscription;
+  }
+
+  onDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
+
+  // ============================================
+  // DRAG AND DROP BLOCKS
+  // ============================================
+  _initBlocksDragAndDrop() {
+    const container = this.$('#quests-container');
+    if (!container) return;
+
+    let draggedBlock = null;
+
+    container.addEventListener('dragstart', (e) => {
+      // Don't hijack task drag and drop
+      if (e.target.closest('.tb-list-item') || e.target.closest('.task-item')) return;
+      
+      const block = e.target.closest('.tb-quest-block');
+      if (block) {
+        draggedBlock = block;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('block-drag', 'true');
+        setTimeout(() => draggedBlock.classList.add('dragging-block'), 0);
+      }
+    });
+
+    container.addEventListener('dragover', (e) => {
+      if (!draggedBlock) return;
+      e.preventDefault();
+      const afterElement = this._getDragAfterElement(container, e.clientY);
+      if (afterElement == null) {
+        container.appendChild(draggedBlock);
+      } else {
+        container.insertBefore(draggedBlock, afterElement);
+      }
+    });
+
+    container.addEventListener('dragend', (e) => {
+      if (draggedBlock) {
+        draggedBlock.classList.remove('dragging-block');
+        draggedBlock = null;
+        this._saveLayoutOrder();
+      }
+    });
+  }
+
+  _getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.tb-quest-block:not(.dragging-block)')];
+    return draggableElements.reduce((closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset: offset, element: child };
+      } else {
+        return closest;
+      }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+  }
+
+  async _saveLayoutOrder() {
+    const container = this.$('#quests-container');
+    if (!container) return;
+    const blocks = container.querySelectorAll('.tb-quest-block');
+    const order = Array.from(blocks).map(b => b.dataset.blockId);
+    
+    try {
+      const profile = await ProfileService.getMe();
+      if (profile) {
+        const settings = profile.settings || {};
+        settings.taskboard_layout = order;
+        await ProfileService.updateMe({ settings });
+      }
+    } catch(e) { console.error("Failed to save layout order", e); }
+  }
+
+  async _loadLayoutOrder() {
+    try {
+      const profile = await ProfileService.getMe();
+      if (profile && profile.settings && profile.settings.taskboard_layout) {
+        const order = profile.settings.taskboard_layout;
+        const container = this.$('#quests-container');
+        if (container && order.length > 0) {
+          order.forEach(blockId => {
+            const block = container.querySelector(`[data-block-id="${blockId}"]`);
+            if (block) container.appendChild(block);
+          });
+        }
+      }
+    } catch(e) { console.error("Failed to load layout order", e); }
   }
 
   // ============================================
@@ -84,7 +209,7 @@ export default class TaskBoard extends Component {
 
         <!-- BODY: 3 columns -->
         <div class="tb-body">
-          <!-- COL 1: Day nav + Timeline -->
+          <!-- COL 1: Timeline -->
           <div class="tb-col-timeline">
             <div class="tb-day-strip" id="day-strip">
               <button class="dn-arrow" data-action="prev-week">
@@ -99,11 +224,18 @@ export default class TaskBoard extends Component {
           </div>
 
           <!-- COL 2: Quest List -->
-          <div id="col-questlist" class="tb-col-quests"></div>
+          <div class="tb-col-quests" id="quests-container">
+            <div id="col-quests-today" class="tb-quest-block" draggable="true" data-block-id="today"></div>
+            <div id="col-quests-all" class="tb-quest-block" draggable="true" data-block-id="all"></div>
+            <div id="col-quests-tomorrow" class="tb-quest-block" draggable="true" data-block-id="tomorrow"></div>
+          </div>
 
-          <!-- COL 3: Right Panel -->
+          <!-- COL 3: Right Panel (always Eisenhower + Calendar) -->
           <div id="col-right-panel" class="tb-col-right"></div>
         </div>
+
+        <!-- Floating Quest Details Popover -->
+        <div id="quest-popover" class="quest-popover hidden"></div>
       </div>
     `;
   }
@@ -161,6 +293,13 @@ export default class TaskBoard extends Component {
       if (dayEl) {
         this.state.currentDate = new Date(dayEl.dataset.date);
         this._refreshDayStrip();
+        
+        // Оновлюємо таймлайн одразу при кліку
+        if (this.timeList) {
+          this.timeList.props.currentDateStr = dayEl.dataset.date;
+          this.timeList.refreshCells();
+        }
+        
         return;
       }
       const arrow = e.target.closest('.dn-arrow');
@@ -168,10 +307,15 @@ export default class TaskBoard extends Component {
       const delta = arrow.dataset.action === 'prev-week' ? -7 : 7;
       this.state.currentDate.setDate(this.state.currentDate.getDate() + delta);
       this._refreshDayStrip();
+      
+      if (this.timeList) {
+        this.timeList.props.currentDateStr = this.state.currentDate.toISOString().split('T')[0];
+        this.timeList.refreshCells();
+      }
     });
   }
 
-  _refreshDayStrip() {
+  async _refreshDayStrip() {
     const strip = this.$('#day-strip');
     if (!strip) return;
     const days = this._getWeekDays();
@@ -193,6 +337,10 @@ export default class TaskBoard extends Component {
       this.miniCalendar.props.currentDate = this.state.currentDate;
       this.miniCalendar.update();
     }
+
+    // BUG-3 fix: перезагрузка квестов при смене дня
+    await this.loadState();
+    this._refreshAll();
   }
 
   // ============================================
@@ -202,6 +350,7 @@ export default class TaskBoard extends Component {
     this.timeList = new TimeList({
       questsData: this.state.questsData,
       activeQuestId: this.state.activeQuestId,
+      currentDateStr: this.state.currentDate.toISOString().split('T')[0],
       onCreate: async (hour, startM, durH, durM) => {
         const tempId = 'quest-' + Date.now() + Math.random().toString(36).substring(2, 5);
         const currentDateStr = this.state.currentDate.toISOString().split('T')[0];
@@ -289,12 +438,63 @@ export default class TaskBoard extends Component {
   }
 
   async initQuestList() {
-    this.questList = new QuestList({
+    // BUG FIX: Quests Today/Tomorrow should always be the REAL physical today/tomorrow,
+    // not the currentDate selected in the day strip (which only controls the Timeline)
+    const realToday = new Date();
+    const todayStr = realToday.toISOString().split('T')[0];
+    
+    const realTomorrow = new Date(realToday);
+    realTomorrow.setDate(realTomorrow.getDate() + 1);
+    const tomorrowStr = realTomorrow.toISOString().split('T')[0];
+
+    const deleteHandler = (taskId) => {
+      delete this.state.questsData[taskId];
+      if (this.state.activeQuestId === taskId) this._hideQuestPopover();
+      // Remove DOM element from timeline
+      const row = this.element.querySelector(`[id="${taskId}"]`);
+      if (row) row.remove();
+      this._refreshAll();
+      if (!taskId.startsWith('quest-')) TaskService.delete(taskId).catch(e=>e);
+    };
+
+    this.questListToday = new QuestList({
+      title: 'КВЕСТИ НА СЬОГОДНІ',
       questsData: this.state.questsData,
       activeQuestId: this.state.activeQuestId,
-      onSelect: (taskId) => this.setActiveQuest(taskId)
+      filterFn: (id, q) => {
+        const d = q.due_date;
+        const dStr = d ? (d.includes('T') ? d.split('T')[0] : d) : null;
+        return dStr === todayStr;
+      },
+      onSelect: (taskId) => this.setActiveQuest(taskId),
+      onDelete: deleteHandler
     });
-    await this.questList.render(this.$('#col-questlist'), 'innerHTML');
+    
+    this.questListAll = new QuestList({
+      title: 'ВСІ КВЕСТИ',
+      questsData: this.state.questsData,
+      activeQuestId: this.state.activeQuestId,
+      filterFn: (id, q) => true,
+      onSelect: (taskId) => this.setActiveQuest(taskId),
+      onDelete: deleteHandler
+    });
+
+    this.questListTomorrow = new QuestList({
+      title: 'НА НАСТУПНИЙ ДЕНЬ',
+      questsData: this.state.questsData,
+      activeQuestId: this.state.activeQuestId,
+      filterFn: (id, q) => {
+        const d = q.due_date;
+        const dStr = d ? (d.includes('T') ? d.split('T')[0] : d) : null;
+        return dStr === tomorrowStr;
+      },
+      onSelect: (taskId) => this.setActiveQuest(taskId),
+      onDelete: deleteHandler
+    });
+
+    await this.questListToday.render(this.$('#col-quests-today'), 'innerHTML');
+    await this.questListAll.render(this.$('#col-quests-all'), 'innerHTML');
+    await this.questListTomorrow.render(this.$('#col-quests-tomorrow'), 'innerHTML');
   }
 
   async initRightPanel() {
@@ -317,7 +517,7 @@ export default class TaskBoard extends Component {
       onDropToQuadrant: (taskId, quadrant) => {
         if (this.state.questsData[taskId]) {
           this.state.questsData[taskId].quadrant = quadrant;
-          this.eisenhowerPanel.refresh();
+          this._refreshAll();
           if (!taskId.startsWith('quest-')) TaskService.update(taskId, { quadrant }).catch(e=>e);
         }
       },
@@ -339,7 +539,7 @@ export default class TaskBoard extends Component {
   }
 
   // ============================================
-  // RIGHT PANEL TOGGLE
+  // RIGHT PANEL — always shows Eisenhower + Calendar
   // ============================================
   async _showEisenhowerPanel() {
     this.state.rightPanelMode = 'eisenhower';
@@ -357,62 +557,124 @@ export default class TaskBoard extends Component {
     await this.miniCalendar.render(cWrap, 'innerHTML');
   }
 
-  async _showDetailsPanel() {
-    this.state.rightPanelMode = 'details';
-    const c = this.$('#col-right-panel');
-    if (!c) return;
-    c.innerHTML = '';
-    // Back button
-    const back = document.createElement('div');
-    back.className = 'rp-back';
-    back.innerHTML = `<i data-lucide="arrow-left" style="width:12px;height:12px;"></i> Пріоритети`;
-    back.addEventListener('click', () => this._showEisenhowerPanel());
-    c.appendChild(back);
-    if (window.lucide) lucide.createIcons({ root: back });
-    // Settings
-    const sWrap = document.createElement('div');
-    sWrap.className = 'rp-settings-wrap';
-    c.appendChild(sWrap);
-    this.questSettings.props.activeQuestId = this.state.activeQuestId;
-    await this.questSettings.render(sWrap, 'innerHTML');
+  // ============================================
+  // QUEST POPOVER — floating details overlay
+  // ============================================
+  async _showQuestPopover(taskId) {
+    const popover = this.$('#quest-popover');
+    if (!popover) return;
+
+    this.questSettings.props.activeQuestId = taskId;
+    popover.innerHTML = '';
+    popover.classList.remove('hidden');
+
+    // Render QuestSettings inside popover
+    await this.questSettings.render(popover, 'innerHTML');
+
+    // Position: fixed to right side of the quests column
+    const questsCol = this.$('.tb-col-quests');
+    if (questsCol) {
+      const rect = questsCol.getBoundingClientRect();
+      popover.style.top = rect.top + 'px';
+      popover.style.left = (rect.right + 8) + 'px';
+      // Ensure it doesn't go off-screen
+      const popRect = popover.getBoundingClientRect();
+      if (popRect.right > window.innerWidth - 10) {
+        popover.style.left = (rect.left - popover.offsetWidth - 8) + 'px';
+      }
+      if (popRect.bottom > window.innerHeight - 10) {
+        popover.style.top = Math.max(10, window.innerHeight - popover.offsetHeight - 10) + 'px';
+      }
+    }
+
+    // Outside click to close
+    const closeHandler = (e) => {
+      if (!popover.contains(e.target) && !e.target.closest('.tb-list-item') && !e.target.closest('.task-item') && !e.target.closest('.eq-chip')) {
+        this._hideQuestPopover();
+        document.removeEventListener('mousedown', closeHandler);
+      }
+    };
+    // Delay to avoid immediate close from the same click
+    setTimeout(() => document.addEventListener('mousedown', closeHandler), 50);
+  }
+
+  _hideQuestPopover() {
+    const popover = this.$('#quest-popover');
+    if (popover) {
+      popover.classList.add('hidden');
+      popover.innerHTML = '';
+    }
+    this.state.activeQuestId = null;
+    // Update highlights
+    if (this.timeList) {
+      this.timeList.props.activeQuestId = null;
+      this.timeList.updateActiveQuestHighlight();
+    }
+    if (this.questListToday) {
+      this.questListToday.props.activeQuestId = null;
+      this.questListToday.refreshList();
+    }
+    if (this.questListAll) {
+      this.questListAll.props.activeQuestId = null;
+      this.questListAll.refreshList();
+    }
+    if (this.questListTomorrow) {
+      this.questListTomorrow.props.activeQuestId = null;
+      this.questListTomorrow.refreshList();
+    }
   }
 
   // ============================================
   // ORCHESTRATION
   // ============================================
-  setActiveQuest(taskId) {
+  async setActiveQuest(taskId) {
     this.state.activeQuestId = taskId;
     if (this.timeList) {
       this.timeList.props.activeQuestId = taskId;
       this.timeList.updateActiveQuestHighlight();
     }
-    if (this.questList) {
-      this.questList.props.activeQuestId = taskId;
-      this.questList.refreshList();
+    if (this.questListToday) {
+      this.questListToday.props.activeQuestId = taskId;
+      this.questListToday.refreshList();
     }
-    // Switch right panel based on selection
+    if (this.questListAll) {
+      this.questListAll.props.activeQuestId = taskId;
+      this.questListAll.refreshList();
+    }
+    if (this.questListTomorrow) {
+      this.questListTomorrow.props.activeQuestId = taskId;
+      this.questListTomorrow.refreshList();
+    }
+    // Show floating popover instead of replacing the right panel
     if (taskId) {
-      if (this.state.rightPanelMode === 'details' && this.questSettings && this.questSettings._mounted) {
-        // Already in details mode — just refresh
-        this.questSettings.props.activeQuestId = taskId;
-        this.questSettings.renderDetails();
-      } else {
-        // Switch from Eisenhower to Details
-        this._showDetailsPanel();
-      }
+      await this._showQuestPopover(taskId);
     } else {
-      // No quest selected — go back to Eisenhower
-      if (this.state.rightPanelMode === 'details') {
-        this._showEisenhowerPanel();
-      }
+      this._hideQuestPopover();
     }
   }
 
   _refreshAll() {
-    if (this.timeList) this.timeList.refreshCells();
-    if (this.questList) this.questList.refreshList();
-    if (this.eisenhowerPanel) this.eisenhowerPanel.refresh();
-    if (this.state.rightPanelMode === 'details' && this.questSettings) this.questSettings.renderDetails();
+    // Sync live data references to all child components
+    if (this.timeList) {
+      this.timeList.props.questsData = this.state.questsData;
+      this.timeList.refreshCells();
+    }
+    if (this.questListToday) {
+      this.questListToday.props.questsData = this.state.questsData;
+      this.questListToday.refreshList();
+    }
+    if (this.questListAll) {
+      this.questListAll.props.questsData = this.state.questsData;
+      this.questListAll.refreshList();
+    }
+    if (this.questListTomorrow) {
+      this.questListTomorrow.props.questsData = this.state.questsData;
+      this.questListTomorrow.refreshList();
+    }
+    if (this.eisenhowerPanel) {
+      this.eisenhowerPanel.props.questsData = this.state.questsData;
+      this.eisenhowerPanel.refresh();
+    }
   }
 
   // ============================================
@@ -420,6 +682,8 @@ export default class TaskBoard extends Component {
   // ============================================
   async loadState() {
     try {
+      const currentDateStr = this.state.currentDate.toISOString().split('T')[0];
+      // Fetch ALL tasks so we can show them in "All Quests" and filter locally
       const data = await TaskService.fetchAll();
       if (data) {
         this.state.questsData = data.items || {};
@@ -436,7 +700,7 @@ export default class TaskBoard extends Component {
           if (!q.subtype) q.subtype = '';
           if (q.quadrant === undefined) q.quadrant = null;
           if (q.lane === undefined) q.lane = 0;
-          if (!q.due_date) q.due_date = '';
+          if (!q.due_date) q.due_date = currentDateStr;
         }
         this.state.questCounter = Object.keys(this.state.questsData).length + 1;
       }

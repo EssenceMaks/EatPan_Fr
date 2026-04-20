@@ -8,7 +8,7 @@ export default class QuestList extends Component {
   async template() {
     return `
       <div class="tb-questlist-col">
-        <div class="tb-sidebar-header">КВЕСТИ НА ДЕНЬ</div>
+        <div class="tb-sidebar-header">${this.props.title || 'КВЕСТИ НА ДЕНЬ'}</div>
         <div class="tb-list-container" id="quest-list-container">
            <!-- Quests injected here via JS -->
         </div>
@@ -21,6 +21,23 @@ export default class QuestList extends Component {
     
     // Делегування кліків
     this.element.addEventListener('click', (e) => {
+       // Check action buttons first
+       const actionBtn = e.target.closest('.tb-list-action');
+       if (actionBtn) {
+           e.stopPropagation();
+           const row = actionBtn.closest('.tb-list-item');
+           const taskId = row?.dataset.taskId;
+           if (!taskId) return;
+           
+           const action = actionBtn.dataset.action;
+           if (action === 'delete' && this.props.onDelete) {
+               if (confirm('Видалити квест?')) this.props.onDelete(taskId);
+           } else if (action === 'edit' && this.props.onSelect) {
+               this.props.onSelect(taskId);
+           }
+           return;
+       }
+       
        const row = e.target.closest('.tb-list-item');
        if (row && row.dataset.taskId) {
            if (this.props.onSelect) this.props.onSelect(row.dataset.taskId);
@@ -36,10 +53,13 @@ export default class QuestList extends Component {
     
     listContainer.innerHTML = '';
     
-    // Сортування квестів у хронологічному порядку
-    const sorted = Object.entries(this.props.questsData)
-        .filter(([_, q]) => !q.archived)
-        .sort((a, b) => {
+    // Сортування та фільтрація квестів
+    let entries = Object.entries(this.props.questsData).filter(([_, q]) => !q.archived);
+    if (this.props.filterFn) {
+        entries = entries.filter(([id, q]) => this.props.filterFn(id, q));
+    }
+    
+    const sorted = entries.sort((a, b) => {
             let aMin = a[1].hour * 60 + a[1].startM;
             let bMin = b[1].hour * 60 + b[1].startM;
             return aMin - bMin;
@@ -50,11 +70,21 @@ export default class QuestList extends Component {
         item.className = `tb-list-item ${this.props.activeQuestId === taskId ? 'active' : ''}`;
         item.dataset.taskId = taskId;
         
+        // BUG-4 fix: drag-and-drop в Eisenhower квадранты
+        item.draggable = true;
+        item.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', taskId);
+          e.dataTransfer.effectAllowed = 'move';
+          item.classList.add('dragging');
+        });
+        item.addEventListener('dragend', () => item.classList.remove('dragging'));
+
         const dot = document.createElement('div');
         dot.className = 'tb-list-color-dot';
         dot.style.backgroundColor = quest.color;
         
         const text = document.createElement('span');
+        text.className = 'tb-list-item-title';
         text.textContent = quest.title || 'Новий квест';
         
         // Закреслення, якщо виконано
@@ -64,8 +94,17 @@ export default class QuestList extends Component {
             dot.style.backgroundColor = '#3b4d56';
         }
 
+        // Hover actions
+        const actions = document.createElement('div');
+        actions.className = 'tb-list-actions';
+        actions.innerHTML = `
+          <span class="tb-list-action" data-action="edit" title="Редагувати">✏️</span>
+          <span class="tb-list-action" data-action="delete" title="Видалити">🗑️</span>
+        `;
+
         item.appendChild(dot);
         item.appendChild(text);
+        item.appendChild(actions);
         
         listContainer.appendChild(item);
     });

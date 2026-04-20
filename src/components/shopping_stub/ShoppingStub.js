@@ -16,17 +16,17 @@ export default class ShoppingStub extends Component {
 
   async template() {
     return `
-      <div class="stub-sector-root" style="padding:16px; height:100%; overflow-y:auto; font-family:var(--font-body, sans-serif);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="font-family:var(--font-title);color:var(--text-accent);font-size:1.2rem;margin:0;">
-            <i data-lucide="list-todo" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;"></i>
+      <div class="stub-sector-root" style="padding:24px; height:100%; overflow-y:auto; font-family:var(--font-body, 'EB Garamond', serif); background-color: var(--bg-parchment, #f4e8d1); color: var(--c-ink-primary, #2c1b18); background-image: var(--parchment-texture); box-sizing: border-box;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px; border-bottom: 2px solid var(--c-ink-light, #d2b48c); padding-bottom: 12px;">
+          <h2 style="font-family:var(--font-title, 'Cinzel', serif);color:var(--c-accent-gold, #b8860b);font-size:1.8rem;margin:0; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
+            <i data-lucide="list-todo" style="width:28px;height:28px;vertical-align:middle;margin-right:10px;"></i>
             Списки покупок
           </h2>
-          <button class="stub-btn stub-btn--primary" data-action="refresh">
-            <i data-lucide="refresh-cw" style="width:12px;height:12px;"></i> Оновити
+          <button class="stub-btn" data-action="refresh" style="background:var(--c-ink-primary); color:var(--bg-parchment); border:1px solid var(--c-accent-gold); padding:8px 16px; font-family:var(--font-title); border-radius:4px; cursor:pointer;">
+            <i data-lucide="refresh-cw" style="width:16px;height:16px; vertical-align: middle;"></i> Оновити
           </button>
         </div>
-        <div id="shopping-content"><div class="stub-loading">Завантаження...</div></div>
+        <div id="shopping-content"><div style="text-align:center; font-style:italic; padding: 40px; color: var(--c-ink-light);">Завантаження...</div></div>
       </div>
     `;
   }
@@ -57,42 +57,38 @@ export default class ShoppingStub extends Component {
     const entries = Object.entries(lists);
 
     return `
-      <div class="stub-section">
-        <div class="stub-section__title"><i data-lucide="shopping-cart"></i> Мої списки (${entries.length})</div>
-        ${entries.length === 0
-          ? '<div class="stub-loading">Створіть перший список</div>'
-          : entries.map(([id, lst]) => `
-            <div class="stub-row" style="cursor:pointer;" data-action="select-list" data-id="${id}">
-              <span>
-                <strong>${lst.name}</strong>
-                <span style="opacity:0.5;font-size:0.75rem;margin-left:6px;">${lst.remaining || 0}/${lst.total_items || 0}</span>
-              </span>
-              <div style="display:flex;gap:4px;">
-                <button class="stub-btn" data-action="edit-list" data-id="${id}" style="font-size:0.65rem;">Ред.</button>
-                <button class="stub-btn stub-btn--danger" data-action="delete-list" data-id="${id}" style="font-size:0.65rem;">✕</button>
+      <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px; max-width: 1200px; margin: 0 auto;">
+          <div style="display:flex; flex-direction:column; gap: 24px;">
+              <div class="stub-section" style="background: rgba(255,255,255,0.4); border: 1px solid var(--c-ink-light); border-radius: 8px; padding: 20px;">
+                <div style="font-family: var(--font-title); font-size: 1.4rem; color: var(--c-ink-primary); border-bottom: 1px solid var(--c-ink-light); margin-bottom: 16px; padding-bottom: 8px;"><i data-lucide="shopping-cart"></i> Мої списки (${entries.length})</div>
+                ${entries.length === 0
+                  ? '<div style="font-style:italic; color:var(--c-ink-light);">Створіть перший список</div>'
+                  : entries.map(([id, lst]) => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 8px; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.1); border-radius: 4px; margin-bottom: 8px; cursor:pointer;" data-action="select-list" data-id="${id}">
+                      <span>
+                        <strong style="font-size: 1.1rem; color: ${this.activeList === id ? 'var(--c-accent-gold)' : 'var(--c-ink-primary)'}">${lst.name}</strong>
+                        <span style="opacity:0.7;font-size:0.9rem;margin-left:8px; font-style:italic;">${lst.remaining || 0}/${lst.total_items || 0}</span>
+                      </span>
+                      <div style="display:flex;gap:4px;">
+                        <button data-action="edit-list" data-id="${id}" style="background:transparent; border:1px solid var(--c-ink-primary); color:var(--c-ink-primary); cursor:pointer; padding: 4px 8px; border-radius: 4px;">Ред.</button>
+                        <button data-action="delete-list" data-id="${id}" style="background:transparent; border:1px solid #8b0000; color:#8b0000; cursor:pointer; padding: 4px 8px; border-radius: 4px;">✕</button>
+                      </div>
+                    </div>
+                  `).join('')}
               </div>
-            </div>
-          `).join('')}
-      </div>
 
-      <div class="stub-section">
-        <div class="stub-section__title"><i data-lucide="plus-circle"></i> Новий список</div>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <input class="stub-input" id="shopping-list-name" placeholder="Назва списку..." style="max-width:200px;" />
-          <button class="stub-btn stub-btn--primary" data-action="create-list">Створити</button>
-        </div>
-      </div>
-
-      ${this.activeList ? this._renderActiveList() : ''}
-
-      <div class="stub-section">
-        <div class="stub-section__title"><i data-lucide="plus"></i> Додати товар у список</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-          <input class="stub-input" id="item-list-uuid" placeholder="UUID списку..." style="max-width:280px;" value="${this.activeList || ''}" />
-          <input class="stub-input" id="item-name" placeholder="Назва товару..." style="max-width:140px;" />
-          <input class="stub-input" id="item-qty" type="number" value="1" style="max-width:50px;" />
-          <button class="stub-btn stub-btn--primary" data-action="add-item">Додати</button>
-        </div>
+              <div class="stub-section" style="background: rgba(255,255,255,0.4); border: 1px solid var(--c-ink-light); border-radius: 8px; padding: 20px;">
+                <div style="font-family: var(--font-title); font-size: 1.4rem; color: var(--c-ink-primary); border-bottom: 1px solid var(--c-ink-light); margin-bottom: 16px; padding-bottom: 8px;"><i data-lucide="plus-circle"></i> Новий список</div>
+                <div style="display:flex;gap:12px;flex-direction:column;">
+                  <input id="shopping-list-name" placeholder="Назва списку..." style="padding: 8px; border: 1px solid var(--c-ink-light); background: var(--bg-parchment); font-family: var(--font-body); font-size: 1rem; color: var(--c-ink-primary); border-radius: 4px;" />
+                  <button data-action="create-list" style="background:var(--c-ink-primary); color:var(--bg-parchment); border:1px solid var(--c-accent-gold); padding:10px 16px; font-family:var(--font-title); border-radius:4px; cursor:pointer; font-size: 1.1rem; width: 100%;">Створити Список</button>
+                </div>
+              </div>
+          </div>
+          
+          <div>
+              ${this.activeList ? this._renderActiveList() : '<div style="text-align:center; padding: 40px; color: var(--c-ink-light); font-style:italic;">Оберіть список для перегляду</div>'}
+          </div>
       </div>
     `;
   }
@@ -103,21 +99,32 @@ export default class ShoppingStub extends Component {
     const itemEntries = Object.entries(items);
 
     return `
-      <div class="stub-section" style="border-left:3px solid var(--accent-primary, #8b4513);">
-        <div class="stub-section__title"><i data-lucide="list"></i> Товари списку: ${listData.name || ''}</div>
-        ${itemEntries.length === 0 ? '<div class="stub-loading">Список порожній</div>' : ''}
-        ${itemEntries.map(([id, item]) => `
-            <div class="stub-row">
-              <span>
-                <input type="checkbox" ${item.purchased ? 'checked' : ''} data-action="toggle-item" data-listid="${this.activeList}" data-id="${id}">
-                <span style="${item.purchased ? 'text-decoration:line-through;opacity:0.6;' : ''}">${item.name} (${item.quantity})</span>
-              </span>
-              <div style="display:flex;gap:4px;">
-                <button class="stub-btn" data-action="edit-item" data-listid="${this.activeList}" data-id="${id}" style="font-size:0.65rem;">Ред.</button>
-                <button class="stub-btn stub-btn--danger" data-action="delete-item-list" data-listid="${this.activeList}" data-id="${id}" style="font-size:0.65rem;">✕</button>
-              </div>
-            </div>
-        `).join('')}
+      <div class="stub-section" style="background: rgba(255,255,255,0.4); border: 1px solid var(--c-ink-light); border-radius: 8px; padding: 20px;">
+        <div style="font-family: var(--font-title); font-size: 1.6rem; color: var(--c-accent-gold); border-bottom: 2px solid var(--c-ink-light); margin-bottom: 16px; padding-bottom: 8px;"><i data-lucide="list"></i> ${listData.name || ''}</div>
+        
+        <div style="margin-bottom: 24px;">
+            ${itemEntries.length === 0 ? '<div style="font-style:italic; color:var(--c-ink-light);">Список порожній</div>' : ''}
+            ${itemEntries.map(([id, item]) => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding: 8px 0; border-bottom: 1px dotted rgba(0,0,0,0.1);">
+                  <label style="display:flex; align-items:center; gap: 12px; cursor:pointer; font-size: 1.1rem; flex:1;">
+                    <input type="checkbox" ${item.purchased ? 'checked' : ''} data-action="toggle-item" data-listid="${this.activeList}" data-id="${id}" style="width: 18px; height: 18px; accent-color: var(--c-accent-gold);">
+                    <span style="${item.purchased ? 'text-decoration:line-through;opacity:0.6;' : ''}">${item.name} <span style="opacity:0.7;font-style:italic;">(${item.quantity})</span></span>
+                  </label>
+                  <div style="display:flex;gap:4px;">
+                    <button data-action="edit-item" data-listid="${this.activeList}" data-id="${id}" style="background:transparent; border:none; color:var(--c-ink-primary); cursor:pointer; text-decoration: underline;">Ред.</button>
+                    <button data-action="delete-item-list" data-listid="${this.activeList}" data-id="${id}" style="background:transparent; border:none; color:#8b0000; cursor:pointer; text-decoration: underline;">✕</button>
+                  </div>
+                </div>
+            `).join('')}
+        </div>
+
+        <div style="font-family: var(--font-title); font-size: 1.2rem; color: var(--c-ink-primary); border-bottom: 1px solid var(--c-ink-light); margin-bottom: 16px; padding-bottom: 8px;"><i data-lucide="plus"></i> Додати товар</div>
+        <div style="display:flex;gap:12px; align-items:center;">
+          <input type="hidden" id="item-list-uuid" value="${this.activeList || ''}" />
+          <input id="item-name" placeholder="Назва товару..." style="flex:1; padding: 8px; border: 1px solid var(--c-ink-light); background: var(--bg-parchment); font-family: var(--font-body); font-size: 1rem; color: var(--c-ink-primary); border-radius: 4px;" />
+          <input id="item-qty" type="number" value="1" style="width:60px; padding: 8px; border: 1px solid var(--c-ink-light); background: var(--bg-parchment); font-family: var(--font-body); font-size: 1rem; color: var(--c-ink-primary); border-radius: 4px;" />
+          <button data-action="add-item" style="background:var(--c-ink-primary); color:var(--bg-parchment); border:1px solid var(--c-accent-gold); padding:8px 16px; font-family:var(--font-title); border-radius:4px; cursor:pointer;">Додати</button>
+        </div>
       </div>
     `;
   }
