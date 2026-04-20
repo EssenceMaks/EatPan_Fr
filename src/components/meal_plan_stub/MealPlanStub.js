@@ -389,7 +389,7 @@ export default class MealPlanStub extends Component {
       return `
               <div class="schedule-day" style="${isToday ? 'border-color: var(--c-accent-gold); box-shadow: 0 0 0 1px var(--c-accent-gold);' : ''}">
                 <div class="day-header">
-                  <span>${shortDay} <span style="font-size:0.8rem;opacity:0.6;">(${dateStr})</span> ${isToday ? '<span style="font-size:0.7rem;opacity:0.5;margin-left:4px;">СЬОГОДНІ</span>' : ''}</span>
+                  <span style="text-transform: uppercase;">${day} <span style="font-size:0.8rem;opacity:0.6;text-transform:none;">(${dateStr})</span> ${isToday ? '<span style="font-size:0.7rem;opacity:0.5;margin-left:4px;text-transform:none;">СЬОГОДНІ</span>' : ''}</span>
                 </div>
                 
                 <div class="day-grid-cols">
@@ -459,7 +459,7 @@ export default class MealPlanStub extends Component {
         const arrowColor = inShopping ? '#16a34a' : 'var(--c-accent-gold)';
 
         return `
-                    <div class="ing-item" draggable="true" data-drag-type="ingredient" data-name="${ing}" data-meal="${req.name}" style="color: ${isChecked ? '#166534' : 'inherit'}; border-color: rgba(0,0,0,0.05); background: rgba(255,255,255,0.4);">
+                    <div class="ing-item" draggable="true" data-drag-type="ingredient" data-name="${ing}" data-meal="${req.name}" style="color: ${isChecked ? '#166534' : 'inherit'}; border-color: rgba(0,0,0,0.05); background: rgba(255,255,255,0.4); margin-right: 20px;">
                       <div style="display:flex; align-items:center; gap:8px;">
                         <button data-action="toggle-ing-checkbox" data-meal-id="${req.id}" data-ing="${ing}" style="background:none; border:none; padding:0; cursor:pointer; color: ${isChecked ? '#166534' : 'rgba(0,0,0,0.3)'}; transition: transform 0.1s;">
                           <i data-lucide="${isChecked ? 'check-square' : 'square'}" style="width:18px;height:18px;"></i>
@@ -493,13 +493,13 @@ export default class MealPlanStub extends Component {
       </div>
 
       <div class="mp-col">
-        <div class="mp-col-header" style="justify-content:center; position:relative;">
-          <span style="flex:1; text-align:left;">Список покупок</span>
-          <div style="display:flex; gap:4px; position:absolute; right:16px; top:50%; transform:translateY(-50%);">
-            <button data-action="create-shopping-list" style="background:#1a0f04; color:#f8f1e3; border:none; border-radius:4px; padding:2px 10px; font-size:0.8rem; cursor:pointer; font-family:var(--font-title); font-weight:bold;" title="Створити список та відправити в сектор Списки">
-              <i data-lucide="list-plus" style="width:12px;height:12px;vertical-align:middle;margin-right:2px;"></i> Створити
+        <div class="mp-col-header" style="display:flex; justify-content:space-between; align-items:center; padding: 0 12px; position:relative;">
+          <span style="font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; text-align: left; padding-right: 8px;" title="Список покупок">Список покупок</span>
+          <div style="display:flex; gap:4px; flex-shrink: 0;">
+            <button data-action="create-shopping-list" style="background:#1a0f04; color:#f8f1e3; border:none; border-radius:4px; padding:4px 8px; font-size:0.8rem; cursor:pointer; font-family:var(--font-title); font-weight:bold; display:flex; align-items:center;" title="Створити список та відправити в сектор Списки">
+              <i data-lucide="list-plus" style="width:14px;height:14px;margin-right:4px;"></i> Створити
             </button>
-            <button data-action="clear-shopping" style="background:none; border:1px solid rgba(153,27,27,0.3); color:#991b1b; border-radius:4px; padding:2px 8px; font-size:0.8rem; cursor:pointer;" title="Очистити список">Очистити</button>
+            <button data-action="clear-shopping" style="background:none; border:1px solid rgba(153,27,27,0.3); color:#991b1b; border-radius:4px; padding:4px 8px; font-size:0.8rem; cursor:pointer; font-weight:bold;" title="Очистити список">Очистити</button>
           </div>
         </div>
         <div class="mp-col-body dropzone" data-drop-type="shopping" style="background: rgba(255,255,255,0.2);">
