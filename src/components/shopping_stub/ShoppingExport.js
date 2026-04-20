@@ -93,11 +93,12 @@ export default class ShoppingExport {
         if (!items || Object.keys(items).length === 0) return "Список порожній";
         let text = "Список покупок:\n\n";
         for (const [id, item] of Object.entries(items)) {
-            const check = item.purchased ? "[x]" : "[ ]";
-            text += `${check} ${item.name} (x${item.quantity || 1} ${item.unit || 'шт.'})\n`;
+            text += `[✅ ][❌ ] \n`;
+            text += `[ ] ${item.name} (x${item.quantity || 1} ${item.unit || 'шт'})\n`;
             if (item.notes) text += `    Примітки: ${item.notes}\n`;
+            text += "\n";
         }
-        return text;
+        return text.trimEnd() + "\n";
     }
 
     static async copyAsText(items) {
