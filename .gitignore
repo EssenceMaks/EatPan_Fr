@@ -11,15 +11,10 @@ Thumbs.db
 
 # Node (if it appears in the future)
 node_modules/
-чтиво_на_записку/
 
-# Archive
+# Archive & old reading materials
 _archive/
-.agents/
-docs/
-
-# Other folders
-audio/
+чтиво_на_записку/
 
 # AI Agents & Figma Tooling
 Figma_EatPan_Antigravity/
@@ -27,6 +22,9 @@ figma_uikit_generator.js
 .agents/rules/sync_with_figma.md
 docs/changelogs/figma_changelog.md
 docs/changelogs/figma_validation.md
+
+# Other folders
+audio/
 
 # Test Scripts
 *_test_*.py
@@ -39,3 +37,7 @@ recipe_sample.json
 fix_cats.mjs
 implementation_plan_17_04_*.md
 _changelog_docs/
+
+# Dev server scripts
+_dev_server.py
+serve.py
